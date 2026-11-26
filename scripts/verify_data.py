@@ -52,4 +52,17 @@ for name, code, province, tier, position, _, coordinates, point, _ in cities:
     assert 73 <= coordinates[0] <= 135 and 16 <= coordinates[1] <= 54, name
     frame = atlas_map["seaFrame"] if code == "460300" else atlas_map["frame"]
     assert frame[0] <= point[0] <= frame[2] and frame[1] <= point[1] <= frame[3], name
+
+prof_path = assets / "city-profiles.js"
+if prof_path.is_file():
+    prof_prefix = "window.atlasProfiles = "
+    prof_src = prof_path.read_text(encoding="utf-8").strip()
+    assert prof_src.startswith(prof_prefix) and prof_src.endswith(";")
+    profiles = json.loads(prof_src[len(prof_prefix):-1])
+    assert set(profiles.keys()) == {city[1] for city in cities}
+    for code, item in profiles.items():
+        assert 30 <= len(item["i"]) <= 50, (code, len(item["i"]))
+        assert isinstance(item["ec"], list) and len(item["ec"]) == 6, code
+        assert isinstance(item["tr"], list) and len(item["tr"]) == 14, code
+
 print(f"{meta['year']} 年版：333 个地级行政区、4 座直辖市、34 个省级图层、线级数量、定位字段与南海附图均通过。")

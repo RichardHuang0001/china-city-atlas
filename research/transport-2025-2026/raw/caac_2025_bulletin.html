@@ -1,0 +1,264 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no, minimal-ui" />
+<meta name="apple-mobile-web-app-capable" content="yes" />
+<meta name="apple-mobile-web-app-status-bar-style" content="black" />
+<meta name="format-detection" content="telephone=no, email=no" />
+<link rel="stylesheet" type="text/css" href="../../../images/base.css" />
+<link rel="stylesheet" type="text/css" href="../../../images/all.css" />
+<link rel="stylesheet" type="text/css" href="../../../images/swipe.css" />
+<style type="text/css">
+.n_list li,.m_tit{font-size:0.16rem}
+.info_base li span{display: inline;padding-left: 0;font-size: 0.16rem;}
+</style>
+<script type="text/javascript" src="../../../images/jquery-1.7.1.min.js"></script>
+<script type="text/javascript" src="../../../images/all.js"></script>
+<script type="text/javascript" src="../../../images/search.js"></script>
+<script type="text/javascript">
+$(function(){
+   var zhuti="111";
+   if(zhuti=="21"||zhuti=="45"||zhuti=="19"||zhuti=="44"||zhuti=="17"){
+      $("#tbwenhao").hide();      
+   }
+   if(zhuti=="13"){
+      $("#CCAR").html("CCAR");
+   }
+   var bwdw="发展计划司";
+   if(bwdw==""){
+      $("#tbbwdw").hide();      
+   }
+   var fwrq="2026-02-26 00:00:00";
+   if(fwrq==""){
+      $("#tbfwrq").hide();      
+   }
+   var wenhao="";
+   if(wenhao==""||zhuti=="13"){
+      $("#tbwenhao").hide();     
+   }
+   var youxiao="";
+   if(youxiao==""||zhuti=="11"||zhuti=="110"||zhuti=="111"||zhuti=="112"||zhuti=="113"){
+      $("#tbyouxiao").hide();
+   }
+   var ticai="";
+   if(ticai.trim()==""){
+      $("#tdTicai").hide();
+   }
+   var buhao="";
+   if(buhao.trim()==""||buhao=="null"){
+      $("#trBuhao").hide();
+   }
+ 
+   /*if($("#liAll").height()>500){
+      $("#liAll").css("height","500px");
+      $("#liAll").css("overflow","hidden");
+      $("#aC").show();
+   }
+   
+    $("#aC").click(function()
+    {        
+      $("#liAll").css("height","100%");     
+      $(this).hide();
+    });*/
+
+//相关推送地址修改
+var urls=$(".repUrl");
+for(var i=0;i<urls.length;i++){
+  var hr=$(urls[i]).prop("href");
+  hr=hr.replace("/XXGK","/PHONE/XXGK_17");
+  $(urls[i]).prop("href",hr);
+}
+})
+
+
+</script>
+<title>2025年全国民用运输机场生产统计公报</title>
+<style>
+ .c_table td{padding:0.03rem 0.02rem;}
+img{max-width:100%;overflow:hidden;}video{max-width:100%;overflow:hidden;}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <div class="sub_head"><div class="top" style="height: 0.05rem;line-height: 0.05rem;background: #2c80c8;color: #fff;width: 100%;margin-bottom: 0.1rem;"><a id="toolbarSwitch" href="javascript:void(0);" style="color: #fff;float: right;margin-right: 0.05rem;font-size: 0.1rem;top: 0px;margin-top: 0.1rem;">【无障碍浏览】</a></div>
+<style type="text/css">.sub_head{height:auto;}</style>
+<div class="top"><a class="re_back"></a>信息公开 - 统计数据<a class="search2" href="http://www.caac.gov.cn/so/s?tab=xxgk&siteCode=bm70000001"></a></div></div>
+   <style>
+.nav li a {
+    line-height: 0.38rem;}
+</style>
+
+<div class="goTop" id="goTop" style="position: fixed;display: none;width: 35px;height: 35px;z-index: 20;"><img src="http://www.caac.gov.cn/PHONE/images/scrolltop.png" style="width:100%;" /></div>
+<div class="nav_box">菜单</div>
+	<div class="nav">
+    <ul><div style="display:none"><img src="/images/weixinLogo.jpg" /></div>
+      <li><a id="INDEX" href="../../../../SY/">首&nbsp;页</a></li>
+      <li><a id="XWZX" href="../../../../XWZX/">新闻中心</a></li>
+      <li><a id="XXGK" href="../../">信息公开</a></li>
+      <li><a id="FWDT" href="../../../../FWDT/">办事大厅</a></li>
+       <!--li><a id="AQJG" href="../../../../AQJG/">安全监管</a></li-->
+	  <li><a id="HDJL" href="../../../../HDJL/">互动交流</a></li>
+	  <li><a id="ZTZL" href="../../../../ZTZL/">专题专栏</a></li>
+	  <li><a id="GYMH" href="../../../../GYMH/">关于民航</a></li>
+	  <li><a id="WHMH" href="../../../../WHMH/" class="caac">我和民航</a></li>
+    </ul>
+    <i class="f_close" id="f_close"></i>
+  </div>
+	</div>
+  <!---->
+  <div class="con_panel">
+    <table class="c_table">	  
+	  <tr>
+	    <td><span style="font-weight:bold;">主题分类</span>：年度机场生产公报</td>
+	  </tr>
+	  <tr>
+	    <td id="tdTicai" valign="top"><span style="font-weight:bold;">体裁分类</span>：</td>
+	  </tr>
+	  <tr>
+            <td id="tbbwdw" valign="top"><span style="font-weight:bold;">办文单位</span>：发展计划司</td>
+	  </tr>
+	  <tr>
+	    <td id="tbfwrq"><span style="font-weight:bold;">发文日期</span>：2026-02-26</td>
+	  </tr>
+	  <tr>
+	    <td colspan="2"><span style="font-weight:bold;">名&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;称</span>：2025年全国民用运输机场生产统计公报</td>
+	  </tr>
+	  <tr>
+	    <td id="tbwenhao">文号：</td>
+	    <td id="tbyouxiao">有效性：</td>
+	  </tr>
+          <tr id="trBuhao">
+	    <td colspan="2"><span id="CCAR"></span>部号：</td>	    
+	  </tr>
+	</table>
+  </div>
+  <div class="n_con">
+    <div class="n_tit">2025年全国民用运输机场生产统计公报</div>	
+	<div class="info_base">
+          <ul>	   
+            <li id="liAll" >
+                            <div id="id_tblAppendix">
+                  <br />
+                     <p style="font-size:0.16rem"><strong> 附件：</strong><br />
+                     <a href="./P020260226360830234339.pdf" target="_blank">2025年全国民用运输机场生产统计公报.pdf</a><BR/><a href="./P020260226360830390937.xlsx" target="_blank">2025年全国民用运输机场吞吐量排名.xlsx</a><BR/><a href="./P020260226360830545167.xlsx" target="_blank">2025年全国枢纽机场分航线吞吐量 .xlsx</a> </p>
+                  </div>
+                  
+							  <script>
+									  var appendixfile="2025年全国民用运输机场生产统计公报.pdf";
+									  var appendixlink="";
+									 
+									  if(appendixfile!="" || appendixlink!="" )
+									     id_tblAppendix.style.display = "inline";
+									  else  
+									     id_tblAppendix.style.display = "none";
+                                                           </script> </li>           
+          </ul>
+	</div>
+	
+        	
+	<div class="n_list">
+	  <ul>
+               
+		
+	  </ul>
+	</div>
+<div class="t_c" style="padding-top:0.3rem"><a class="con_panel" style="padding:0.05rem 0.3rem;display:none" id="aC">阅读全文</a></div>
+	        <!--分享按钮-->
+                    <div style="width: 120px;height: 28px;display: inline-block;">
+                        <div class="bdsharebuttonbox">
+                            <span style="float: left;line-height: 28px; padding: 0 5px;">分享到：</span>
+                            <A class=bds_more href="#" tangram_guid="TANGRAM_29" data-cmd="more" style='background-position: 0 0!important;width: 3px;'></A>
+                        </div>
+                       
+                    </div>
+  </div>
+ <div class="copyright" style="line-height: 0.45rem">
+	  <p><a href="../../../../SY/" target="_blank">首页</a>丨<a href="../../../../WZDT/" target="_blank">导航</a>丨<a href="http://www.caac.gov.cn/">电脑版</a>丨<span onclick="openwin()">移动客户端</span></p>
+	  <p>版权所有：中国民用航空局</p>
+	</div>
+<div class="apptg">
+     <img src="../../../images/icon3.png" />
+     <p>民航局客户端</p>
+     <a class="down" onclick="openwin()">立即下载</a>
+     <a class="lfngb" href="javascript:;"><img src="../../../images/gb.png" /></a>
+ </div>
+<div align="left">
+<script type="text/javascript">
+var _bdhmProtocol = (("https:" == document.location.protocol) ? " https://" : " http://");
+document.write(unescape("%3Cscript src='" + _bdhmProtocol + "hm.baidu.com/h.js%3F5a5d0bf8fed43948a3ad11f98a1be846' type='text/javascript'%3E%3C/script%3E"));
+</script>
+</div>
+
+<script type="text/javascript">
+  /*移动客户端下载*/
+   function openwin(){ 
+      var url=getdownloadappurl();
+　　  window.open (url,"_blank","height=100, width=400, toolbar =no, menubar=no, scrollbars=no, resizable=no, location=no, status=no");
+    }
+</script>
+
+<!-- PHPStat Start 详细 -->
+<script language="javascript">var __$nodeid=GetChannelID('757');var __$contentid='230119';var __$title='2025年全国民用运输机场生产统计公报';var __$AuthorPh='';var __$Editor='';var __$Liability='Lulu';var __$pubtime='2026-02-26 10:01:23';var __$source='';
+</script>
+<script language="JavaScript" charset="utf-8" src="http://www.caac.gov.cn/phpstat/count/10000026/10000026.js"></script><noscript><img src="http://www.caac.gov.cn/phpstat/count/10000021/10000021.php" alt="" style="border:0" /></noscript>
+<!-- /PHPStat End -->
+
+<!-- PHPStat Start 办文单位 -->
+<script language="javascript">var __$nodeid=GetChannelID('');var __$contentid='230119';var __$title='2025年全国民用运输机场生产统计公报';var __$AuthorPh='';var __$Editor='';var __$Liability='Lulu';var __$pubtime='2026-02-26 10:01:23';var __$source='';
+</script>
+<script language="JavaScript" charset="utf-8" src="http://www.caac.gov.cn/phpstat/count/10000026/10000026.js"></script><noscript><img src="http://www.caac.gov.cn/phpstat/count/10000021/10000021.php" alt="" style="border:0" /></noscript>
+<!-- /PHPStat End -->
+
+<!-- 适老化改造 -->
+<script type="text/javascript" src="http://www.caac.gov.cn/images/esdToolsInit.js"></script>
+</div>
+</body>
+<script type="text/javascript">
+    function setShareItem(){
+        var docchannelid = '757';
+        var docchannelName = '统计数据';
+        var docid = '230119';
+        var docName = '2025年全国民用运输机场生产统计公报';
+        var docUrl = window.location.href;
+        var siteid= '10';
+
+        var url = config.backstageURL + "/jsonp/sharelog/savelog";
+        var data = new Object();
+        data.channelId=docchannelid;
+        data.docId=docid;
+        data.docTitle=docName;
+        data.docUrl=docUrl;
+        data.channelName = docchannelName;
+        data.siteId=siteid;
+
+        jQuery.support.cors = true;
+        jQuery.ajax({
+            type:"GET",
+            url:url,
+            data:data,
+            dataType: "jsonp",
+            jsonp: "callbackparam", //服务端用于接收callback调用的function名的参数
+            jsonpCallback: "logback", //callback的function名称,服务端会把名称和data一起传递回来
+            success: function(json) {
+                //alert('');
+            },
+            error: function(){}
+        });
+    }
+
+    $(function(){
+        // 16个分享
+        $(".bdshare_popup_list li a").live("click",function(){
+            setShareItem();
+        });
+
+        // 更多时所有的分享
+        $(".bdshare_dialog_list li a").live("click",function(){
+            setShareItem();
+        });
+    })
+</script>
+
+<script>window._bd_share_config={"common":{"bdSnsKey":{},"bdText":"2025年全国民用运输机场生产统计公报","bdMini":"2","bdMiniList":["weixin","tsina","tqq","isohu","qzone","tqf","renren","bdysc","bdxc","kaixin001","tieba","douban","bdhome","sqq","thx","ibaidu"],"bdPic":"","bdStyle":"0","bdSize":"16"},"share":{}};with(document)0[(getElementsByTagName('head')[0]||body).appendChild(createElement('script')).src='http://bdimg.share.baidu.com/static/api/js/share.js?v=89860593.js?cdnversion='+~(-new Date()/36e5)];</script>
+</html>

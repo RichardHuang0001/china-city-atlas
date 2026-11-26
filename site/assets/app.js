@@ -3,6 +3,7 @@
   const {meta = {}, cities, provinces} = window.atlasData;
   const map = window.atlasMap;
   const labelLayout = window.atlasLabels;
+  const profiles = window.atlasProfiles || {};
   const FIELD = {
     name: 0, code: 1, province: 2, tier: 3, rank: 4,
     reference: 5, coord: 6, point: 7, urbanRef: 8,
@@ -79,6 +80,215 @@
   let allDistricts;
   let mainMarkers = [];
   let markerScale;
+  let renderedDetailKey = '';
+
+  const el = (tag, className, text) => {
+    const node = document.createElement(tag);
+    if (className) node.className = className;
+    if (text !== undefined) node.textContent = text;
+    return node;
+  };
+  const fmtNum = (val, digits = 0) => (val === null || val === undefined || Number.isNaN(val))
+    ? null
+    : Number(val).toLocaleString('zh-CN', {maximumFractionDigits: digits, minimumFractionDigits: digits});
+
+  function buildKpiItem(label, valueText, unitText) {
+    const wrap = document.createElement('div');
+    const dt = el('dt', '', label);
+    const dd = el('dd', '');
+    if (valueText === null) {
+      dd.textContent = '暂无数据';
+    } else {
+      dd.textContent = valueText;
+      if (unitText) dd.append(el('small', '', unitText));
+    }
+    wrap.append(dt, dd);
+    return wrap;
+  }
+
+  function buildTransportRow(label, text, isEmpty = false) {
+    const row = el('div', 'detail-tr-row');
+    row.append(el('dt', '', label));
+    row.append(el('dd', isEmpty ? 'is-empty' : '', text));
+    return row;
+  }
+
+  function formatTransportItems(tr, isTop3) {
+    const [
+      apCnt, apPaxWan, apGrade,
+      hsrStns, hsrTrains, hsrReach,
+      hasMetro, crossMetro, otherUr, urModes, urLines, urKm, urPaxWan, crScStns,
+    ] = tr;
+    // 1. 机场
+    let apText = '暂无民航运输机场';
+    if (apCnt > 0) {
+      const grade = apGrade ? '（' + apGrade + '）' : '';
+      apText = isTop3 && apPaxWan > 0
+        ? apCnt + ' 座' + grade + ' · 2025年吞吐 ' + fmtNum(apPaxWan, 0) + ' 万人次'
+        : apCnt + ' 座' + grade;
+    }
+    // 2. 高铁
+    let hsrText = '暂无高铁/动车组停靠';
+    if (hsrStns > 0) {
+      hsrText = isTop3
+        ? hsrStns + ' 站 · 日均 ' + fmtNum(hsrTrains, 0) + ' 班（G/D/C，直达 ' + hsrReach + ' 城）'
+        : hsrStns + ' 站（G/D/C 动车组）';
+    }
+    // 3. 地铁
+    let metroText = '暂无地铁';
+    let metroEmpty = true;
+    if (hasMetro) {
+      metroEmpty = false;
+      if (isTop3 && urPaxWan) {
+        const paxStr = urPaxWan >= 10000
+          ? (urPaxWan / 10000).toFixed(2) + ' 亿人次'
+          : fmtNum(urPaxWan, 0) + ' 万人次';
+        metroText = urLines + ' 条（总网 ' + urKm + ' km）· 2025年客运 ' + paxStr;
+      } else {
+        metroText = urLines + ' 条（' + urKm + ' km）';
+      }
+    } else if (crossMetro) {
+      metroEmpty = false;
+      metroText = '跨市延伸接入（' + urModes + (urKm > 0 ? ' · ' + urKm + ' km' : '') + '）';
+    }
+    // 4. 城轨（非地铁城市轨道制式 + 国铁市域/城际）
+    let urText = '暂无其他城轨制式';
+    let urEmpty = true;
+    const nonMetroModes = urModes
+      ? urModes.split(';').filter(m => m && m !== '地铁' && m !== '跨市地铁')
+      : [];
+    if (otherUr && nonMetroModes.length) {
+      urEmpty = false;
+      const modeStr = nonMetroModes.join('、');
+      if (!hasMetro && !crossMetro && urLines > 0) {
+        urText = modeStr + ' ' + urLines + ' 条（' + urKm + ' km）' + (isTop3 && urPaxWan ? ' · 年客运 ' + fmtNum(urPaxWan, 0) + ' 万人次' : '');
+      } else {
+        urText = '含' + modeStr + (crScStns > 0 ? '；国铁市域/城际 ' + crScStns + ' 站' : '');
+      }
+    } else if (crScStns > 0) {
+      urEmpty = false;
+      urText = '国铁市域/城际（S/C 线）' + crScStns + ' 站';
+    }
+    return [
+      ['机场', apText, apCnt === 0],
+      ['高铁', hsrText, hsrStns === 0],
+      ['地铁', metroText, metroEmpty],
+      ['城轨', urText, urEmpty],
+    ];
+  }
+
+  function renderCityDetail(selected) {
+    if (!selected) {
+      ui['city-detail'].hidden = true;
+      renderedDetailKey = '';
+      return;
+    }
+    const code = selected[FIELD.code];
+    const tier = selected[FIELD.tier];
+    const markerHidden = !state.tiers.has(tier);
+    const nextKey = code + '|' + (markerHidden ? '0' : '1');
+    ui['city-detail'].hidden = false;
+    if (nextKey === renderedDetailKey) return;
+    renderedDetailKey = nextKey;
+
+    const prof = profiles[code];
+    const coord = selected[FIELD.coord].map(n => n.toFixed(3));
+    const head = el('div', 'city-detail-head');
+    const titleRow = el('div', 'city-detail-title-row');
+    const h3 = el('h3', 'city-detail-name');
+    h3.innerHTML = swatch(tier);
+    h3.append(document.createTextNode(selected[FIELD.name]));
+    const rankMeta = el(
+      'span',
+      'city-detail-rank',
+      provinces[selected[FIELD.province]] + ' · ' + tiers[tier] + '第 ' + selected[FIELD.rank] + ' ' + rankUnit,
+    );
+    titleRow.append(h3, rankMeta);
+    if (prof?.p) titleRow.append(el('span', 'city-detail-pos', prof.p));
+    if (markerHidden) titleRow.append(el('span', 'city-detail-hidden-note', '当前未勾选该线级标记'));
+
+    const aside = el('div', 'city-detail-aside');
+    aside.append(
+      el('span', 'city-detail-coord', (selected[FIELD.urbanRef] ? '城区参考' : '驻地近似') + ' · ' + coord[0] + '°E, ' + coord[1] + '°N'),
+    );
+    const closeBtn = el('button', 'city-detail-close', '收起');
+    closeBtn.type = 'button';
+    closeBtn.dataset.action = 'close-detail';
+    closeBtn.setAttribute('aria-label', '关闭城市详情');
+    aside.append(closeBtn);
+    head.append(titleRow, aside);
+
+    const nodes = [head];
+
+    // Narrative + Cultural & Tourism Tags
+    if (prof) {
+      const lead = el('div', 'city-detail-lead');
+      lead.append(el('p', 'city-detail-intro', prof.i));
+
+      const tagsWrap = el('div', 'city-detail-tags');
+      if (prof.hc?.length) {
+        tagsWrap.append(el('span', 'detail-tag detail-tag--hist', '国家历史文化名城'));
+      }
+      for (const tag of prof.h || []) {
+        if (tag === '国家历史文化名城') continue;
+        tagsWrap.append(el('span', 'detail-tag', tag));
+      }
+      const spots5a = prof.a5 || [];
+      const maxSpots = 4;
+      for (const s of spots5a.slice(0, maxSpots)) {
+        tagsWrap.append(el('span', 'detail-tag detail-tag--scenic', '5A · ' + s));
+      }
+      if (spots5a.length > maxSpots) {
+        const more = el('span', 'detail-tag detail-tag--scenic', '等 ' + spots5a.length + ' 处 5A 景区');
+        more.title = spots5a.join('、');
+        tagsWrap.append(more);
+      } else if (!spots5a.length) {
+        for (const s of (prof.th || []).slice(0, 3)) {
+          tagsWrap.append(el('span', 'detail-tag detail-tag--scenic', s));
+        }
+      }
+      if (tagsWrap.childNodes.length) lead.append(tagsWrap);
+      nodes.push(lead);
+
+      // 2-column Infrastructure Grid: Economy/Commerce + 4-Mode Transport
+      const grid = el('div', 'city-detail-grid');
+
+      const econCard = el('section', 'detail-card');
+      const econHead = el('div', 'detail-card-head');
+      econHead.append(el('h4', '', '经济与商业概况'), el('span', 'detail-card-sub', '知城 2025/2026 归档'));
+      const kpis = el('dl', 'detail-kpis');
+      const [gdp, pop, retail, mallCnt, commScore] = prof.ec || [];
+      kpis.append(
+        buildKpiItem('地区生产总值', fmtNum(gdp, 0), '亿元'),
+        buildKpiItem('常住人口', fmtNum(pop, 0), '万人'),
+        buildKpiItem('社会消费品零售总额', fmtNum(retail, 0), '亿元'),
+        buildKpiItem(
+          '购物中心 / 商业集聚度',
+          mallCnt !== null && mallCnt !== undefined ? fmtNum(mallCnt, 0) + ' 座' : fmtNum(commScore, 1) + ' 分',
+          mallCnt !== null && mallCnt !== undefined && commScore !== null ? ' · ' + fmtNum(commScore, 1) + ' 分' : '',
+        ),
+      );
+      econCard.append(econHead, kpis);
+
+      const trCard = el('section', 'detail-card');
+      const trHead = el('div', 'detail-card-head');
+      const isTop3 = tier <= 3;
+      trHead.append(
+        el('h4', '', '四大公共交通基础设施'),
+        el('span', 'detail-card-sub', isTop3 ? '含数量与承载规模' : '有无与数量概览'),
+      );
+      const trList = el('dl', 'detail-transport-list');
+      for (const [label, text, isEmpty] of formatTransportItems(prof.tr || [], isTop3)) {
+        trList.append(buildTransportRow(label, text, isEmpty));
+      }
+      trCard.append(trHead, trList);
+
+      grid.append(econCard, trCard);
+      nodes.push(grid);
+    }
+
+    ui['city-detail'].replaceChildren(...nodes);
+  }
 
   function resetCamera() {
     camera = {zoom: 1, center: null};
@@ -478,13 +688,7 @@
     byId('reference').hidden = !references.length;
     ui['reference-rows'].innerHTML = references.map(city =>
       cityButton(city, swatch(city[FIELD.tier]) + city[FIELD.name] + ' · ' + tiers[city[FIELD.tier]] + ' ' + city[FIELD.rank])).join('');
-    ui['city-detail'].hidden = !selected;
-    if (selected) {
-      const coord = selected[FIELD.coord].map(n => n.toFixed(3));
-      ui['city-detail'].textContent = cityDescription(selected) + '。' +
-        (selected[FIELD.urbanRef] ? '城区参考位置' : '公开驻地数据的近似位置') + '，东经 ' + coord[0] + '°，北纬 ' + coord[1] + '°。' +
-        (state.tiers.has(selected[FIELD.tier]) ? '' : ' 当前未勾选该线级的地图标记。');
-    }
+    renderCityDetail(selected);
     hideTooltip();
   }
 
@@ -732,6 +936,12 @@
       if (button) selectCity(button.dataset.city, 'table');
     });
   }
+  ui['city-detail'].addEventListener('click', event => {
+    if (event.target.closest('[data-action="close-detail"]')) {
+      state.selected = '';
+      render();
+    }
+  });
   ui['province-summary'].addEventListener('click', event => {
     const button = event.target.closest('[data-province]');
     if (!button) return;
