@@ -53,7 +53,7 @@
   const byId = id => document.getElementById(id);
   const ui = Object.fromEntries([
     'query', 'province', 'legend', 'reset', 'atlas', 'points', 'map-stage',
-    'provinces', 'province-labels', 'district-lines', 'boundaries', 'sea-card',
+    'provinces', 'city-highlight', 'province-labels', 'district-lines', 'boundaries', 'sea-card',
     'sea-detail', 'sea-points', 'sea-mini', 'sea-open', 'marker-count', 'table-tier',
     'zoom-in', 'zoom-out', 'zoom-fit', 'city-leaders', 'city-labels', 'sea-labels',
     'tooltip', 'inset', 'national', 'map-title', 'map-hint', 'city-detail',
@@ -269,6 +269,24 @@
         '点击名称查看详情。';
   }
 
+  const provinceDistrictPath = code => {
+    const entry = map.districts[code];
+    return !entry ? '' : typeof entry === 'string' ? entry : Object.values(entry).join('');
+  };
+  const cityRegionPaths = new Map();
+  for (const entry of Object.values(map.districts)) {
+    if (typeof entry === 'object' && entry) {
+      for (const [code, path] of Object.entries(entry)) cityRegionPaths.set(code, path);
+    }
+  }
+  const cityRegionPath = code => {
+    const city = code && lookup.get(code);
+    if (!city) return '';
+    if (city[FIELD.reference]) return map.provinces[city[FIELD.province]]?.[0] || '';
+    return cityRegionPaths.get(code) || '';
+  };
+  const seaHighlightNodes = [...document.querySelectorAll('.sea-city-highlight')];
+
   function updateDistrictLines() {
     const {inset, province} = state;
     const nextScope = inset ? '' : province ? province : camera.zoom >= zoomSteps[MAP_CONFIG.districtZoomIndex] ? 'national' : '';
@@ -276,10 +294,10 @@
     districtScope = nextScope;
     if (!nextScope) ui['district-lines'].setAttribute('d', '');
     else if (nextScope === 'national') {
-      allDistricts ||= Object.values(map.districts).join('');
+      allDistricts ||= Object.keys(map.districts).map(provinceDistrictPath).join('');
       ui['district-lines'].setAttribute('d', allDistricts);
     } else {
-      ui['district-lines'].setAttribute('d', map.districts[nextScope] || '');
+      ui['district-lines'].setAttribute('d', provinceDistrictPath(nextScope));
     }
   }
 
@@ -510,6 +528,9 @@
       '[data-city="' + code + '"], [data-leader-for="' + code + '"]'
     )] : [];
     for (const node of highlightedNodes) node.classList.add('is-highlighted');
+    ui['city-highlight'].setAttribute('d', state.inset ? '' : cityRegionPath(code));
+    const seaPath = (code && map.seaCities?.[code]) || '';
+    for (const node of seaHighlightNodes) node.setAttribute('d', seaPath);
   }
 
   function highlightProvince(node) {
@@ -530,7 +551,7 @@
     const cityNode = event.target.closest('[data-city]');
     const provinceNode = state.province ? null : event.target.closest('[data-province]');
     const city = cityNode && lookup.get(cityNode.dataset.city);
-    const province = provinceNode?.dataset.province;
+    const province = provinceNode?.dataset.province || (!state.province && city && city[FIELD.province]);
     if (!city && !province) {
       hideTooltip();
       return;

@@ -104,6 +104,7 @@ for code, area in read_layer(1):
         inset_paths.append("".join(path(transform(part, inset, interleaved=False)) for part in parts))
 
 seen = set()
+sea_cities = {}
 for code, area in read_layer(2):
     if not code or code.endswith("0000") or code[:2] not in provinces:
         continue
@@ -115,7 +116,13 @@ for code, area in read_layer(2):
     seen.add(code)
     parts = [part for part in items(area) if province != "46" or part.bounds[3] >= 18]
     if parts:
-        districts.setdefault(province, []).append("".join(path(transform(part, main, interleaved=False)) for part in parts))
+        districts.setdefault(province, {})[code] = "".join(
+            path(transform(part, main, interleaved=False)) for part in parts
+        )
+    if code == "460300":
+        sea_cities[code] = "".join(
+            path(transform(part, inset, interleaved=False)) for part in items(area)
+        )
 
 assert set(provinces) == set(city_data["provinces"])
 assert len(inset_lines) == 10
@@ -127,10 +134,13 @@ for city in city_data["cities"]:
                [round(n, 2) for n in (inset if code == "460300" else main)(*coordinates)], fallback]
 
 compact = lambda obj: json.dumps(obj, ensure_ascii=False, separators=(",", ":"))
-city_data = {k: city_data[k] for k in ("cities", "provinces")}
 city_rows = ",\n".join("    " + compact(row) for row in city_data["cities"])
-city_path.write_text(CITY_PREFIX + '{\n  "cities": [\n' + city_rows +
-                     '\n  ],\n  "provinces": ' + compact(city_data["provinces"]) + '\n};\n')
+meta_block = (
+    '  "meta": ' + json.dumps(city_data["meta"], ensure_ascii=False, indent=2).replace("\n", "\n  ") + ",\n"
+    if "meta" in city_data else ""
+)
+city_path.write_text(CITY_PREFIX + "{\n" + meta_block + '  "cities": [\n' + city_rows +
+                     '\n  ],\n  "provinces": ' + compact(city_data["provinces"]) + "\n};\n", encoding="utf-8")
 rounded = lambda box: [round(float(n), 1) for n in box]
 map_data = {
     "provinces": provinces,
@@ -140,7 +150,8 @@ map_data = {
     "boundary": "".join(lines),
     "seaBoundary": "".join(inset_lines),
     "seaLand": "".join(inset_paths),
-    "districts": {code: "".join(paths) for code, paths in districts.items()},
+    "districts": districts,
+    "seaCities": sea_cities,
 }
 map_path = ASSETS / "map-data.js"
 map_path.write_text("window.atlasMap = {\n" + ",\n".join(

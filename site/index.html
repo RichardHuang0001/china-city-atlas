@@ -64,10 +64,11 @@
         <svg id="atlas" xmlns="http://www.w3.org/2000/svg" role="group" aria-label="城市分布互动地图" aria-describedby="map-hint" tabindex="0">
           <title>中国城市分布</title>
           <g id="provinces"></g>
+          <path id="city-highlight" fill-rule="evenodd"></path>
           <path id="district-lines" fill-rule="evenodd"></path>
           <path id="boundaries"></path>
           <g id="province-labels"></g>
-          <g id="sea-detail" hidden><path class="sea-land" fill-rule="evenodd"></path><path class="sea-boundary"></path></g>
+          <g id="sea-detail" hidden><path class="sea-land" fill-rule="evenodd"></path><path class="sea-city-highlight" fill-rule="evenodd"></path><path class="sea-boundary"></path></g>
           <g id="city-leaders" aria-hidden="true"></g>
           <g id="points"></g>
           <g id="city-labels" aria-hidden="true"></g>
@@ -89,7 +90,7 @@
         <div id="sea-card" aria-label="南海诸岛附图">
           <button type="button" id="sea-open" aria-label="放大南海诸岛附图">南海诸岛 <span aria-hidden="true">↗</span></button>
           <svg id="sea-mini" role="group" aria-label="南海诸岛地图">
-            <path class="sea-land" fill-rule="evenodd"></path><path class="sea-boundary"></path><g id="sea-points"></g><g id="sea-labels" aria-hidden="true"></g>
+            <path class="sea-land" fill-rule="evenodd"></path><path class="sea-city-highlight" fill-rule="evenodd"></path><path class="sea-boundary"></path><g id="sea-points"></g><g id="sea-labels" aria-hidden="true"></g>
           </svg>
         </div>
         <div id="tooltip" role="tooltip" hidden></div>

@@ -32,7 +32,13 @@ assert set(data["provinces"]) == set(atlas_map["bounds"]) == set(atlas_map["prov
 assert all(path.startswith("M") for path, _ in atlas_map["provinces"].values())
 assert atlas_map["seaBoundary"].count("M") == 10
 assert atlas_map["seaLand"].startswith("M")
-assert atlas_map["districts"]["51"].startswith("M")
+assert atlas_map["districts"]["51"]["510100"].startswith("M")
+assert atlas_map["seaCities"]["460300"].startswith("M")
+for city in main:
+    code, province = city[1], city[2]
+    if code == "460300":
+        continue
+    assert atlas_map["districts"][province][code].startswith("M"), code
 assert Counter(city[3] for city in main) == dict(enumerate(main_totals))
 for tier, total in enumerate(tier_totals):
     assert {city[4] for city in cities if city[3] == tier} == set(range(1, total + 1)), tier
