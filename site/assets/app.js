@@ -151,6 +151,7 @@
       obstacles.push({
         left: box.left - rect.left - 4, right: box.right - rect.left + 4,
         top: box.top - rect.top - 4, bottom: box.bottom - rect.top + 4,
+        uiObstacle: true,
       });
     }
 
@@ -164,24 +165,30 @@
         const [, [x, y]] = map.provinces[code];
         const px = (x - left) / units;
         const py = (y - top) / units;
-        const halfWidth = (name.length * font * 1.13 + 6) / 2;
-        obstacles.push({left: px - halfWidth, right: px + halfWidth, top: py - font, bottom: py + font});
+        const halfWidth = (name.length * font * 1.08 + 2) / 2;
+        const halfHeight = font * .65;
+        obstacles.push({
+          left: px - halfWidth, right: px + halfWidth,
+          top: py - halfHeight, bottom: py + halfHeight,
+          provinceLabel: true,
+        });
       }
     }
 
     const focus = state.selected || (mainMarkers.length === 1 ? mainMarkers[0].city[1] : '');
     const level = zoomSteps.indexOf(camera.zoom);
+    const local = !!state.province;
     const placed = labelLayout.place({
       markers: mainMarkers, width: rect.width, height: rect.height, left, top, units,
-      level, local: !!state.province, focus, obstacles, colors,
+      level, local, focus, obstacles, colors,
     });
     ui['city-leaders'].replaceChildren(placed.leaders);
     ui['city-labels'].replaceChildren(placed.labels);
     const wide = rect.width >= labelLayout.narrowMap;
-    const tier = labelLayout.priorityTier(rect.width, level);
+    const tier = labelLayout.priorityTier(rect.width, level, local);
     ui['map-hint'].textContent = state.inset ? '三沙位于永兴岛附近。' :
       wide && tier < 5 ? '当前视野优先显示' + tiers[tier] + '及以上城市名。' +
-        (level ? '点击城市名查看详情。' : '点击 ＋ 展开二线城市名。') :
+        (level ? '点击城市名查看详情。' : '点击 ＋ 展开' + tiers[tier + 1] + '城市名。') :
       wide ? '显示当前视野内的各档城市名。点击城市名查看详情。' :
         '放大可看到更多城市名。点击名称查看详情。';
   }
