@@ -47,6 +47,8 @@
   let fittedView;
   let cameraFrame;
   let mapScope;
+  let districtScope = '';
+  let allDistricts;
   let mainMarkers = [];
   let markerScale;
 
@@ -157,6 +159,7 @@
     const obstacles = [];
     for (const control of [
       ui['zoom-in'].parentElement,
+      ui.national,
       document.querySelector('.zoom-tip'),
       ui['sea-card'],
     ]) {
@@ -208,7 +211,22 @@
         '点击名称查看详情。';
   }
 
+  function updateDistrictLines() {
+    const {inset, province} = state;
+    const nextScope = inset ? '' : province ? province : camera.zoom >= zoomSteps[3] ? 'national' : '';
+    if (nextScope === districtScope) return;
+    districtScope = nextScope;
+    if (!nextScope) ui['district-lines'].setAttribute('d', '');
+    else if (nextScope === 'national') {
+      allDistricts ||= Object.values(map.districts).join('');
+      ui['district-lines'].setAttribute('d', allDistricts);
+    } else {
+      ui['district-lines'].setAttribute('d', map.districts[nextScope] || '');
+    }
+  }
+
   function paintCamera() {
+    updateDistrictLines();
     const {center: [x, y], width, height} = currentView();
     const left = x - width / 2;
     const top = y - height / 2;
@@ -254,7 +272,7 @@
     ui['sea-card'].hidden = !!province;
     ui.provinces.toggleAttribute('hidden', inset);
     ui.boundaries.toggleAttribute('hidden', inset);
-    ui['district-lines'].setAttribute('d', !inset && map.districts[province] || '');
+    updateDistrictLines();
     for (const [code, shape] of provincePaths) {
       shape.classList.toggle('selected', code === province);
       shape.classList.toggle('context', !!province && code !== province);
