@@ -1,29 +1,51 @@
 # 中国城市分级地图 · 2025
 
-有本地地图资源时，双击 `site/index.html` 即可离线使用。页面里的来源链接由访客主动打开。
+[在线页面](https://citiescn.hiww.top/) · [源码仓库](https://github.com/RichardHuang0001/china-city-atlas) · [接手指南](AGENTS.md) · [数据来源与口径](docs/sources.md)
 
-公开仓库保存页面源码、城市记录和底图构建脚本。生成的 `site/assets/map-data.js` 不随仓库分发。新克隆需先按下文从指定来源构建本地地图资源，确认符合源数据的使用条件。
+用全国及省级地图、线级筛选和城市名录浏览第一财经 2025 年城市魅力榜。收录 **293 座地级市**，**4 座直辖市**单列参考。名录显示榜单原图的线内图序，未纳入综合分数和全国总名次。
 
-经确认可公开展示后，可将 **`site/` 里的内容**部署到静态托管根目录或任意子路径。请保留 `assets/` 目录结构。可用 `python3 -m http.server 8000 --directory site` 在本机预览。公开发布前请核对天地图源数据条款及专题地图的审图要求。
+## 本地使用
 
-## 目录
+本机已有 `site/assets/map-data.js` 时，双击 `site/index.html` 即可离线打开。桌面端默认显示全部线级，手机端默认显示一线、新一线和二线。地图用「＋／−」缩放，放大后可拖动，点击「全览」恢复当前范围。城市名随缩放逐级出现，地图标记和名录线级可独立筛选。
 
-- `site/index.html` 页面结构及来源说明。
-- `site/assets/style.css` 响应式样式与地图颜色图例。
-- `site/assets/app.js` 原生浏览器交互。
-- `site/assets/map-labels.js` 随缩放调整的城市标签与避让。
-- `tools/mobile-preview.html` 开发者本地手机预览，位于部署目录之外。
-- `site/assets/data.js` 经核对的 297 条城市记录。
-- `site/assets/map-data.js` 预投影的省级与地级边界、南海附图和点击区域。
-- `site/licenses/map-source.txt` 上游开源仓库的 MIT 声明。
-- `scripts/verify_data.py` 离线核对总数、唯一性、线级及地图图层。
-- `scripts/build_map.py` 从固定版本的 GeoJSON 重建矢量资产。只在维护底图时需要。
-- `docs/sources.md` 数据出处、字段和适用范围。
+开发时可双击 `tools/mobile-preview.html`，在 360、390、430 px 三种宽度下操作同一个页面。该入口在 `site/` 之外。也可在项目根目录运行 `python3 -m http.server 8000 --directory site`，打开 `http://localhost:8000/`。
 
-## 本地核对
+## 技术结构
 
-运行 `python3 scripts/verify_data.py`。使用浏览器打开页面后，可从“四川省”测试地图放大与 18 座地级市，从“林芝市”测试搜索与五线标记，从“海南省 → 三沙”测试南海诸岛附图。用地图右上角的加减按钮缩放，放大后按住鼠标拖动。“全览”恢复当前范围。桌面默认优先显示一线和新一线名称，放大一档后优先显示当前视野内的二线及以上名称，之后逐档增加。手机端默认显示一线、新一线和二线标记，标签间距更宽松。点击名称可查看城市详情。双击项目内的 `tools/mobile-preview.html`，可切换 360、390、430 像素视口。正式页面没有预览入口，只需部署 `site/`。地图标记支持多选或全部隐藏，城市名录有独立的线级筛选。返回全国会保留筛选条件，重置会恢复当前设备的默认线级。
+| 路径 | 职责 |
+| --- | --- |
+| `site/index.html`、`site/assets/style.css` | 页面结构、响应式布局和样式 |
+| `site/assets/app.js` | 视图状态、SVG 地图绘制、地图与表格联动 |
+| `site/assets/map-labels.js` | 根据屏幕尺寸和缩放级别安排城市名、避让和引线 |
+| `site/assets/data.js` | 城市记录、省级字典与城市投影坐标 |
+| `site/assets/map-data.js` | 生成的省级与地级 SVG 路径、南海附图和视图范围 |
+| `scripts/build_map.py`、`scripts/verify_data.py` | 底图重建与数据校验 |
+| `docs/sources.md`、`site/licenses/map-source.txt` | 数据来源、限制和上游打包仓库的 MIT 许可声明 |
 
-本期数据按第一财经 2025 年榜单。全榜分数和正式总名次未纳入项目。
+前端使用原生 HTML、CSS、JavaScript 和 SVG。资源均为相对路径，无框架、后端、地图服务密钥或 CDN 运行依赖。Python 只用于维护数据，Node.js 及 pnpm 只用于发布流程。
 
-重建底图时，按数据说明获取固定版本的两个源文件。安装 Shapely 2.1 或更新版及 PyProj 后，运行 `python3 scripts/build_map.py /path/to/chn/global`。正常打开页面或部署无需执行这一步。
+## 从公开仓库重建底图
+
+公开仓库不包含生成的 `site/assets/map-data.js`。新克隆时，从[固定版本的上游目录](https://github.com/JayMuShui/chinese-global-compliant-geodata/tree/3cf3485789876c37be6193bf2848cf9aaa40f758/src/geojson/countries/as/chn/global)取得 `chn-level-1.json` 和 `chn-level-2.json`，放入同一目录。从项目根目录运行：
+
+```sh
+python3 -m venv .venv
+.venv/bin/python -m pip install 'shapely>=2.1,<3' pyproj
+.venv/bin/python scripts/build_map.py /path/to/chn/global
+python3 scripts/verify_data.py
+```
+
+构建器校验源文件 SHA-256，写入底图资源，并重新计算 `data.js` 内的城市图面坐标。此步骤无需联网读取源文件。底图资源保留在本地并参与站点构建，受 Git 忽略规则保护。
+
+## 发布与验证
+
+线上站点使用 Cloudflare Workers Static Assets。发布配置维护在同级工作区 `hiww-web/apps/citiescn/`。在 `hiww-web` 根目录运行：
+
+```sh
+pnpm --filter @hiww/citiescn typecheck
+pnpm --filter @hiww/citiescn build
+pnpm --filter @hiww/citiescn deploy:dry
+pnpm --filter @hiww/citiescn exec wrangler deploy
+```
+
+前三条用于检查、构建及试运行，最后一条才发布。构建脚本只复制正式站点资源，`tools/` 不会部署。发布后验证 HTTPS、桌面与手机布局、地图搜索和缩放，并确认 `/tools/mobile-preview.html` 返回 404。当前专题图未单独送审，不能借用上游数据或原标准地图的审图号，详见[数据来源与口径](docs/sources.md)。
