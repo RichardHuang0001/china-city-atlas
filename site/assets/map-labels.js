@@ -65,6 +65,17 @@ window.atlasLabels = (() => {
     return level < 2 ? 0 : Math.min(5, level - 1);
   }
 
+  function disclosureRange(width, level, local, minTier) {
+    let reveal = priorityTier(width, level, local);
+    let fillMax = local ? 5 : Math.min(5, 2 + level);
+    // If the user filters out all higher tiers, disclose starting from their highest checked tier.
+    if (minTier > reveal) {
+      reveal = minTier;
+      fillMax = Math.max(fillMax, minTier);
+    }
+    return {reveal, fillMax};
+  }
+
   function makeLabel(city, [x, y], fontSize, anchor, selected = false, priority = false) {
     const text = document.createElementNS(svgNamespace, 'text');
     text.dataset.city = city[1];
@@ -290,13 +301,12 @@ window.atlasLabels = (() => {
     if (!markers.length) return {labels, leaders};
     const mobile = width < narrowMap;
     const font = mobile ? 11 : 12.5;
-    const reveal = priorityTier(width, level, local);
-    const spacingPad = local ? 0 : Math.max(0, (mobile ? 12 : 9) - level * (mobile ? 3 : 3));
     const textIndex = createSpatialIndex();
     const pointsIndex = createSpatialIndex();
     for (const box of obstacles) textIndex.add({...box});
 
     const candidates = [];
+    let minTier = 5;
     for (const {city, point, size} of markers) {
       const x = (point[0] - left) / units;
       const y = (point[1] - top) / units;
@@ -304,12 +314,17 @@ window.atlasLabels = (() => {
       const radius = size + 1.35;
       const isFocus = city[1] === focus;
       const tier = isFocus ? -1 : city[3];
+      if (city[3] < minTier) minTier = city[3];
       pointsIndex.add({
         left: x - radius, right: x + radius, top: y - radius, bottom: y + radius,
         tier, isFocus,
       });
       candidates.push({city, x, y, radius, tier, isFocus});
     }
+    if (!candidates.length) return {labels, leaders};
+
+    const {reveal, fillMax} = disclosureRange(width, level, local, minTier);
+    const spacingPad = local ? 0 : Math.max(4, (mobile ? 18 : 14) - level * 3);
 
     // Place highest-priority cities first so lower tiers never displace higher tiers.
     candidates.sort((a, b) =>
@@ -319,6 +334,7 @@ window.atlasLabels = (() => {
     const placedLabels = [];
     for (const candidate of candidates) {
       const {city, isFocus} = candidate;
+      if (!isFocus && city[3] > fillMax) continue;
       const preferred = city[3] <= reveal;
       const required = isFocus || city[3] === 0 || (!mobile && preferred);
       const fontSize = isFocus ? font + 1.5 : city[3] < 2 ? font + .5 : font;

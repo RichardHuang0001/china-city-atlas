@@ -211,11 +211,19 @@ button:disabled { cursor: default; }
 }
 .symbol {
   display: inline-block;
-  inline-size: 1em;
-  block-size: 1em;
+  inline-size: 1.15em;
+  block-size: 1.15em;
   margin-inline-end: .29em;
-  vertical-align: -.14em;
+  vertical-align: -.2em;
   overflow: visible;
+}
+.symbol-digit, .marker-digit {
+  fill: none;
+  stroke: #fffdf9;
+  stroke-width: .195;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+  pointer-events: none;
 }
 .legend .symbol { margin: 0; }
 
@@ -269,13 +277,14 @@ button:disabled { cursor: default; }
   font-weight: 650;
   letter-spacing: .13em;
 }
-.marker {
-  cursor: pointer;
+.marker { cursor: pointer; }
+.marker-badge {
   stroke: var(--white);
   stroke-width: 1.05px;
+  stroke-linejoin: round;
   vector-effect: non-scaling-stroke;
 }
-.marker.active { stroke: var(--ink); stroke-width: 2px; }
+.marker.active .marker-badge { stroke: var(--ink); stroke-width: 2px; }
 .zoom-tools {
   position: absolute;
   top: 14px;
@@ -461,7 +470,7 @@ footer { margin-top: 13px; color: var(--muted); font-size: 12px; }
   .zoom-tools button + button { border-top: 0; border-inline-start: 1px solid var(--line); }
   #sea-card { left: 8px; bottom: 8px; width: 72px; }
   #sea-open { min-height: 28px; padding-inline: 5px; font-size: 11px; }
-  .marker { stroke-width: .75px; }
+  .marker-badge { stroke-width: .75px; }
   .table-tools select { min-height: 36px; padding-inline: 5px; font-size: 12px; }
   .counts { padding-inline: 12px; }
   .sources-grid { grid-template-columns: minmax(0, 1fr); }
@@ -484,4 +493,4 @@ footer { margin-top: 13px; color: var(--muted); font-size: 12px; }
 .label-leader .leader-ink { stroke-width: 1.45px; }
 .label-leader.is-highlighted .leader-ink { stroke-width: 2.4px; }
 .city-label.is-highlighted, .city-label.selected { fill: #6e203d; font-weight: 790; }
-.marker.is-highlighted { stroke: #4b2937; stroke-width: 1.75px; }
+.marker.is-highlighted .marker-badge { stroke: #4b2937; stroke-width: 1.75px; }

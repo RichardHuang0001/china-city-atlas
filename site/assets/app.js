@@ -5,14 +5,23 @@
   const labelLayout = window.atlasLabels;
   const tiers = ['一线', '新一线', '二线', '三线', '四线', '五线'];
   const colors = ['#9b3454', '#ad5141', '#936820', '#926074', '#6c6279', '#82674e'];
-  // One outline per tier. The same glyphs appear on the map, legend and table.
-  const symbols = [
-    'M0,-1.22 .29,-.38 1.14,-.38 .48,.15 .73,1 0,.49 -.73,1 -.48,.15 -1.14,-.38 -.29,-.38Z',
-    'M0,-1.17 1.05,0 0,1.17 -1.05,0Z',
-    'M0,-1.12 1.03,.86 -1.03,.86Z',
-    'M-.87,-.87H.87V.87H-.87Z',
-    'M0,-1 .87,-.5 .87,.5 0,1 -.87,.5 -.87,-.5Z',
-    'M0,-.88A.88,.88 0 1 1 0,.88A.88,.88 0 1 1 0,-.88Z',
+  const tierScales = [1.09, 1.04, 1.0, .95, .9, .85];
+  // Six distinct badge silhouettes + white geometric numerals (Scheme A) shared by map, legend, and table.
+  const badges = [
+    'M0,-1.17 .29,-.83 .74,-.90 .70,-.45 1.07,-.18 .82,.19 .94,.62 .51,.74 .30,1.12 0,.93 -.30,1.12 -.51,.74 -.94,.62 -.82,.19 -1.07,-.18 -.70,-.45 -.74,-.90 -.29,-.83Z',
+    'M-.12,-1.02 Q0,-1.14 .12,-1.02 L1.02,-.12 Q1.14,0 1.02,.12 L.12,1.02 Q0,1.14 -.12,1.02 L-1.02,.12 Q-1.14,0 -1.02,-.12Z',
+    'M-.69,-.91 H.69 Q.85,-.91 .85,-.75 V.05 C.85,.56 .37,.90 0,1.06 C-.37,.90 -.85,.56 -.85,.05 V-.75 Q-.85,-.91 -.69,-.91Z',
+    'M-.56,-.86 H.56 Q.86,-.86 .86,-.56 V.56 Q.86,.86 .56,.86 H-.56 Q-.86,.86 -.86,.56 V-.56 Q-.86,-.86 -.56,-.86Z',
+    'M0,-.96 L.83,-.48 V.48 L0,.96 L-.83,.48 V-.48Z',
+    'M0,-.82 A.82,.82 0 1 1 0,.82 A.82,.82 0 1 1 0,-.82Z',
+  ];
+  const digits = [
+    'M-.17,-.24 L.05,-.39 L.05,.39 M-.19,.39 L.22,.39',
+    'M-.40,-.19 L-.23,-.32 L-.23,.32 M-.39,.32 L-.09,.32 M.14,-.13 H.40 M.27,-.26 V0',
+    'M-.25,-.27 C-.25,-.48 .25,-.48 .25,-.25 C.25,-.05 -.25,.13 -.25,.30 L.27,.30',
+    'M-.24,-.26 C-.16,-.42 .24,-.42 .24,-.20 C.24,-.04 .05,-.02 -.06,-.02 C.09,-.02 .26,.04 .26,.21 C.26,.41 -.16,.42 -.26,.26',
+    'M.13,.37 L.13,-.37 L-.28,.13 L.28,.13',
+    'M.22,-.35 L-.18,-.35 L-.21,-.04 C-.10,-.11 .24,-.09 .24,.14 C.24,.37 -.12,.40 -.24,.26',
   ];
   const byId = id => document.getElementById(id);
   const ui = Object.fromEntries([
@@ -45,8 +54,9 @@
     camera = {zoom: 1, center: null};
   }
 
-  const swatch = tier => '<svg class="symbol" aria-hidden="true" viewBox="-1.25 -1.25 2.5 2.5">' +
-    '<path d="' + symbols[tier] + '" fill="' + colors[tier] + '"></path></svg>';
+  const swatch = tier => '<svg class="symbol" aria-hidden="true" viewBox="-1.35 -1.35 2.7 2.7">' +
+    '<path d="' + badges[tier] + '" fill="' + colors[tier] + '"></path>' +
+    '<path class="symbol-digit" d="' + digits[tier] + '"></path></svg>';
   const cityDescription = city => city[0] + ' · ' + provinces[city[2]] + ' · ' + tiers[city[3]] + '第 ' + city[4] + ' 位（图序）';
   const rank = (a, b) => a[3] - b[3] || a[4] - b[4];
   const orders = {
@@ -186,11 +196,11 @@
     ui['city-labels'].replaceChildren(placed.labels);
     const wide = rect.width >= labelLayout.narrowMap;
     const tier = labelLayout.priorityTier(rect.width, level, local);
+    const zoomTag = camera.zoom > 1 ? '（' + camera.zoom.toFixed(2).replace(/\.?0+$/, '') + '×）' : '';
     ui['map-hint'].textContent = state.inset ? '三沙位于永兴岛附近。' :
-      wide && tier < 5 ? '当前视野优先显示' + tiers[tier] + '及以上城市名。' +
-        (level ? '点击城市名查看详情。' : '点击 ＋ 展开' + tiers[tier + 1] + '城市名。') :
-      wide ? '显示当前视野内的各档城市名。点击城市名查看详情。' :
-        '放大可看到更多城市名。点击名称查看详情。';
+      wide && tier < 5 ? '当前' + zoomTag + '优先显示' + tiers[tier] + '及以上，点击 ＋ 展开' + tiers[tier + 1] + '城市名。' :
+      wide ? '当前' + zoomTag + '显示视野内的各档城市名，点击名称查看详情。' :
+        (camera.zoom > 1 ? '当前 ' + zoomTag.slice(1, -1) + '，' : '') + '放大可逐级看到更多城市名。点击名称查看详情。';
   }
 
   function paintCamera() {
@@ -295,26 +305,34 @@
     const mini = document.createDocumentFragment();
     const miniLabels = document.createDocumentFragment();
     let active;
-    const ordinarySize = ui.atlas.clientWidth < 600 ? 3 : 5;
+    const ordinarySize = ui.atlas.clientWidth < 600 ? 4.8 : 7;
     let shown = 0;
     for (const city of [...markers].reverse()) {
       const [, code, , tier, , reference, , point] = city;
       const sansha = code === '460300';
       if (!point || (state.inset && !sansha) || (state.province && !state.inset && sansha)) continue;
       const miniature = sansha && !state.province;
-      const size = code === state.selected ? 8 : miniature ? 4.5 : reference ? ordinarySize + 1.5 : ordinarySize;
-      const marker = document.createElementNS(ns, 'path');
+      const baseSize = code === state.selected ? Math.max(8.8, ordinarySize * 1.25) :
+        miniature ? 5.2 : reference ? ordinarySize + .9 : ordinarySize;
+      const size = baseSize * tierScales[tier];
+      const marker = document.createElementNS(ns, 'g');
       marker.dataset.city = code;
       marker.dataset.tier = tier;
-      marker.setAttribute('d', symbols[tier]);
-      marker.setAttribute('fill', colors[tier]);
       marker.setAttribute('class', 'marker' + (code === state.selected ? ' active' : ''));
       marker.setAttribute('role', 'img');
       marker.setAttribute('aria-label', cityDescription(city));
+      const badge = document.createElementNS(ns, 'path');
+      badge.setAttribute('class', 'marker-badge');
+      badge.setAttribute('d', badges[tier]);
+      badge.setAttribute('fill', colors[tier]);
+      const digit = document.createElementNS(ns, 'path');
+      digit.setAttribute('class', 'marker-digit');
+      digit.setAttribute('d', digits[tier]);
+      marker.append(badge, digit);
       if (miniature) {
         positionMarker(marker, point, size * miniScale);
         mini.append(marker);
-        miniLabels.append(labelLayout.makeLabel(city, [point[0] + 7 * miniScale, point[1]], 10 * miniScale, 'start'));
+        miniLabels.append(labelLayout.makeLabel(city, [point[0] + 8 * miniScale, point[1]], 10 * miniScale, 'start'));
       } else {
         mainMarkers.push({node: marker, point, size, city});
         if (code === state.selected) active = marker;
@@ -407,8 +425,10 @@
 
   function mapHover(event) {
     if (drag?.moved) return;
-    const city = lookup.get(event.target.dataset.city);
-    const province = !state.province && event.target.dataset.province;
+    const cityNode = event.target.closest('[data-city]');
+    const provinceNode = !state.province && event.target.closest('[data-province]');
+    const city = cityNode && lookup.get(cityNode.dataset.city);
+    const province = provinceNode?.dataset.province;
     if (!city && !province) {
       hideTooltip();
       return;
@@ -424,8 +444,10 @@
   }
 
   function mapClick(event) {
-    if (event.target.dataset.city) selectCity(event.target.dataset.city, 'map');
-    else if (!state.province && event.target.dataset.province) selectProvince(event.target.dataset.province);
+    const cityNode = event.target.closest('[data-city]');
+    const provinceNode = !state.province && event.target.closest('[data-province]');
+    if (cityNode) selectCity(cityNode.dataset.city, 'map');
+    else if (provinceNode) selectProvince(provinceNode.dataset.province);
     hideTooltip();
   }
 
@@ -494,6 +516,16 @@
     if (event.key === 'Escape' && state.province) {
       event.preventDefault();
       selectProvince('');
+    } else if (event.key === '+' || event.key === '=') {
+      event.preventDefault();
+      changeZoom(1);
+    } else if (event.key === '-' || event.key === '_') {
+      event.preventDefault();
+      changeZoom(-1);
+    } else if (event.key === '0') {
+      event.preventDefault();
+      resetCamera();
+      paintCamera();
     }
   });
   ui.legend.addEventListener('change', event => {
