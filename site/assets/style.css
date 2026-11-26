@@ -285,15 +285,36 @@ button:disabled { cursor: default; }
   vector-effect: non-scaling-stroke;
 }
 .marker.active .marker-badge { stroke: var(--ink); stroke-width: 2px; }
-.zoom-tools {
+.zoom-dock {
   position: absolute;
   top: 14px;
   right: 14px;
+  display: flex;
+  align-items: flex-start;
+  gap: 9px;
+  pointer-events: none;
+}
+.zoom-tip {
+  margin: 7px 0 0;
+  padding: 4px 10px;
+  border: 1px solid var(--line);
+  border-radius: 999px;
+  background: #fffdf9eb;
+  box-shadow: 0 2px 8px #71425210;
+  color: #77505a;
+  font-size: 12px;
+  font-weight: 520;
+  letter-spacing: .02em;
+  line-height: 1.35;
+  white-space: nowrap;
+}
+.zoom-tools {
   display: grid;
   border: 1px solid var(--line-strong);
   border-radius: 10px;
   background: var(--white);
   box-shadow: 0 3px 10px #71425217;
+  pointer-events: auto;
 }
 .zoom-tools button {
   min-width: 44px;
@@ -456,12 +477,22 @@ footer { margin-top: 13px; color: var(--muted); font-size: 12px; }
   #map-stage { display: grid; }
   #atlas { grid-area: 2 / 1; min-height: 326px; }
   #map-stage[data-local] #atlas { height: clamp(340px, 54svh, 475px); }
-  .zoom-tools {
+  .zoom-dock {
     position: static;
     grid-area: 1 / 1;
-    grid-auto-flow: column;
-    justify-self: end;
+    align-items: center;
+    justify-content: space-between;
+    gap: 6px;
     margin: 8px 8px 0;
+  }
+  .zoom-tip {
+    margin: 0;
+    padding: 4px 8px;
+    font-size: clamp(10.5px, 2.9vw, 11.5px);
+    box-shadow: none;
+  }
+  .zoom-tools {
+    grid-auto-flow: column;
     box-shadow: none;
   }
   .zoom-tools button { min-width: 39px; min-height: 36px; }

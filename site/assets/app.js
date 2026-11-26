@@ -155,8 +155,12 @@
     const rect = ui.atlas.getBoundingClientRect();
     const units = width / (rect.width || 1);
     const obstacles = [];
-    for (const control of [ui['zoom-in'].parentElement, ui['sea-card']]) {
-      if (control.hidden) continue;
+    for (const control of [
+      ui['zoom-in'].parentElement,
+      document.querySelector('.zoom-tip'),
+      ui['sea-card'],
+    ]) {
+      if (!control || control.hidden) continue;
       const box = control.getBoundingClientRect();
       obstacles.push({
         left: box.left - rect.left - 4, right: box.right - rect.left + 4,
