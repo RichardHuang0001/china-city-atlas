@@ -3,6 +3,7 @@ window.atlasLabels = (() => {
   'use strict';
   const svgNamespace = 'http://www.w3.org/2000/svg';
   const narrowMap = 650;
+  const FIELD = {name: 0, code: 1, tier: 3, rank: 4};
 
   function createSpatialIndex() {
     const cellSize = 32;
@@ -56,18 +57,18 @@ window.atlasLabels = (() => {
     return w > 0 && h > 0 ? w * h : 0;
   }
 
-  function priorityTier(width, level, local = false) {
+  function priorityTier(width, level, local = false, maxTier = 5) {
     if (width >= narrowMap) {
-      return local ? Math.min(5, 3 + level) : Math.min(5, 1 + level);
+      return local ? Math.min(maxTier, 3 + level) : Math.min(maxTier, 1 + level);
     }
     // A narrow map leaves room for the symbols and coastlines at every step.
-    if (local) return Math.min(5, 2 + level);
-    return level < 2 ? 0 : Math.min(5, level - 1);
+    if (local) return Math.min(maxTier, 2 + level);
+    return level < 2 ? 0 : Math.min(maxTier, level - 1);
   }
 
-  function disclosureRange(width, level, local, minTier) {
-    let reveal = priorityTier(width, level, local);
-    let fillMax = local ? 5 : Math.min(5, 2 + level);
+  function disclosureRange(width, level, local, minTier, maxTier = 5) {
+    let reveal = priorityTier(width, level, local, maxTier);
+    let fillMax = local ? maxTier : Math.min(maxTier, 2 + level);
     // If the user filters out all higher tiers, disclose starting from their highest checked tier.
     if (minTier > reveal) {
       reveal = minTier;
@@ -78,16 +79,16 @@ window.atlasLabels = (() => {
 
   function makeLabel(city, [x, y], fontSize, anchor, selected = false, priority = false) {
     const text = document.createElementNS(svgNamespace, 'text');
-    text.dataset.city = city[1];
-    text.dataset.tier = city[3];
+    text.dataset.city = city[FIELD.code];
+    text.dataset.tier = city[FIELD.tier];
     text.setAttribute('class', 'city-label' +
-      (selected ? ' selected' : city[3] < 2 ? ' major' : '') + (priority ? ' priority' : ''));
+      (selected ? ' selected' : city[FIELD.tier] < 2 ? ' major' : '') + (priority ? ' priority' : ''));
     text.setAttribute('x', x);
     text.setAttribute('y', y);
     text.setAttribute('text-anchor', anchor);
     text.setAttribute('font-size', fontSize);
     text.setAttribute('stroke-width', fontSize * .24);
-    text.textContent = city[0];
+    text.textContent = city[FIELD.name];
     return text;
   }
 
@@ -280,7 +281,7 @@ window.atlasLabels = (() => {
 
   function drawLeader(city, [x1, y1, x2, y2], left, top, units, color) {
     const leader = document.createElementNS(svgNamespace, 'g');
-    leader.dataset.leaderFor = city[1];
+    leader.dataset.leaderFor = city[FIELD.code];
     leader.setAttribute('class', 'label-leader');
     leader.setAttribute('stroke', color);
     const line = document.createElementNS(svgNamespace, 'line');
@@ -295,7 +296,7 @@ window.atlasLabels = (() => {
     return leader;
   }
 
-  function place({markers, width, height, left, top, units, level, local, focus, obstacles, colors}) {
+  function place({markers, width, height, left, top, units, level, local, focus, obstacles, colors, maxTier = 5}) {
     const labels = document.createDocumentFragment();
     const leaders = document.createDocumentFragment();
     if (!markers.length) return {labels, leaders};
@@ -306,15 +307,15 @@ window.atlasLabels = (() => {
     for (const box of obstacles) textIndex.add({...box});
 
     const candidates = [];
-    let minTier = 5;
+    let minTier = maxTier;
     for (const {city, point, size} of markers) {
       const x = (point[0] - left) / units;
       const y = (point[1] - top) / units;
       if (x < 0 || y < 0 || x > width || y > height) continue;
       const radius = size + 1.35;
-      const isFocus = city[1] === focus;
-      const tier = isFocus ? -1 : city[3];
-      if (city[3] < minTier) minTier = city[3];
+      const isFocus = city[FIELD.code] === focus;
+      const tier = isFocus ? -1 : city[FIELD.tier];
+      if (city[FIELD.tier] < minTier) minTier = city[FIELD.tier];
       pointsIndex.add({
         left: x - radius, right: x + radius, top: y - radius, bottom: y + radius,
         tier, isFocus,
@@ -323,29 +324,29 @@ window.atlasLabels = (() => {
     }
     if (!candidates.length) return {labels, leaders};
 
-    const {reveal, fillMax} = disclosureRange(width, level, local, minTier);
+    const {reveal, fillMax} = disclosureRange(width, level, local, minTier, maxTier);
     const spacingPad = local ? 0 : Math.max(4, (mobile ? 18 : 14) - level * 3);
 
     // Place highest-priority cities first so lower tiers never displace higher tiers.
     candidates.sort((a, b) =>
       Number(b.isFocus) - Number(a.isFocus) ||
-      a.city[3] - b.city[3] || a.city[4] - b.city[4]);
+      a.city[FIELD.tier] - b.city[FIELD.tier] || a.city[FIELD.rank] - b.city[FIELD.rank]);
 
     const placedLabels = [];
     for (const candidate of candidates) {
       const {city, isFocus} = candidate;
-      if (!isFocus && city[3] > fillMax) continue;
-      const preferred = city[3] <= reveal;
-      const required = isFocus || city[3] === 0 || (!mobile && preferred);
-      const fontSize = isFocus ? font + 1.5 : city[3] < 2 ? font + .5 : font;
+      if (!isFocus && city[FIELD.tier] > fillMax) continue;
+      const preferred = city[FIELD.tier] <= reveal;
+      const required = isFocus || city[FIELD.tier] === 0 || (!mobile && preferred);
+      const fontSize = isFocus ? font + 1.5 : city[FIELD.tier] < 2 ? font + .5 : font;
       const best = choosePlacement({
-        ...candidate, width, height, fontSize, name: city[0],
+        ...candidate, width, height, fontSize, name: city[FIELD.name],
         required, preferred, spacingPad: preferred || isFocus ? 0 : spacingPad,
         mobile, textIndex, pointsIndex,
       });
       if (!best) continue;
       const {option, box, line} = best;
-      if (line) leaders.append(drawLeader(city, line, left, top, units, colors[city[3]]));
+      if (line) leaders.append(drawLeader(city, line, left, top, units, colors[city[FIELD.tier]]));
       placedLabels.push(makeLabel(city, [left + option.x * units, top + option.y * units],
         fontSize * units, option.anchor, isFocus, required));
       textIndex.add(box);

@@ -1,0 +1,417 @@
+{
+  "data": [
+    {
+      "region_id": "110000",
+      "region_name": "北京市",
+      "province_name": "北京市",
+      "baseline_date": "2016-01-04",
+      "latest_date": "2026-11-25",
+      "company_count": 484
+    },
+    {
+      "region_id": "120000",
+      "region_name": "天津市",
+      "province_name": "天津市",
+      "baseline_date": "2016-01-04",
+      "latest_date": "2026-11-25",
+      "company_count": 73
+    },
+    {
+      "region_id": "130100",
+      "region_name": "石家庄市",
+      "province_name": "河北省",
+      "baseline_date": "2016-01-04",
+      "latest_date": "2026-11-25",
+      "company_count": 23
+    },
+    {
+      "region_id": "210100",
+      "region_name": "沈阳市",
+      "province_name": "辽宁省",
+      "baseline_date": "2016-01-04",
+      "latest_date": "2026-11-25",
+      "company_count": 26
+    },
+    {
+      "region_id": "210200",
+      "region_name": "大连市",
+      "province_name": "辽宁省",
+      "baseline_date": "2016-01-04",
+      "latest_date": "2026-11-25",
+      "company_count": 29
+    },
+    {
+      "region_id": "220100",
+      "region_name": "长春市",
+      "province_name": "吉林省",
+      "baseline_date": "2016-01-04",
+      "latest_date": "2026-11-25",
+      "company_count": 30
+    },
+    {
+      "region_id": "230100",
+      "region_name": "哈尔滨市",
+      "province_name": "黑龙江省",
+      "baseline_date": "2016-01-04",
+      "latest_date": "2026-11-25",
+      "company_count": 30
+    },
+    {
+      "region_id": "310000",
+      "region_name": "上海市",
+      "province_name": "上海市",
+      "baseline_date": "2016-01-04",
+      "latest_date": "2026-11-25",
+      "company_count": 454
+    },
+    {
+      "region_id": "320100",
+      "region_name": "南京市",
+      "province_name": "江苏省",
+      "baseline_date": "2016-01-04",
+      "latest_date": "2026-11-25",
+      "company_count": 124
+    },
+    {
+      "region_id": "320200",
+      "region_name": "无锡市",
+      "province_name": "江苏省",
+      "baseline_date": "2016-01-04",
+      "latest_date": "2026-11-25",
+      "company_count": 132
+    },
+    {
+      "region_id": "320400",
+      "region_name": "常州市",
+      "province_name": "江苏省",
+      "baseline_date": "2016-01-04",
+      "latest_date": "2026-11-25",
+      "company_count": 77
+    },
+    {
+      "region_id": "320500",
+      "region_name": "苏州市",
+      "province_name": "江苏省",
+      "baseline_date": "2016-01-04",
+      "latest_date": "2026-11-25",
+      "company_count": 238
+    },
+    {
+      "region_id": "320600",
+      "region_name": "南通市",
+      "province_name": "江苏省",
+      "baseline_date": "2016-01-04",
+      "latest_date": "2026-11-25",
+      "company_count": 56
+    },
+    {
+      "region_id": "330100",
+      "region_name": "杭州市",
+      "province_name": "浙江省",
+      "baseline_date": "2016-01-04",
+      "latest_date": "2026-11-25",
+      "company_count": 240
+    },
+    {
+      "region_id": "330200",
+      "region_name": "宁波市",
+      "province_name": "浙江省",
+      "baseline_date": "2016-01-04",
+      "latest_date": "2026-11-25",
+      "company_count": 126
+    },
+    {
+      "region_id": "330300",
+      "region_name": "温州市",
+      "province_name": "浙江省",
+      "baseline_date": "2016-01-04",
+      "latest_date": "2026-11-25",
+      "company_count": 44
+    },
+    {
+      "region_id": "330400",
+      "region_name": "嘉兴市",
+      "province_name": "浙江省",
+      "baseline_date": "2016-01-04",
+      "latest_date": "2026-11-25",
+      "company_count": 69
+    },
+    {
+      "region_id": "330500",
+      "region_name": "湖州市",
+      "province_name": "浙江省",
+      "baseline_date": "2016-01-04",
+      "latest_date": "2026-11-25",
+      "company_count": 40
+    },
+    {
+      "region_id": "330600",
+      "region_name": "绍兴市",
+      "province_name": "浙江省",
+      "baseline_date": "2016-01-04",
+      "latest_date": "2026-11-25",
+      "company_count": 83
+    },
+    {
+      "region_id": "330700",
+      "region_name": "金华市",
+      "province_name": "浙江省",
+      "baseline_date": "2016-01-04",
+      "latest_date": "2026-11-25",
+      "company_count": 42
+    },
+    {
+      "region_id": "331000",
+      "region_name": "台州市",
+      "province_name": "浙江省",
+      "baseline_date": "2016-01-04",
+      "latest_date": "2026-11-25",
+      "company_count": 73
+    },
+    {
+      "region_id": "340100",
+      "region_name": "合肥市",
+      "province_name": "安徽省",
+      "baseline_date": "2016-01-04",
+      "latest_date": "2026-11-25",
+      "company_count": 91
+    },
+    {
+      "region_id": "340200",
+      "region_name": "芜湖市",
+      "province_name": "安徽省",
+      "baseline_date": "2016-01-04",
+      "latest_date": "2026-11-25",
+      "company_count": 23
+    },
+    {
+      "region_id": "350100",
+      "region_name": "福州市",
+      "province_name": "福建省",
+      "baseline_date": "2016-01-04",
+      "latest_date": "2026-11-25",
+      "company_count": 55
+    },
+    {
+      "region_id": "350200",
+      "region_name": "厦门市",
+      "province_name": "福建省",
+      "baseline_date": "2016-01-04",
+      "latest_date": "2026-11-25",
+      "company_count": 69
+    },
+    {
+      "region_id": "350500",
+      "region_name": "泉州市",
+      "province_name": "福建省",
+      "baseline_date": "2016-01-04",
+      "latest_date": "2026-11-25",
+      "company_count": 21
+    },
+    {
+      "region_id": "360100",
+      "region_name": "南昌市",
+      "province_name": "江西省",
+      "baseline_date": "2016-01-04",
+      "latest_date": "2026-11-25",
+      "company_count": 35
+    },
+    {
+      "region_id": "370100",
+      "region_name": "济南市",
+      "province_name": "山东省",
+      "baseline_date": "2016-01-04",
+      "latest_date": "2026-11-25",
+      "company_count": 47
+    },
+    {
+      "region_id": "370200",
+      "region_name": "青岛市",
+      "province_name": "山东省",
+      "baseline_date": "2016-01-04",
+      "latest_date": "2026-11-25",
+      "company_count": 65
+    },
+    {
+      "region_id": "370300",
+      "region_name": "淄博市",
+      "province_name": "山东省",
+      "baseline_date": "2016-01-04",
+      "latest_date": "2026-11-25",
+      "company_count": 36
+    },
+    {
+      "region_id": "370600",
+      "region_name": "烟台市",
+      "province_name": "山东省",
+      "baseline_date": "2016-01-04",
+      "latest_date": "2026-11-25",
+      "company_count": 51
+    },
+    {
+      "region_id": "370700",
+      "region_name": "潍坊市",
+      "province_name": "山东省",
+      "baseline_date": "2016-01-04",
+      "latest_date": "2026-11-25",
+      "company_count": 30
+    },
+    {
+      "region_id": "410100",
+      "region_name": "郑州市",
+      "province_name": "河南省",
+      "baseline_date": "2016-01-04",
+      "latest_date": "2026-11-25",
+      "company_count": 41
+    },
+    {
+      "region_id": "420100",
+      "region_name": "武汉市",
+      "province_name": "湖北省",
+      "baseline_date": "2016-01-04",
+      "latest_date": "2026-11-25",
+      "company_count": 82
+    },
+    {
+      "region_id": "430100",
+      "region_name": "长沙市",
+      "province_name": "湖南省",
+      "baseline_date": "2016-01-04",
+      "latest_date": "2026-11-25",
+      "company_count": 85
+    },
+    {
+      "region_id": "440100",
+      "region_name": "广州市",
+      "province_name": "广东省",
+      "baseline_date": "2016-01-04",
+      "latest_date": "2026-11-25",
+      "company_count": 161
+    },
+    {
+      "region_id": "440300",
+      "region_name": "深圳市",
+      "province_name": "广东省",
+      "baseline_date": "2016-01-04",
+      "latest_date": "2026-11-25",
+      "company_count": 431
+    },
+    {
+      "region_id": "440400",
+      "region_name": "珠海市",
+      "province_name": "广东省",
+      "baseline_date": "2016-01-04",
+      "latest_date": "2026-11-25",
+      "company_count": 42
+    },
+    {
+      "region_id": "440500",
+      "region_name": "汕头市",
+      "province_name": "广东省",
+      "baseline_date": "2016-01-04",
+      "latest_date": "2026-11-25",
+      "company_count": 31
+    },
+    {
+      "region_id": "440600",
+      "region_name": "佛山市",
+      "province_name": "广东省",
+      "baseline_date": "2016-01-04",
+      "latest_date": "2026-11-25",
+      "company_count": 56
+    },
+    {
+      "region_id": "441900",
+      "region_name": "东莞市",
+      "province_name": "广东省",
+      "baseline_date": "2016-01-04",
+      "latest_date": "2026-11-25",
+      "company_count": 65
+    },
+    {
+      "region_id": "442000",
+      "region_name": "中山市",
+      "province_name": "广东省",
+      "baseline_date": "2016-01-04",
+      "latest_date": "2026-11-25",
+      "company_count": 30
+    },
+    {
+      "region_id": "460100",
+      "region_name": "海口市",
+      "province_name": "海南省",
+      "baseline_date": "2016-01-04",
+      "latest_date": "2026-11-25",
+      "company_count": 23
+    },
+    {
+      "region_id": "500000",
+      "region_name": "重庆市",
+      "province_name": "重庆市",
+      "baseline_date": "2016-01-04",
+      "latest_date": "2026-11-25",
+      "company_count": 79
+    },
+    {
+      "region_id": "510100",
+      "region_name": "成都市",
+      "province_name": "四川省",
+      "baseline_date": "2016-01-04",
+      "latest_date": "2026-11-25",
+      "company_count": 124
+    },
+    {
+      "region_id": "520100",
+      "region_name": "贵阳市",
+      "province_name": "贵州省",
+      "baseline_date": "2016-01-04",
+      "latest_date": "2026-11-25",
+      "company_count": 24
+    },
+    {
+      "region_id": "530100",
+      "region_name": "昆明市",
+      "province_name": "云南省",
+      "baseline_date": "2016-01-04",
+      "latest_date": "2026-11-25",
+      "company_count": 29
+    },
+    {
+      "region_id": "610100",
+      "region_name": "西安市",
+      "province_name": "陕西省",
+      "baseline_date": "2016-01-04",
+      "latest_date": "2026-11-25",
+      "company_count": 66
+    },
+    {
+      "region_id": "620100",
+      "region_name": "兰州市",
+      "province_name": "甘肃省",
+      "baseline_date": "2016-01-04",
+      "latest_date": "2026-11-25",
+      "company_count": 20
+    },
+    {
+      "region_id": "650100",
+      "region_name": "乌鲁木齐市",
+      "province_name": "新疆维吾尔自治区",
+      "baseline_date": "2016-01-04",
+      "latest_date": "2026-11-25",
+      "company_count": 32
+    }
+  ],
+  "calc_version": "v3.5_20160104_20260729_fast_entry_after_20d_capped_free_float_mv_tushare_pct_chg_historical_region_override",
+  "sources": [
+    {
+      "source_name": "知城城市产业魅力指数",
+      "source_table": "area_index.area_index_city_display_scope"
+    }
+  ],
+  "caveats": [
+    "样本仅限该计算版本的城市产业魅力指数成分企业，不代表全市企业总量或全部产业。",
+    "权重为0—1比例，市值单位为亿元；指数贡献单位为点，不是GDP贡献。"
+  ],
+  "next_offset": null,
+  "has_more": false
+}

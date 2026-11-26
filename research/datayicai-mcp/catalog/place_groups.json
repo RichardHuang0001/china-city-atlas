@@ -1,0 +1,975 @@
+{
+  "query": {
+    "browse": "groups",
+    "period": null,
+    "scope_period": null,
+    "limit": 200,
+    "offset": 0
+  },
+  "data": [
+    {
+      "place_group_id": "administrative-division-2023-province-region",
+      "name": "全国省级行政区",
+      "series_code": "administrative-division",
+      "member_count": 31,
+      "definition": "31个省级行政区，含省、自治区和直辖市，不含港、澳、台。",
+      "valid_from": "2023-01-01",
+      "valid_to": null
+    },
+    {
+      "place_group_id": "administrative-division-2023-prefecture-division",
+      "name": "全国地级行政单元",
+      "series_code": "administrative-division",
+      "member_count": 337,
+      "definition": "333个地级行政单元（含地级市、自治州、地区和盟）及4个直辖市，共337个地级以上行政单元。",
+      "valid_from": "2023-01-01",
+      "valid_to": null
+    },
+    {
+      "place_group_id": "administrative-division-2023-county-division",
+      "name": "全国县级行政单元",
+      "series_code": "administrative-division",
+      "member_count": 2847,
+      "definition": "2847个县级行政单元，含市辖区、县、自治县、旗、自治旗、县级市、特区和林区。",
+      "valid_from": "2023-01-01",
+      "valid_to": null
+    },
+    {
+      "place_group_id": "administrative-division-2023-prefecture-and-above-city",
+      "name": "地级以上城市",
+      "series_code": "administrative-division",
+      "member_count": 297,
+      "definition": "293个地级市（不包含自治州、地区和盟）及4个直辖市，共297个地级以上城市。",
+      "valid_from": "2023-01-01",
+      "valid_to": null
+    },
+    {
+      "place_group_id": "administrative-division-2023-county-level-city",
+      "name": "县级市",
+      "series_code": "administrative-division",
+      "member_count": 398,
+      "definition": "398个县级市。",
+      "valid_from": "2023-01-01",
+      "valid_to": null
+    },
+    {
+      "place_group_id": "administrative-division-2023-established-city",
+      "name": "建制城市",
+      "series_code": "administrative-division",
+      "member_count": 695,
+      "definition": "293个地级市（不包含自治州、地区和盟）、398个县级市及4个直辖市，共695个建制城市。",
+      "valid_from": "2023-01-01",
+      "valid_to": null
+    },
+    {
+      "place_group_id": "administrative-division-2023-provincial-capital",
+      "name": "省会及自治区首府",
+      "series_code": "administrative-division",
+      "member_count": 27,
+      "definition": "23个省会城市及4个自治区首府，共27个省会及自治区首府；不含直辖市。",
+      "valid_from": "2023-01-01",
+      "valid_to": null
+    },
+    {
+      "place_group_id": "administrative-division-2023-sub-provincial-city",
+      "name": "副省级城市",
+      "series_code": "administrative-division",
+      "member_count": 15,
+      "definition": "10个省会城市及5个计划单列市，共15个副省级城市。",
+      "valid_from": "2023-01-01",
+      "valid_to": null
+    },
+    {
+      "place_group_id": "administrative-division-2023-separately-planned-city",
+      "name": "计划单列市",
+      "series_code": "administrative-division",
+      "member_count": 5,
+      "definition": "大连、青岛、宁波、厦门、深圳五个计划单列市。",
+      "valid_from": "2023-01-01",
+      "valid_to": null
+    },
+    {
+      "place_group_id": "industry-index-city-2023",
+      "name": "产业指数城市",
+      "series_code": "industry-index-city",
+      "member_count": 50,
+      "definition": "当前批准的50个产业指数样本城市，历史分析覆盖2016-01-04起；不表示该样本当时已发布。",
+      "valid_from": "2016-01-04",
+      "valid_to": null
+    },
+    {
+      "place_group_id": "geographic-region-2023-north-china",
+      "name": "华北地区",
+      "series_code": "geographic-region",
+      "member_count": 5,
+      "definition": "北京、天津、河北、山西、内蒙古5个省级行政区。",
+      "valid_from": "2023-01-01",
+      "valid_to": null
+    },
+    {
+      "place_group_id": "geographic-region-2023-northeast-china",
+      "name": "东北地区",
+      "series_code": "geographic-region",
+      "member_count": 3,
+      "definition": "辽宁、吉林、黑龙江3个省级行政区。",
+      "valid_from": "2023-01-01",
+      "valid_to": null
+    },
+    {
+      "place_group_id": "geographic-region-2023-east-china",
+      "name": "华东地区",
+      "series_code": "geographic-region",
+      "member_count": 7,
+      "definition": "上海、江苏、浙江、安徽、福建、江西、山东7个省级行政区。",
+      "valid_from": "2023-01-01",
+      "valid_to": null
+    },
+    {
+      "place_group_id": "geographic-region-2023-central-china",
+      "name": "华中地区",
+      "series_code": "geographic-region",
+      "member_count": 3,
+      "definition": "河南、湖北、湖南3个省级行政区。",
+      "valid_from": "2023-01-01",
+      "valid_to": null
+    },
+    {
+      "place_group_id": "geographic-region-2023-south-china",
+      "name": "华南地区",
+      "series_code": "geographic-region",
+      "member_count": 3,
+      "definition": "广东、广西、海南3个省级行政区。",
+      "valid_from": "2023-01-01",
+      "valid_to": null
+    },
+    {
+      "place_group_id": "geographic-region-2023-southwest-china",
+      "name": "西南地区",
+      "series_code": "geographic-region",
+      "member_count": 5,
+      "definition": "重庆、四川、贵州、云南、西藏5个省级行政区。",
+      "valid_from": "2023-01-01",
+      "valid_to": null
+    },
+    {
+      "place_group_id": "geographic-region-2023-northwest-china",
+      "name": "西北地区",
+      "series_code": "geographic-region",
+      "member_count": 5,
+      "definition": "陕西、甘肃、青海、宁夏、新疆5个省级行政区。",
+      "valid_from": "2023-01-01",
+      "valid_to": null
+    },
+    {
+      "place_group_id": "urban-agglomeration-2021-jingjinji",
+      "name": "京津冀城市群",
+      "series_code": "urban-agglomeration",
+      "member_count": 13,
+      "definition": "十四五规划优化提升的城市群。北京、天津及河北11市。",
+      "valid_from": "2021-01-01",
+      "valid_to": null
+    },
+    {
+      "place_group_id": "urban-agglomeration-2021-yangtze-river-delta",
+      "name": "长三角城市群",
+      "series_code": "urban-agglomeration",
+      "member_count": 27,
+      "definition": "十四五规划优化提升的城市群。上海及江苏、浙江各9市、安徽8市，为规划确定的中心区27市；规划范围另含沪苏浙皖全域。",
+      "valid_from": "2021-01-01",
+      "valid_to": null
+    },
+    {
+      "place_group_id": "urban-agglomeration-2021-pearl-river-delta",
+      "name": "珠三角城市群",
+      "series_code": "urban-agglomeration",
+      "member_count": 9,
+      "definition": "十四五规划优化提升的城市群。广州、深圳等广东9市。",
+      "valid_from": "2021-01-01",
+      "valid_to": null
+    },
+    {
+      "place_group_id": "urban-agglomeration-2021-chengdu-chongqing",
+      "name": "成渝城市群",
+      "series_code": "urban-agglomeration",
+      "member_count": 16,
+      "definition": "十四五规划优化提升的城市群。重庆及四川15市。官方范围为重庆中心城区及万州等27个区县、开州与云阳部分地区，四川绵阳除平武与北川、达州除万源、雅安除天全与宝兴；本集合按整市计入。",
+      "valid_from": "2021-01-01",
+      "valid_to": null
+    },
+    {
+      "place_group_id": "urban-agglomeration-2021-middle-yangtze",
+      "name": "长江中游城市群",
+      "series_code": "urban-agglomeration",
+      "member_count": 31,
+      "definition": "十四五规划优化提升的城市群。湖北13市（含仙桃、潜江、天门3个省直辖县级市）、湖南8市、江西10市。官方范围中抚州、吉安为部分县区；本集合按整市计入。",
+      "valid_from": "2021-01-01",
+      "valid_to": null
+    },
+    {
+      "place_group_id": "urban-agglomeration-2021-shandong-peninsula",
+      "name": "山东半岛城市群",
+      "series_code": "urban-agglomeration",
+      "member_count": 16,
+      "definition": "十四五规划发展壮大的城市群。山东全域16市。",
+      "valid_from": "2021-01-01",
+      "valid_to": null
+    },
+    {
+      "place_group_id": "urban-agglomeration-2021-guangdong-fujian-zhejiang-coastal",
+      "name": "粤闽浙沿海城市群",
+      "series_code": "urban-agglomeration",
+      "member_count": 16,
+      "definition": "十四五规划发展壮大的城市群。福建9市、浙江温州与衢州与丽水、广东汕头与潮州与揭阳与梅州。十四五纲要首次提出该城市群，至今未有规划界定其范围；本集合按《海峡西岸经济区发展规划》（国函〔2011〕23号）范围剔除江西4市取定。",
+      "valid_from": "2021-01-01",
+      "valid_to": null
+    },
+    {
+      "place_group_id": "urban-agglomeration-2021-central-plains",
+      "name": "中原城市群",
+      "series_code": "urban-agglomeration",
+      "member_count": 30,
+      "definition": "十四五规划发展壮大的城市群。河南18市（含省直辖县级市济源）、山西3市、河北2市、安徽5市、山东2市。规划分两层：核心发展区14市为郑州、开封、洛阳、平顶山、新乡、焦作、许昌、漯河、济源、鹤壁、商丘、周口及山西晋城、安徽亳州，其余16市为联动辐射范围；本集合按规划范围30市整体计入。",
+      "valid_from": "2021-01-01",
+      "valid_to": null
+    },
+    {
+      "place_group_id": "urban-agglomeration-2021-guanzhong-plain",
+      "name": "关中平原城市群",
+      "series_code": "urban-agglomeration",
+      "member_count": 11,
+      "definition": "十四五规划发展壮大的城市群。陕西6市、山西运城与临汾、甘肃天水与平凉与庆阳。官方范围中商洛仅4县区、运城除平陆与垣曲、临汾仅8县市区、平凉仅5县区、庆阳仅市区，另含杨凌农业高新技术产业示范区；本集合按整市计入，示范区不计。",
+      "valid_from": "2021-01-01",
+      "valid_to": null
+    },
+    {
+      "place_group_id": "urban-agglomeration-2021-beibu-gulf",
+      "name": "北部湾城市群",
+      "series_code": "urban-agglomeration",
+      "member_count": 15,
+      "definition": "十四五规划发展壮大的城市群。广西6市、广东3市、海南海口与儋州及东方、澄迈、临高、昌江4个县级行政单元。",
+      "valid_from": "2021-01-01",
+      "valid_to": null
+    },
+    {
+      "place_group_id": "urban-agglomeration-2021-harbin-changchun",
+      "name": "哈长城市群",
+      "series_code": "urban-agglomeration",
+      "member_count": 11,
+      "definition": "十四五规划培育发展的城市群。黑龙江5市、吉林5市及延边朝鲜族自治州。",
+      "valid_from": "2021-01-01",
+      "valid_to": null
+    },
+    {
+      "place_group_id": "urban-agglomeration-2021-central-south-liaoning",
+      "name": "辽中南城市群",
+      "series_code": "urban-agglomeration",
+      "member_count": 9,
+      "definition": "十四五规划培育发展的城市群。沈阳、大连等辽宁9市。国家级规划未界定其范围；本集合按辽宁省推进「一圈一带两区」区域协调发展三年行动方案的9市口径取定，另有含丹东、锦州、葫芦岛的12市说法。",
+      "valid_from": "2021-01-01",
+      "valid_to": null
+    },
+    {
+      "place_group_id": "urban-agglomeration-2021-central-shanxi",
+      "name": "山西中部城市群",
+      "series_code": "urban-agglomeration",
+      "member_count": 5,
+      "definition": "十四五规划培育发展的城市群。太原、晋中、忻州、吕梁、阳泉。依据山西省《山西中部城市群高质量发展规划（2022—2035年）》，为省级而非国家级规划。",
+      "valid_from": "2021-01-01",
+      "valid_to": null
+    },
+    {
+      "place_group_id": "urban-agglomeration-2021-central-guizhou",
+      "name": "黔中城市群",
+      "series_code": "urban-agglomeration",
+      "member_count": 6,
+      "definition": "十四五规划培育发展的城市群。贵阳及遵义、安顺、毕节、黔东南、黔南。官方范围为贵阳市、贵安新区及其余5个市州共33个县市区；本集合按整市计入，贵安新区不计。",
+      "valid_from": "2021-01-01",
+      "valid_to": null
+    },
+    {
+      "place_group_id": "urban-agglomeration-2021-central-yunnan",
+      "name": "滇中城市群",
+      "series_code": "urban-agglomeration",
+      "member_count": 5,
+      "definition": "十四五规划培育发展的城市群。昆明、曲靖、玉溪及楚雄彝族自治州、红河哈尼族彝族自治州。官方范围中红河州仅北部7县市；本集合按整州计入。",
+      "valid_from": "2021-01-01",
+      "valid_to": null
+    },
+    {
+      "place_group_id": "urban-agglomeration-2021-hubaoeyu",
+      "name": "呼包鄂榆城市群",
+      "series_code": "urban-agglomeration",
+      "member_count": 4,
+      "definition": "十四五规划培育发展的城市群。呼和浩特、包头、鄂尔多斯、榆林。",
+      "valid_from": "2021-01-01",
+      "valid_to": null
+    },
+    {
+      "place_group_id": "urban-agglomeration-2021-lanzhou-xining",
+      "name": "兰州－西宁城市群",
+      "series_code": "urban-agglomeration",
+      "member_count": 9,
+      "definition": "十四五规划培育发展的城市群。甘肃兰州、白银、定西、临夏回族自治州，青海西宁、海东及海北、海南、黄南3个自治州。官方范围中除兰州、西宁、海东外均为部分县区；本集合按整市州计入。",
+      "valid_from": "2021-01-01",
+      "valid_to": null
+    },
+    {
+      "place_group_id": "urban-agglomeration-2021-ningxia-yellow-river",
+      "name": "宁夏沿黄城市群",
+      "series_code": "urban-agglomeration",
+      "member_count": 4,
+      "definition": "十四五规划培育发展的城市群。银川、石嘴山、吴忠、中卫。国家级城市群规划未界定其范围；本集合按《全国主体功能区规划》宁夏沿黄经济区的4个地级市取定，另有含平罗、青铜峡、灵武等县级单元的10城市说法。",
+      "valid_from": "2021-01-01",
+      "valid_to": null
+    },
+    {
+      "place_group_id": "urban-agglomeration-2021-north-tianshan",
+      "name": "天山北坡城市群",
+      "series_code": "urban-agglomeration",
+      "member_count": 5,
+      "definition": "十四五规划培育发展的城市群。乌鲁木齐、克拉玛依、昌吉回族自治州、塔城地区及新疆生产建设兵团石河子市。国家级规划未界定其范围；本集合按天山北坡经济带「东起阜康、乌鲁木齐，西至乌苏、克拉玛依」的范围，按整市州计入所涉地州市。",
+      "valid_from": "2021-01-01",
+      "valid_to": null
+    },
+    {
+      "place_group_id": "city-tier-2026-first-tier",
+      "name": "一线城市",
+      "series_code": "city-tier",
+      "member_count": 4,
+      "definition": "第一财经城市研究所《新一线城市魅力指数报告》2026年城市分级中的一线城市。",
+      "valid_from": "2026-01-01",
+      "valid_to": null
+    },
+    {
+      "place_group_id": "city-tier-2026-new-first-tier",
+      "name": "新一线城市",
+      "series_code": "city-tier",
+      "member_count": 15,
+      "definition": "第一财经城市研究所《新一线城市魅力指数报告》2026年城市分级中的新一线城市。",
+      "valid_from": "2026-01-01",
+      "valid_to": null
+    },
+    {
+      "place_group_id": "city-tier-2026-second-tier",
+      "name": "二线城市",
+      "series_code": "city-tier",
+      "member_count": 30,
+      "definition": "第一财经城市研究所《新一线城市魅力指数报告》2026年城市分级中的二线城市。",
+      "valid_from": "2026-01-01",
+      "valid_to": null
+    },
+    {
+      "place_group_id": "city-tier-2026-third-tier",
+      "name": "三线城市",
+      "series_code": "city-tier",
+      "member_count": 70,
+      "definition": "第一财经城市研究所《新一线城市魅力指数报告》2026年城市分级中的三线城市。",
+      "valid_from": "2026-01-01",
+      "valid_to": null
+    },
+    {
+      "place_group_id": "city-tier-2026-fourth-tier",
+      "name": "四线城市",
+      "series_code": "city-tier",
+      "member_count": 90,
+      "definition": "第一财经城市研究所《新一线城市魅力指数报告》2026年城市分级中的四线城市。",
+      "valid_from": "2026-01-01",
+      "valid_to": null
+    },
+    {
+      "place_group_id": "city-tier-2026-fifth-tier",
+      "name": "五线城市",
+      "series_code": "city-tier",
+      "member_count": 128,
+      "definition": "第一财经城市研究所《新一线城市魅力指数报告》2026年城市分级中的五线城市。",
+      "valid_from": "2026-01-01",
+      "valid_to": null
+    },
+    {
+      "place_group_id": "city-tier-2025-first-tier",
+      "name": "一线城市",
+      "series_code": "city-tier",
+      "member_count": 4,
+      "definition": "第一财经城市研究所《新一线城市魅力排行榜》2025年城市分级中的一线城市。",
+      "valid_from": "2025-01-01",
+      "valid_to": "2025-12-31"
+    },
+    {
+      "place_group_id": "city-tier-2025-new-first-tier",
+      "name": "新一线城市",
+      "series_code": "city-tier",
+      "member_count": 15,
+      "definition": "第一财经城市研究所《新一线城市魅力排行榜》2025年城市分级中的新一线城市。",
+      "valid_from": "2025-01-01",
+      "valid_to": "2025-12-31"
+    },
+    {
+      "place_group_id": "city-tier-2025-second-tier",
+      "name": "二线城市",
+      "series_code": "city-tier",
+      "member_count": 30,
+      "definition": "第一财经城市研究所《新一线城市魅力排行榜》2025年城市分级中的二线城市。",
+      "valid_from": "2025-01-01",
+      "valid_to": "2025-12-31"
+    },
+    {
+      "place_group_id": "city-tier-2025-third-tier",
+      "name": "三线城市",
+      "series_code": "city-tier",
+      "member_count": 70,
+      "definition": "第一财经城市研究所《新一线城市魅力排行榜》2025年城市分级中的三线城市。",
+      "valid_from": "2025-01-01",
+      "valid_to": "2025-12-31"
+    },
+    {
+      "place_group_id": "city-tier-2025-fourth-tier",
+      "name": "四线城市",
+      "series_code": "city-tier",
+      "member_count": 90,
+      "definition": "第一财经城市研究所《新一线城市魅力排行榜》2025年城市分级中的四线城市。",
+      "valid_from": "2025-01-01",
+      "valid_to": "2025-12-31"
+    },
+    {
+      "place_group_id": "city-tier-2025-fifth-tier",
+      "name": "五线城市",
+      "series_code": "city-tier",
+      "member_count": 128,
+      "definition": "第一财经城市研究所《新一线城市魅力排行榜》2025年城市分级中的五线城市。",
+      "valid_from": "2025-01-01",
+      "valid_to": "2025-12-31"
+    },
+    {
+      "place_group_id": "city-tier-2024-first-tier",
+      "name": "一线城市",
+      "series_code": "city-tier",
+      "member_count": 4,
+      "definition": "第一财经城市研究所《新一线城市魅力排行榜》2024年城市分级中的一线城市。",
+      "valid_from": "2024-01-01",
+      "valid_to": "2024-12-31"
+    },
+    {
+      "place_group_id": "city-tier-2024-new-first-tier",
+      "name": "新一线城市",
+      "series_code": "city-tier",
+      "member_count": 15,
+      "definition": "第一财经城市研究所《新一线城市魅力排行榜》2024年城市分级中的新一线城市。",
+      "valid_from": "2024-01-01",
+      "valid_to": "2024-12-31"
+    },
+    {
+      "place_group_id": "city-tier-2024-second-tier",
+      "name": "二线城市",
+      "series_code": "city-tier",
+      "member_count": 30,
+      "definition": "第一财经城市研究所《新一线城市魅力排行榜》2024年城市分级中的二线城市。",
+      "valid_from": "2024-01-01",
+      "valid_to": "2024-12-31"
+    },
+    {
+      "place_group_id": "city-tier-2024-third-tier",
+      "name": "三线城市",
+      "series_code": "city-tier",
+      "member_count": 70,
+      "definition": "第一财经城市研究所《新一线城市魅力排行榜》2024年城市分级中的三线城市。",
+      "valid_from": "2024-01-01",
+      "valid_to": "2024-12-31"
+    },
+    {
+      "place_group_id": "city-tier-2024-fourth-tier",
+      "name": "四线城市",
+      "series_code": "city-tier",
+      "member_count": 90,
+      "definition": "第一财经城市研究所《新一线城市魅力排行榜》2024年城市分级中的四线城市。",
+      "valid_from": "2024-01-01",
+      "valid_to": "2024-12-31"
+    },
+    {
+      "place_group_id": "city-tier-2024-fifth-tier",
+      "name": "五线城市",
+      "series_code": "city-tier",
+      "member_count": 128,
+      "definition": "第一财经城市研究所《新一线城市魅力排行榜》2024年城市分级中的五线城市。",
+      "valid_from": "2024-01-01",
+      "valid_to": "2024-12-31"
+    },
+    {
+      "place_group_id": "city-tier-2023-first-tier",
+      "name": "一线城市",
+      "series_code": "city-tier",
+      "member_count": 4,
+      "definition": "第一财经城市研究所《城市商业魅力排行榜》2023年城市分级中的一线城市。",
+      "valid_from": "2023-01-01",
+      "valid_to": "2023-12-31"
+    },
+    {
+      "place_group_id": "city-tier-2023-new-first-tier",
+      "name": "新一线城市",
+      "series_code": "city-tier",
+      "member_count": 15,
+      "definition": "第一财经城市研究所《城市商业魅力排行榜》2023年城市分级中的新一线城市。",
+      "valid_from": "2023-01-01",
+      "valid_to": "2023-12-31"
+    },
+    {
+      "place_group_id": "city-tier-2023-second-tier",
+      "name": "二线城市",
+      "series_code": "city-tier",
+      "member_count": 30,
+      "definition": "第一财经城市研究所《城市商业魅力排行榜》2023年城市分级中的二线城市。",
+      "valid_from": "2023-01-01",
+      "valid_to": "2023-12-31"
+    },
+    {
+      "place_group_id": "city-tier-2023-third-tier",
+      "name": "三线城市",
+      "series_code": "city-tier",
+      "member_count": 70,
+      "definition": "第一财经城市研究所《城市商业魅力排行榜》2023年城市分级中的三线城市。",
+      "valid_from": "2023-01-01",
+      "valid_to": "2023-12-31"
+    },
+    {
+      "place_group_id": "city-tier-2023-fourth-tier",
+      "name": "四线城市",
+      "series_code": "city-tier",
+      "member_count": 90,
+      "definition": "第一财经城市研究所《城市商业魅力排行榜》2023年城市分级中的四线城市。",
+      "valid_from": "2023-01-01",
+      "valid_to": "2023-12-31"
+    },
+    {
+      "place_group_id": "city-tier-2023-fifth-tier",
+      "name": "五线城市",
+      "series_code": "city-tier",
+      "member_count": 128,
+      "definition": "第一财经城市研究所《城市商业魅力排行榜》2023年城市分级中的五线城市。",
+      "valid_from": "2023-01-01",
+      "valid_to": "2023-12-31"
+    },
+    {
+      "place_group_id": "city-tier-2022-first-tier",
+      "name": "一线城市",
+      "series_code": "city-tier",
+      "member_count": 4,
+      "definition": "第一财经城市研究所《城市商业魅力排行榜》2022年城市分级中的一线城市。",
+      "valid_from": "2022-01-01",
+      "valid_to": "2022-12-31"
+    },
+    {
+      "place_group_id": "city-tier-2022-new-first-tier",
+      "name": "新一线城市",
+      "series_code": "city-tier",
+      "member_count": 15,
+      "definition": "第一财经城市研究所《城市商业魅力排行榜》2022年城市分级中的新一线城市。",
+      "valid_from": "2022-01-01",
+      "valid_to": "2022-12-31"
+    },
+    {
+      "place_group_id": "city-tier-2022-second-tier",
+      "name": "二线城市",
+      "series_code": "city-tier",
+      "member_count": 30,
+      "definition": "第一财经城市研究所《城市商业魅力排行榜》2022年城市分级中的二线城市。",
+      "valid_from": "2022-01-01",
+      "valid_to": "2022-12-31"
+    },
+    {
+      "place_group_id": "city-tier-2022-third-tier",
+      "name": "三线城市",
+      "series_code": "city-tier",
+      "member_count": 70,
+      "definition": "第一财经城市研究所《城市商业魅力排行榜》2022年城市分级中的三线城市。",
+      "valid_from": "2022-01-01",
+      "valid_to": "2022-12-31"
+    },
+    {
+      "place_group_id": "city-tier-2022-fourth-tier",
+      "name": "四线城市",
+      "series_code": "city-tier",
+      "member_count": 90,
+      "definition": "第一财经城市研究所《城市商业魅力排行榜》2022年城市分级中的四线城市。",
+      "valid_from": "2022-01-01",
+      "valid_to": "2022-12-31"
+    },
+    {
+      "place_group_id": "city-tier-2022-fifth-tier",
+      "name": "五线城市",
+      "series_code": "city-tier",
+      "member_count": 128,
+      "definition": "第一财经城市研究所《城市商业魅力排行榜》2022年城市分级中的五线城市。",
+      "valid_from": "2022-01-01",
+      "valid_to": "2022-12-31"
+    },
+    {
+      "place_group_id": "city-tier-2021-first-tier",
+      "name": "一线城市",
+      "series_code": "city-tier",
+      "member_count": 4,
+      "definition": "第一财经城市研究所《城市商业魅力排行榜》2021年城市分级中的一线城市。",
+      "valid_from": "2021-01-01",
+      "valid_to": "2021-12-31"
+    },
+    {
+      "place_group_id": "city-tier-2021-new-first-tier",
+      "name": "新一线城市",
+      "series_code": "city-tier",
+      "member_count": 15,
+      "definition": "第一财经城市研究所《城市商业魅力排行榜》2021年城市分级中的新一线城市。",
+      "valid_from": "2021-01-01",
+      "valid_to": "2021-12-31"
+    },
+    {
+      "place_group_id": "city-tier-2021-second-tier",
+      "name": "二线城市",
+      "series_code": "city-tier",
+      "member_count": 30,
+      "definition": "第一财经城市研究所《城市商业魅力排行榜》2021年城市分级中的二线城市。",
+      "valid_from": "2021-01-01",
+      "valid_to": "2021-12-31"
+    },
+    {
+      "place_group_id": "city-tier-2021-third-tier",
+      "name": "三线城市",
+      "series_code": "city-tier",
+      "member_count": 70,
+      "definition": "第一财经城市研究所《城市商业魅力排行榜》2021年城市分级中的三线城市。",
+      "valid_from": "2021-01-01",
+      "valid_to": "2021-12-31"
+    },
+    {
+      "place_group_id": "city-tier-2021-fourth-tier",
+      "name": "四线城市",
+      "series_code": "city-tier",
+      "member_count": 90,
+      "definition": "第一财经城市研究所《城市商业魅力排行榜》2021年城市分级中的四线城市。",
+      "valid_from": "2021-01-01",
+      "valid_to": "2021-12-31"
+    },
+    {
+      "place_group_id": "city-tier-2021-fifth-tier",
+      "name": "五线城市",
+      "series_code": "city-tier",
+      "member_count": 128,
+      "definition": "第一财经城市研究所《城市商业魅力排行榜》2021年城市分级中的五线城市。",
+      "valid_from": "2021-01-01",
+      "valid_to": "2021-12-31"
+    },
+    {
+      "place_group_id": "city-tier-2020-first-tier",
+      "name": "一线城市",
+      "series_code": "city-tier",
+      "member_count": 4,
+      "definition": "第一财经城市研究所《城市商业魅力排行榜》2020年城市分级中的一线城市。",
+      "valid_from": "2020-01-01",
+      "valid_to": "2020-12-31"
+    },
+    {
+      "place_group_id": "city-tier-2020-new-first-tier",
+      "name": "新一线城市",
+      "series_code": "city-tier",
+      "member_count": 15,
+      "definition": "第一财经城市研究所《城市商业魅力排行榜》2020年城市分级中的新一线城市。",
+      "valid_from": "2020-01-01",
+      "valid_to": "2020-12-31"
+    },
+    {
+      "place_group_id": "city-tier-2020-second-tier",
+      "name": "二线城市",
+      "series_code": "city-tier",
+      "member_count": 30,
+      "definition": "第一财经城市研究所《城市商业魅力排行榜》2020年城市分级中的二线城市。",
+      "valid_from": "2020-01-01",
+      "valid_to": "2020-12-31"
+    },
+    {
+      "place_group_id": "city-tier-2020-third-tier",
+      "name": "三线城市",
+      "series_code": "city-tier",
+      "member_count": 70,
+      "definition": "第一财经城市研究所《城市商业魅力排行榜》2020年城市分级中的三线城市。",
+      "valid_from": "2020-01-01",
+      "valid_to": "2020-12-31"
+    },
+    {
+      "place_group_id": "city-tier-2020-fourth-tier",
+      "name": "四线城市",
+      "series_code": "city-tier",
+      "member_count": 90,
+      "definition": "第一财经城市研究所《城市商业魅力排行榜》2020年城市分级中的四线城市。",
+      "valid_from": "2020-01-01",
+      "valid_to": "2020-12-31"
+    },
+    {
+      "place_group_id": "city-tier-2020-fifth-tier",
+      "name": "五线城市",
+      "series_code": "city-tier",
+      "member_count": 128,
+      "definition": "第一财经城市研究所《城市商业魅力排行榜》2020年城市分级中的五线城市。",
+      "valid_from": "2020-01-01",
+      "valid_to": "2020-12-31"
+    },
+    {
+      "place_group_id": "city-tier-2019-first-tier",
+      "name": "一线城市",
+      "series_code": "city-tier",
+      "member_count": 4,
+      "definition": "第一财经城市研究所《城市商业魅力排行榜》2019年城市分级中的一线城市。",
+      "valid_from": "2019-01-01",
+      "valid_to": "2019-12-31"
+    },
+    {
+      "place_group_id": "city-tier-2019-new-first-tier",
+      "name": "新一线城市",
+      "series_code": "city-tier",
+      "member_count": 15,
+      "definition": "第一财经城市研究所《城市商业魅力排行榜》2019年城市分级中的新一线城市。",
+      "valid_from": "2019-01-01",
+      "valid_to": "2019-12-31"
+    },
+    {
+      "place_group_id": "city-tier-2019-second-tier",
+      "name": "二线城市",
+      "series_code": "city-tier",
+      "member_count": 30,
+      "definition": "第一财经城市研究所《城市商业魅力排行榜》2019年城市分级中的二线城市。",
+      "valid_from": "2019-01-01",
+      "valid_to": "2019-12-31"
+    },
+    {
+      "place_group_id": "city-tier-2019-third-tier",
+      "name": "三线城市",
+      "series_code": "city-tier",
+      "member_count": 70,
+      "definition": "第一财经城市研究所《城市商业魅力排行榜》2019年城市分级中的三线城市。",
+      "valid_from": "2019-01-01",
+      "valid_to": "2019-12-31"
+    },
+    {
+      "place_group_id": "city-tier-2019-fourth-tier",
+      "name": "四线城市",
+      "series_code": "city-tier",
+      "member_count": 90,
+      "definition": "第一财经城市研究所《城市商业魅力排行榜》2019年城市分级中的四线城市。",
+      "valid_from": "2019-01-01",
+      "valid_to": "2019-12-31"
+    },
+    {
+      "place_group_id": "city-tier-2019-fifth-tier",
+      "name": "五线城市",
+      "series_code": "city-tier",
+      "member_count": 128,
+      "definition": "第一财经城市研究所《城市商业魅力排行榜》2019年城市分级中的五线城市。",
+      "valid_from": "2019-01-01",
+      "valid_to": "2019-12-31"
+    },
+    {
+      "place_group_id": "city-tier-2018-first-tier",
+      "name": "一线城市",
+      "series_code": "city-tier",
+      "member_count": 4,
+      "definition": "第一财经城市研究所《城市商业魅力排行榜》2018年城市分级中的一线城市。",
+      "valid_from": "2018-01-01",
+      "valid_to": "2018-12-31"
+    },
+    {
+      "place_group_id": "city-tier-2018-new-first-tier",
+      "name": "新一线城市",
+      "series_code": "city-tier",
+      "member_count": 15,
+      "definition": "第一财经城市研究所《城市商业魅力排行榜》2018年城市分级中的新一线城市。",
+      "valid_from": "2018-01-01",
+      "valid_to": "2018-12-31"
+    },
+    {
+      "place_group_id": "city-tier-2018-second-tier",
+      "name": "二线城市",
+      "series_code": "city-tier",
+      "member_count": 30,
+      "definition": "第一财经城市研究所《城市商业魅力排行榜》2018年城市分级中的二线城市。",
+      "valid_from": "2018-01-01",
+      "valid_to": "2018-12-31"
+    },
+    {
+      "place_group_id": "city-tier-2018-third-tier",
+      "name": "三线城市",
+      "series_code": "city-tier",
+      "member_count": 70,
+      "definition": "第一财经城市研究所《城市商业魅力排行榜》2018年城市分级中的三线城市。",
+      "valid_from": "2018-01-01",
+      "valid_to": "2018-12-31"
+    },
+    {
+      "place_group_id": "city-tier-2018-fourth-tier",
+      "name": "四线城市",
+      "series_code": "city-tier",
+      "member_count": 90,
+      "definition": "第一财经城市研究所《城市商业魅力排行榜》2018年城市分级中的四线城市。",
+      "valid_from": "2018-01-01",
+      "valid_to": "2018-12-31"
+    },
+    {
+      "place_group_id": "city-tier-2018-fifth-tier",
+      "name": "五线城市",
+      "series_code": "city-tier",
+      "member_count": 128,
+      "definition": "第一财经城市研究所《城市商业魅力排行榜》2018年城市分级中的五线城市。",
+      "valid_from": "2018-01-01",
+      "valid_to": "2018-12-31"
+    },
+    {
+      "place_group_id": "city-tier-2017-first-tier",
+      "name": "一线城市",
+      "series_code": "city-tier",
+      "member_count": 4,
+      "definition": "第一财经城市研究所《城市商业魅力排行榜》2017年城市分级中的一线城市。",
+      "valid_from": "2017-01-01",
+      "valid_to": "2017-12-31"
+    },
+    {
+      "place_group_id": "city-tier-2017-new-first-tier",
+      "name": "新一线城市",
+      "series_code": "city-tier",
+      "member_count": 15,
+      "definition": "第一财经城市研究所《城市商业魅力排行榜》2017年城市分级中的新一线城市。",
+      "valid_from": "2017-01-01",
+      "valid_to": "2017-12-31"
+    },
+    {
+      "place_group_id": "city-tier-2017-second-tier",
+      "name": "二线城市",
+      "series_code": "city-tier",
+      "member_count": 30,
+      "definition": "第一财经城市研究所《城市商业魅力排行榜》2017年城市分级中的二线城市。",
+      "valid_from": "2017-01-01",
+      "valid_to": "2017-12-31"
+    },
+    {
+      "place_group_id": "city-tier-2017-third-tier",
+      "name": "三线城市",
+      "series_code": "city-tier",
+      "member_count": 70,
+      "definition": "第一财经城市研究所《城市商业魅力排行榜》2017年城市分级中的三线城市。",
+      "valid_from": "2017-01-01",
+      "valid_to": "2017-12-31"
+    },
+    {
+      "place_group_id": "city-tier-2017-fourth-tier",
+      "name": "四线城市",
+      "series_code": "city-tier",
+      "member_count": 90,
+      "definition": "第一财经城市研究所《城市商业魅力排行榜》2017年城市分级中的四线城市。",
+      "valid_from": "2017-01-01",
+      "valid_to": "2017-12-31"
+    },
+    {
+      "place_group_id": "city-tier-2017-fifth-tier",
+      "name": "五线城市",
+      "series_code": "city-tier",
+      "member_count": 128,
+      "definition": "第一财经城市研究所《城市商业魅力排行榜》2017年城市分级中的五线城市。",
+      "valid_from": "2017-01-01",
+      "valid_to": "2017-12-31"
+    },
+    {
+      "place_group_id": "city-tier-2016-first-tier",
+      "name": "一线城市",
+      "series_code": "city-tier",
+      "member_count": 4,
+      "definition": "第一财经城市研究所《城市商业魅力排行榜》2016年城市分级中的一线城市。",
+      "valid_from": "2016-01-01",
+      "valid_to": "2016-12-31"
+    },
+    {
+      "place_group_id": "city-tier-2016-new-first-tier",
+      "name": "新一线城市",
+      "series_code": "city-tier",
+      "member_count": 15,
+      "definition": "第一财经城市研究所《城市商业魅力排行榜》2016年城市分级中的新一线城市。",
+      "valid_from": "2016-01-01",
+      "valid_to": "2016-12-31"
+    },
+    {
+      "place_group_id": "city-tier-2016-second-tier",
+      "name": "二线城市",
+      "series_code": "city-tier",
+      "member_count": 30,
+      "definition": "第一财经城市研究所《城市商业魅力排行榜》2016年城市分级中的二线城市。",
+      "valid_from": "2016-01-01",
+      "valid_to": "2016-12-31"
+    },
+    {
+      "place_group_id": "city-tier-2016-third-tier",
+      "name": "三线城市",
+      "series_code": "city-tier",
+      "member_count": 70,
+      "definition": "第一财经城市研究所《城市商业魅力排行榜》2016年城市分级中的三线城市。",
+      "valid_from": "2016-01-01",
+      "valid_to": "2016-12-31"
+    },
+    {
+      "place_group_id": "city-tier-2016-fourth-tier",
+      "name": "四线城市",
+      "series_code": "city-tier",
+      "member_count": 90,
+      "definition": "第一财经城市研究所《城市商业魅力排行榜》2016年城市分级中的四线城市。",
+      "valid_from": "2016-01-01",
+      "valid_to": "2016-12-31"
+    },
+    {
+      "place_group_id": "city-tier-2016-fifth-tier",
+      "name": "五线城市",
+      "series_code": "city-tier",
+      "member_count": 128,
+      "definition": "第一财经城市研究所《城市商业魅力排行榜》2016年城市分级中的五线城市。",
+      "valid_from": "2016-01-01",
+      "valid_to": "2016-12-31"
+    },
+    {
+      "place_group_id": "city-charm-2016-source-cities",
+      "name": "2016版城市魅力榜单来源城市",
+      "series_code": "city-charm-source",
+      "member_count": 337,
+      "definition": "2016版可访问来源根节点的337城集合；保留实际范围，按核定行政编码对应关系归一，不补造原公示中的其他城市数值。",
+      "valid_from": "2016-04-25",
+      "valid_to": "2017-05-24"
+    },
+    {
+      "place_group_id": "city-charm-2017-source-cities",
+      "name": "2017版城市魅力榜单来源城市",
+      "series_code": "city-charm-source",
+      "member_count": 337,
+      "definition": "2017版可访问来源根节点的337城集合；保留实际范围，按核定行政编码对应关系归一，不补造原公示中的其他城市数值。",
+      "valid_from": "2017-05-25",
+      "valid_to": "2018-04-25"
+    },
+    {
+      "place_group_id": "city-charm-2018-source-cities",
+      "name": "2018版城市魅力榜单来源城市",
+      "series_code": "city-charm-source",
+      "member_count": 337,
+      "definition": "2018版可访问来源根节点的337城集合；保留实际范围，按核定行政编码对应关系归一，不补造原公示中的其他城市数值。",
+      "valid_from": "2018-04-26",
+      "valid_to": "2019-05-23"
+    },
+    {
+      "place_group_id": "city-charm-2019-source-cities",
+      "name": "2019版城市魅力榜单来源城市",
+      "series_code": "city-charm-source",
+      "member_count": 337,
+      "definition": "2019版可访问来源根节点的337城集合；保留实际范围，按核定行政编码对应关系归一，不补造原公示中的其他城市数值。",
+      "valid_from": "2019-05-24",
+      "valid_to": "2020-05-28"
+    }
+  ],
+  "computed": [],
+  "alignment": [],
+  "sources": [],
+  "caveats": [],
+  "coverage": {
+    "returned_groups": 106,
+    "total_groups": 106
+  },
+  "truncated": false,
+  "next_offset": null
+}

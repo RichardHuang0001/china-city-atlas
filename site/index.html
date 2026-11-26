@@ -3,8 +3,8 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <meta name="description" content="按地图、省份和榜单线级查阅 2025 年中国 337 座地级及以上城市分布。">
-  <title>中国城市分级地图 · 2025</title>
+  <meta name="description" content="按地图、省份和知城 2026 版线级查阅中国 337 座地级及以上城市分布。">
+  <title>中国城市分级地图 · 2026</title>
   <link rel="stylesheet" href="assets/style.css">
   <script defer src="assets/data.js"></script>
   <script defer src="assets/map-data.js"></script>
@@ -15,7 +15,7 @@
 <main>
   <header class="masthead">
     <div class="edition">
-      <span class="edition-year">2025 年版</span>
+      <span class="edition-year" id="edition-year">2026 年版</span>
       <nav aria-label="页面导航">
         <a href="#directory">城市名录</a>
         <a href="#sources" id="sources-link">来源与口径</a>
@@ -25,7 +25,7 @@
     <div class="hero">
       <div class="hero-copy">
         <h1>中国城市分级地图</h1>
-        <p>按第一财经城市魅力榜，查看六档城市在各省份的分布。</p>
+        <p id="hero-subtitle">按第一财经·新一线知城数据库 2026 版，查看六档城市在各省份的分布。</p>
       </div>
       <dl class="hero-stats" aria-label="收录范围">
         <div><dt>地级行政区</dt><dd>333</dd></div>
@@ -108,14 +108,14 @@
         <label for="table-tier" class="sr-only">名录线级</label>
         <select id="table-tier"><option value="">全部线级</option></select>
         <label for="sort" class="sr-only">排序方式</label>
-        <select id="sort"><option value="rank">榜单图序</option><option value="province">省份</option><option value="tier">线级</option><option value="name">城市名</option></select>
+        <select id="sort"><option value="rank">榜单排序</option><option value="province">省份</option><option value="tier">线级</option><option value="name">城市名</option></select>
         </div>
       </div>
       <div id="counts" class="counts" aria-live="polite"></div>
       <div class="rows-wrap">
         <div class="rows" role="region" aria-label="城市表格" tabindex="0">
           <table aria-label="地级行政区">
-            <thead><tr><th scope="col">线内图序</th><th scope="col">城市</th><th scope="col">省份</th><th scope="col">线级</th></tr></thead>
+            <thead><tr><th scope="col" id="rank-header">线内序</th><th scope="col">城市</th><th scope="col">省份</th><th scope="col">线级</th></tr></thead>
             <tbody id="city-rows"></tbody>
           </table>
           <p id="empty" class="empty" hidden>当前没有符合条件的地级行政区。</p>
@@ -143,8 +143,8 @@
   <details class="sources" id="sources">
     <summary>来源与统计口径</summary>
     <div class="sources-grid">
-      <div><h3>城市线级</h3><p>采用第一财经新一线城市研究所 2025 年 5 月发布的完整分级图（覆盖中国内地全部 337 座地级及以上城市）。线内图序指原图从左到右、从上到下的序号。未展示分数及全榜总名次。</p><a href="https://www.yicai.com/news/102638963.html" target="_blank" rel="noopener">第一财经发布原文 ↗</a></div>
-      <div><h3>行政区划</h3><p>以 2024 年末县以上行政区划代码与 2025 年名录交叉核对。完整收录 333 个地级行政区（293 座地级市与 40 个自治州、地区、盟），4 座直辖市单列参考，合计与原榜 337 席一致。港澳台出现在底图中，无本榜数据。</p><a href="https://dmfw.mca.gov.cn/XzqhVersionPublish.html" target="_blank" rel="noopener">民政部国家地名信息库 ↗</a> · <a href="https://github.com/yescallop/areacodes" target="_blank" rel="noopener">区划代码存档 ↗</a></div>
+      <div id="source-tier-card"><h3>城市线级（2026）</h3><p>采用第一财经·新一线城市研究所知城数据库 2026 版（city_charm.2026）分层归档与总榜次序（覆盖中国内地全部 337 座地级及以上城市）。注：2026 年 5 月公开报告正文不再单独发布综合排名与分级名单，本页线级与线内序取自官方知城数据库同期归档，与当年 1–337 总榜分段一致。</p><a href="https://www.yicai.com/news/103204902.html" target="_blank" rel="noopener">第一财经 2026 报告原文 ↗</a> · <a href="https://www.datayicai.com/data/rankings/charm/2026" target="_blank" rel="noopener">新一线知城 2026 榜单概览 ↗</a></div>
+      <div><h3>行政区划</h3><p>以民政部 2024 年末统计公报及 2024/2025 年行政区划代码存档与知城 2026 版 337 城名录交叉核对。完整收录 333 个地级行政区（293 座地级市与 40 个自治州、地区、盟），4 座直辖市单列参考，合计与数据库 337 席一致。港澳台出现在底图中，无本榜数据。</p><a href="https://dmfw.mca.gov.cn/XzqhVersionPublish.html" target="_blank" rel="noopener">民政部国家地名信息库 ↗</a> · <a href="https://github.com/yescallop/areacodes" target="_blank" rel="noopener">区划代码存档 ↗</a></div>
       <div><h3>底图与标记</h3><p>底图来自开源仓库整理的天地图省级、地级边界。全国和南海附图保留离岸岛屿及断续线，省级视图显示数据源提供的地级边界。页面重新投影和配色，未单独送审。</p><a href="https://github.com/JayMuShui/chinese-global-compliant-geodata" target="_blank" rel="noopener">开源数据仓库 ↗</a> · <a href="https://cloudcenter.tianditu.gov.cn/administrativeDivision/" target="_blank" rel="noopener">天地图数据 ↗</a> · <a href="licenses/map-source.txt">MIT 声明</a></div>
       <div><h3>城市定位</h3><p>标记为近似位置。来源为公开的 WGS 84 驻地地理编码，结合独立的城市定位数据排查明显偏差。部分城市使用城区参考点，详情中有说明。位置数据未逐笔核实到政府现址。</p><a href="https://gaohr.win/site/blogs/2022/2022-03-29-location-of-gov.html" target="_blank" rel="noopener">GaoHR 驻地数据 ↗</a> · <a href="https://datav.aliyun.com/portal/school/atlas/area_selector" target="_blank" rel="noopener">DataV 城市定位参考 ↗</a></div>
     </div>

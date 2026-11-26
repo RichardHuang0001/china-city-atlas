@@ -7,3 +7,6 @@ __pycache__/
 node_modules/
 dist/
 site/assets/map-data.js
+research/datayicai-mcp/charm-2026/city_charm_2026_all_337.json
+research/datayicai-mcp/charm-history/*_337.json
+research/datayicai-mcp/city-stats/*_337.json

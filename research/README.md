@@ -13,12 +13,19 @@
 
 ### 2. `yicai-2026/` — 第一财经城市研究所《2026新一线城市魅力指数报告》（2026-05-28）
 - [yicai-2026-news-103204902.html](yicai-2026/yicai-2026-news-103204902.html) & [yicai-2026-topic-103198991.html](yicai-2026/yicai-2026-topic-103198991.html)：2026-05-28 官方发布正文与专题页。
-- **重要口径变化**：2026 年报告明确宣布「**不再发布 337 座地级及以上城市的新一线城市魅力指数总分、排名和分级结果**」，改为通过五大维度洞察（五大趋势配图 `2026-trend-1~5.jpg`、`2026-methodology-revision.jpg`）与知城小程序单城三级维度数据开放（`2026-zhicheng-miniapp.jpg`）。因此 **2025 年版是最近一期完整官方城市分级名单**。
+- **公开报告口径变化**：2026 年报告明确宣布「**不再发布 337 座地级及以上城市的新一线城市魅力指数总分、排名和分级结果**」，改为通过五大维度洞察（五大趋势配图 `2026-trend-1~5.jpg`、`2026-methodology-revision.jpg`）与知城小程序单城三级维度数据开放（`2026-zhicheng-miniapp.jpg`）。因此 **2025 年版是最近一期公开新闻稿口径下的完整城市分级名单**。
 
-### 3. `mca-areacodes/` — 民政部官方统计口径与区划代码
+### 3. `datayicai-mcp/` — 第一财经「新一线城市数据库 MCP」全量结构化采集归档（2026-11-26）
+- 详见 [datayicai-mcp/README.md](datayicai-mcp/README.md)。通过官方 MCP 服务采集并核验：
+  - **2026 全量（`charm-2026/`）**：`city_charm.2026` 337 城 × 134 节点（45,158 条零缺失），含标准化总分、排名、5 大一级维度、16 项二级维度、52 项三级维度及底层指标，以及数据库内归档的 `city-tier-2026-*` 分组与 2025 对照表（`site_2025_mismatches=0`，二至五线 32 城发生升降）。
+  - **跨年纵向面板（`charm-history/`）**：2016–2026 共 11 年 × 337 城（3,707 行）城市魅力总分、一级维度与线级变迁，及 2025 年 16 项二级维度全量得分。
+  - **客观统计与宏观时间序列（`city-stats/`）**：112 项基础统计指标 337 城最新截面（37,744 条），及 2016–2025 年 10 大核心宏观指标（GDP、增速、人均 GDP、人口、城镇化率、可支配收入、社零、财政收入、金融存款）337 城 10 年面板（33,700 条）。
+  - **产业魅力指数（`city-industry/`）**：截至 2026-11-25 的 50 样本城市产业魅力指数快照与成分市值集中度。
+
+### 4. `mca-areacodes/` — 民政部官方统计口径与区划代码
 - [mca-2024-statistical-bulletin.pdf](mca-areacodes/mca-2024-statistical-bulletin.pdf)：民政部《2024年民政事业发展统计公报》（第 3 页表 1 明确截至 2024 年底全国共有省级 34 个、地级行政区 333 个，其中地级市 293 个、自治州 30 个、地区 7 个、盟 3 个）。
 - [areacodes-README.md](mca-areacodes/areacodes-README.md) & [areacodes-result.csv](mca-areacodes/areacodes-result.csv)：`yescallop/areacodes`（CC0）行政区划代码存档，实测当前在用「地级」单位共 **333 个**，与第一财经 337 城减去 4 直辖市完全一致。
 
-### 4. `geodata-specs/` — 地图数据与制图规范参考
+### 5. `geodata-specs/` — 地图数据与制图规范参考
 - [public-map-content-spec-2023.pdf](geodata-specs/public-map-content-spec-2023.pdf)：自然资源部《公开地图内容表示规范》（2023 年公布）。
 - [geodata-README.md](geodata-specs/geodata-README.md)、[geodata-chn-global-README.md](geodata-specs/geodata-chn-global-README.md) & [geodata-LICENSE](geodata-specs/geodata-LICENSE)：底图上游仓库 `chinese-global-compliant-geodata`（固定 commit `3cf3485789876c37be6193bf2848cf9aaa40f758`）的来源与 MIT 许可说明。

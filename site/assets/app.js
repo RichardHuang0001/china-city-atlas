@@ -1,11 +1,38 @@
 (() => {
   'use strict';
-  const {cities, provinces} = window.atlasData;
+  const {meta = {}, cities, provinces} = window.atlasData;
   const map = window.atlasMap;
   const labelLayout = window.atlasLabels;
-  const tiers = ['一线', '新一线', '二线', '三线', '四线', '五线'];
-  const colors = ['#9b3454', '#ad5141', '#936820', '#926074', '#6c6279', '#82674e'];
-  const tierScales = [1.09, 1.04, 1.0, .95, .9, .85];
+  const FIELD = {
+    name: 0, code: 1, province: 2, tier: 3, rank: 4,
+    reference: 5, coord: 6, point: 7, urbanRef: 8,
+  };
+  const DEFAULT_TIERS = [
+    {name: '一线', color: '#9b3454', scale: 1.09},
+    {name: '新一线', color: '#ad5141', scale: 1.04},
+    {name: '二线', color: '#936820', scale: 1},
+    {name: '三线', color: '#926074', scale: 0.95},
+    {name: '四线', color: '#6c6279', scale: 0.9},
+    {name: '五线', color: '#82674e', scale: 0.85},
+  ];
+  const MAP_CONFIG = {
+    insetProvince: '46',
+    insetCity: '460300',
+    insetTitle: '海南省 · 南海诸岛',
+    insetHint: '三沙位于永兴岛附近。',
+    districtZoomIndex: 3,
+    provinceLabelMaxZoom: 1.6,
+    zoomSteps: [1, 1.23, 1.7, 2.35, 3.25, 4.5, 6, 8],
+    provinceLabels: [
+      ['65', '新疆'], ['54', '西藏'], ['63', '青海'], ['15', '内蒙古'],
+      ['23', '黑龙江'], ['51', '四川'], ['53', '云南'], ['45', '广西'], ['71', '台湾'], ['46', '海南'],
+    ],
+  };
+  const tierConfig = Array.isArray(meta.tiers) && meta.tiers.length ? meta.tiers : DEFAULT_TIERS;
+  const tiers = tierConfig.map(item => item.name);
+  const colors = tierConfig.map(item => item.color);
+  const tierScales = tierConfig.map(item => item.scale);
+  const maxTier = tiers.length - 1;
   // Six distinct badge silhouettes + white geometric numerals (Scheme A) shared by map, legend, and table.
   const badges = [
     'M0,-1.17 .29,-.83 .74,-.90 .70,-.45 1.07,-.18 .82,.19 .94,.62 .51,.74 .30,1.12 0,.93 -.30,1.12 -.51,.74 -.94,.62 -.82,.19 -1.07,-.18 -.70,-.45 -.74,-.90 -.29,-.83Z',
@@ -42,7 +69,8 @@
   const lookup = new Map(cities.map(city => [city[1], city]));
   const collator = new Intl.Collator('zh-CN');
   const ns = 'http://www.w3.org/2000/svg';
-  const zoomSteps = [1, 1.23, 1.7, 2.35, 3.25, 4.5, 6, 8];
+  const zoomSteps = MAP_CONFIG.zoomSteps;
+  const provinceLabels = MAP_CONFIG.provinceLabels;
   let camera = {zoom: 1, center: null};
   let fittedView;
   let cameraFrame;
@@ -56,18 +84,51 @@
     camera = {zoom: 1, center: null};
   }
 
+  function applyEditionMeta() {
+    if (meta.title) document.title = meta.title;
+    const desc = document.querySelector('meta[name="description"]');
+    if (desc && meta.description) desc.setAttribute('content', meta.description);
+    if (meta.editionLabel && byId('edition-year')) byId('edition-year').textContent = meta.editionLabel;
+    if (meta.subtitle && byId('hero-subtitle')) byId('hero-subtitle').textContent = meta.subtitle;
+    if (meta.rankLabel && byId('rank-header')) byId('rank-header').textContent = meta.rankLabel;
+    const rankOpt = ui.sort?.querySelector('option[value="rank"]');
+    if (rankOpt && meta.rankSortLabel) rankOpt.textContent = meta.rankSortLabel;
+    const sourceCard = byId('source-tier-card');
+    if (sourceCard && meta.sourceNote) {
+      const h3 = document.createElement('h3');
+      h3.textContent = meta.sourceTitle || '城市线级';
+      const p = document.createElement('p');
+      p.textContent = meta.sourceNote;
+      const nodes = [h3, p];
+      if (Array.isArray(meta.sourceLinks)) {
+        meta.sourceLinks.forEach((item, idx) => {
+          if (idx > 0) nodes.push(document.createTextNode(' · '));
+          const a = document.createElement('a');
+          a.href = item.url;
+          a.target = '_blank';
+          a.rel = 'noopener';
+          a.textContent = item.label;
+          nodes.push(a);
+        });
+      }
+      sourceCard.replaceChildren(...nodes);
+    }
+  }
+
   const swatch = tier => '<svg class="symbol" aria-hidden="true" viewBox="-1.35 -1.35 2.7 2.7">' +
     '<path d="' + badges[tier] + '" fill="' + colors[tier] + '"></path>' +
     '<path class="symbol-digit" d="' + digits[tier] + '"></path></svg>';
-  const cityDescription = city => city[0] + ' · ' + provinces[city[2]] + ' · ' + tiers[city[3]] + '第 ' + city[4] + ' 位（图序）';
-  const rank = (a, b) => a[3] - b[3] || a[4] - b[4];
+  const rankUnit = meta.rankUnit || '位（线内序）';
+  const cityDescription = city => city[FIELD.name] + ' · ' + provinces[city[FIELD.province]] + ' · ' + tiers[city[FIELD.tier]] + '第 ' + city[FIELD.rank] + ' ' + rankUnit;
+  const rank = (a, b) => a[FIELD.tier] - b[FIELD.tier] || a[FIELD.rank] - b[FIELD.rank];
   const orders = {
     rank,
-    province: (a, b) => collator.compare(provinces[a[2]], provinces[b[2]]) || rank(a, b),
-    tier: (a, b) => a[3] - b[3] || collator.compare(a[0], b[0]),
-    name: (a, b) => collator.compare(a[0], b[0]),
+    province: (a, b) => collator.compare(provinces[a[FIELD.province]], provinces[b[FIELD.province]]) || rank(a, b),
+    tier: (a, b) => a[FIELD.tier] - b[FIELD.tier] || collator.compare(a[FIELD.name], b[FIELD.name]),
+    name: (a, b) => collator.compare(a[FIELD.name], b[FIELD.name]),
   };
 
+  applyEditionMeta();
   for (const [code, name] of Object.entries(provinces)) ui.province.add(new Option(name, code));
   ui.legend.innerHTML = '<label><input type="checkbox" data-tier="all">全选</label>' +
     tiers.map((name, i) => '<label><input type="checkbox" data-tier="' + i + '">' + swatch(i) + name + '</label>').join('');
@@ -86,10 +147,6 @@
   ui.boundaries.setAttribute('d', map.boundary);
   for (const node of document.querySelectorAll('.sea-land')) node.setAttribute('d', map.seaLand);
   for (const node of document.querySelectorAll('.sea-boundary')) node.setAttribute('d', map.seaBoundary);
-  const provinceLabels = [
-    ['65','新疆'], ['54','西藏'], ['63','青海'], ['15','内蒙古'],
-    ['23','黑龙江'], ['51','四川'], ['53','云南'], ['45','广西'], ['71','台湾'], ['46','海南'],
-  ];
   for (const [code, name] of provinceLabels) {
     // Province anchors come from the same projected geometry the view uses.
     const [, anchor] = map.provinces[code];
@@ -101,8 +158,8 @@
   }
 
   function stats(list) {
-    const counts = Array(6).fill(0);
-    for (const city of list) counts[city[3]]++;
+    const counts = Array(tiers.length).fill(0);
+    for (const city of list) counts[city[FIELD.tier]]++;
     return counts;
   }
 
@@ -172,7 +229,7 @@
       });
     }
 
-    const showProvinces = !state.province && camera.zoom < 1.6;
+    const showProvinces = !state.province && camera.zoom < MAP_CONFIG.provinceLabelMaxZoom;
     ui['province-labels'].toggleAttribute('hidden', !showProvinces);
     if (showProvinces) {
       const font = rect.width < 600 ? 9 : 13;
@@ -192,20 +249,20 @@
       }
     }
 
-    const focus = state.selected || (mainMarkers.length === 1 ? mainMarkers[0].city[1] : '');
+    const focus = state.selected || (mainMarkers.length === 1 ? mainMarkers[0].city[FIELD.code] : '');
     const level = zoomLevel(camera.zoom);
     const local = !!state.province;
     const placed = labelLayout.place({
       markers: mainMarkers, width: rect.width, height: rect.height, left, top, units,
-      level, local, focus, obstacles, colors,
+      level, local, focus, obstacles, colors, maxTier,
     });
     ui['city-leaders'].replaceChildren(placed.leaders);
     ui['city-labels'].replaceChildren(placed.labels);
     const wide = rect.width >= labelLayout.narrowMap;
-    const tier = labelLayout.priorityTier(rect.width, level, local);
+    const tier = labelLayout.priorityTier(rect.width, level, local, maxTier);
     const zoomTag = camera.zoom > 1 ? '（' + camera.zoom.toFixed(2).replace(/\.?0+$/, '') + '×）' : '';
-    ui['map-hint'].textContent = state.inset ? '三沙位于永兴岛附近。' :
-      wide && tier < 5 ? '当前' + zoomTag + '优先显示' + tiers[tier] + '及以上，' +
+    ui['map-hint'].textContent = state.inset ? MAP_CONFIG.insetHint :
+      wide && tier < maxTier ? '当前' + zoomTag + '优先显示' + tiers[tier] + '及以上，' +
         (local ? '拖动可浏览邻省，' : '') + '点击 ＋ 展开' + tiers[tier + 1] + '城市名。' :
       wide ? '当前' + zoomTag + '显示视野内的各档城市名，' + (local ? '拖动可浏览邻省，' : '') + '点击名称查看详情。' :
         (local ? '可单指拖动浏览邻省，' : camera.zoom > 1 ? '当前 ' + zoomTag.slice(1, -1) + '，可单指拖动地图，' : '放大可逐级看到更多城市名，') +
@@ -214,7 +271,7 @@
 
   function updateDistrictLines() {
     const {inset, province} = state;
-    const nextScope = inset ? '' : province ? province : camera.zoom >= zoomSteps[3] ? 'national' : '';
+    const nextScope = inset ? '' : province ? province : camera.zoom >= zoomSteps[MAP_CONFIG.districtZoomIndex] ? 'national' : '';
     if (nextScope === districtScope) return;
     districtScope = nextScope;
     if (!nextScope) ui['district-lines'].setAttribute('d', '');
@@ -303,35 +360,36 @@
 
   function matchesScope() {
     const query = state.query.trim().replace(/市$/, '').normalize('NFKC');
-    return cities.filter(city => (!state.province || city[2] === state.province) &&
-      (!query || city[0].includes(query)));
+    return cities.filter(city => (!state.province || city[FIELD.province] === state.province) &&
+      (!query || city[FIELD.name].includes(query)));
   }
 
   function visibleCities() {
     const tier = ui['table-tier'].value;
-    return matchesScope().filter(city => tier === '' || city[3] === Number(tier));
+    return matchesScope().filter(city => tier === '' || city[FIELD.tier] === Number(tier));
   }
 
-  function cityButton(city, label = city[0]) {
-    return '<button type="button" class="city-link" data-city="' + city[1] + '"' +
-      (city[1] === state.selected ? ' aria-current="true"' : '') + '>' + label + '</button>';
+  function cityButton(city, label = city[FIELD.name]) {
+    const code = city[FIELD.code];
+    return '<button type="button" class="city-link" data-city="' + code + '"' +
+      (code === state.selected ? ' aria-current="true"' : '') + '>' + label + '</button>';
   }
 
   function render() {
     const list = visibleCities().sort(orders[ui.sort.value]);
-    const ordinary = list.filter(city => !city[5]);
-    const references = list.filter(city => city[5]);
+    const ordinary = list.filter(city => !city[FIELD.reference]);
+    const references = list.filter(city => city[FIELD.reference]);
     const scoped = matchesScope();
-    const markers = scoped.filter(city => state.tiers.has(city[3]));
-    const selected = scoped.find(city => city[1] === state.selected);
+    const markers = scoped.filter(city => state.tiers.has(city[FIELD.tier]));
+    const selected = scoped.find(city => city[FIELD.code] === state.selected);
     const scope = provinces[state.province] || '全国';
     const selection = !!(ui['table-tier'].value || state.query.trim());
     setView();
     const miniScale = state.province ? 1 : fitInset();
 
-    ui['map-title'].textContent = state.inset ? '海南省 · 南海诸岛' : scope;
+    ui['map-title'].textContent = state.inset ? MAP_CONFIG.insetTitle : scope;
     ui.national.hidden = !state.province;
-    ui.inset.hidden = state.province !== '46';
+    ui.inset.hidden = state.province !== MAP_CONFIG.insetProvince;
     ui.inset.textContent = state.inset ? '查看海南岛' : '查看南海附图';
     ui.province.value = state.province;
     for (const checkbox of ui.legend.querySelectorAll('input')) {
@@ -349,8 +407,11 @@
     const ordinarySize = ui.atlas.clientWidth < 600 ? 4.8 : 7;
     let shown = 0;
     for (const city of [...markers].reverse()) {
-      const [, code, , tier, , reference, , point] = city;
-      const sansha = code === '460300';
+      const code = city[FIELD.code];
+      const tier = city[FIELD.tier];
+      const reference = city[FIELD.reference];
+      const point = city[FIELD.point];
+      const sansha = code === MAP_CONFIG.insetCity;
       if (!point || (state.inset && !sansha) || (state.province && !state.inset && sansha)) continue;
       const miniature = sansha && !state.province;
       const baseSize = code === state.selected ? Math.max(8.8, ordinarySize * 1.25) :
@@ -391,20 +452,20 @@
     const countLabel = selection ? '筛选后线级分布' : scope + '线级分布';
     ui.counts.setAttribute('aria-label', countLabel);
     ui.counts.innerHTML = stats(ordinary).map((n, i) => '<span>' + swatch(i) + tiers[i] + ' ' + n + '</span>').join('');
-    ui['city-rows'].innerHTML = ordinary.map(city => '<tr data-row="' + city[1] + '"' +
-      (city[1] === state.selected ? ' class="active"' : '') + '><td>' + city[4] + '</td><td>' +
-      cityButton(city) + '</td><td>' + provinces[city[2]] + '</td><td>' + swatch(city[3]) + tiers[city[3]] + '</td></tr>').join('');
+    ui['city-rows'].innerHTML = ordinary.map(city => '<tr data-row="' + city[FIELD.code] + '"' +
+      (city[FIELD.code] === state.selected ? ' class="active"' : '') + '><td>' + city[FIELD.rank] + '</td><td>' +
+      cityButton(city) + '</td><td>' + provinces[city[FIELD.province]] + '</td><td>' + swatch(city[FIELD.tier]) + tiers[city[FIELD.tier]] + '</td></tr>').join('');
     ui.empty.hidden = !!ordinary.length;
     ui['reference-count'].textContent = references.length + ' 座';
     byId('reference').hidden = !references.length;
     ui['reference-rows'].innerHTML = references.map(city =>
-      cityButton(city, swatch(city[3]) + city[0] + ' · ' + tiers[city[3]] + ' ' + city[4])).join('');
+      cityButton(city, swatch(city[FIELD.tier]) + city[FIELD.name] + ' · ' + tiers[city[FIELD.tier]] + ' ' + city[FIELD.rank])).join('');
     ui['city-detail'].hidden = !selected;
     if (selected) {
-      const coord = selected[6].map(n => n.toFixed(3));
+      const coord = selected[FIELD.coord].map(n => n.toFixed(3));
       ui['city-detail'].textContent = cityDescription(selected) + '。' +
-        (selected[8] ? '城区参考位置' : '公开驻地数据的近似位置') + '，东经 ' + coord[0] + '°，北纬 ' + coord[1] + '°。' +
-        (state.tiers.has(selected[3]) ? '' : ' 当前未勾选该线级的地图标记。');
+        (selected[FIELD.urbanRef] ? '城区参考位置' : '公开驻地数据的近似位置') + '，东经 ' + coord[0] + '°，北纬 ' + coord[1] + '°。' +
+        (state.tiers.has(selected[FIELD.tier]) ? '' : ' 当前未勾选该线级的地图标记。');
     }
     hideTooltip();
   }
@@ -422,9 +483,9 @@
     const city = lookup.get(code);
     if (!city) return;
     if (origin !== 'map') resetCamera();
-    state.province = city[2];
+    state.province = city[FIELD.province];
     state.selected = code;
-    state.inset = code === '460300';
+    state.inset = code === MAP_CONFIG.insetCity;
     render();
     const button = document.querySelector('[data-row="' + code + '"] button') ||
       ui['reference-rows'].querySelector('[data-city="' + code + '"]');
@@ -475,7 +536,7 @@
       return;
     }
     highlightProvince(provincePaths.get(province));
-    highlightCity(city?.[1] || '');
+    highlightCity(city?.[FIELD.code] || '');
     ui.tooltip.textContent = city ? cityDescription(city) : provinces[province] + ' · 点击放大';
     ui.tooltip.hidden = false;
     const stage = ui['map-stage'].getBoundingClientRect();
@@ -498,7 +559,7 @@
     svg.addEventListener('click', mapClick);
   }
   ui['sea-open'].addEventListener('click', () => {
-    state.province = '46';
+    state.province = MAP_CONFIG.insetProvince;
     state.inset = true;
     render();
     ui.inset.focus();
@@ -617,7 +678,7 @@
   ui.query.addEventListener('keydown', event => {
     if (event.key !== 'Enter') return;
     const list = visibleCities();
-    if (list.length === 1) selectCity(list[0][1], 'search');
+    if (list.length === 1) selectCity(list[0][FIELD.code], 'search');
   });
   ui.province.addEventListener('change', () => selectProvince(ui.province.value));
   ui.national.addEventListener('click', () => {

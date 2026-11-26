@@ -1,0 +1,63 @@
+{
+  "items": [
+    {
+      "track_id": "additive_manufacturing_equipment",
+      "name": "3D打印装备",
+      "description": "覆盖增材制造专用材料、核心部件、工业软件、各类3D打印装备、打印服务、后处理检测及相关应用。",
+      "membership_updated_at": "2026-09-03T19:00:49.606Z",
+      "enterprise_count": 1760
+    },
+    {
+      "track_id": "energy_storage_battery",
+      "name": "储能电池",
+      "description": "聚焦电化学储能电池及直接配套：材料、电芯与模组、电池系统、BMS与热管理、制造检测设备、结构件和回收。排除纯动力电池、整车、PCS/EMS、电站运营及泛储能服务。",
+      "membership_updated_at": "2026-09-24T12:51:47.781Z",
+      "enterprise_count": 379
+    },
+    {
+      "track_id": "optical_communication",
+      "name": "光通信",
+      "description": "覆盖光芯片与核心器件、光器件与连接组件、PCB材料、光纤材料、高速光模块与光互联、光纤光缆与传输设备、测试封装，以及算力网络与通信应用。",
+      "membership_updated_at": "2026-07-10T09:19:58.696Z",
+      "enterprise_count": 3772
+    },
+    {
+      "track_id": "commercial_spaceflight",
+      "name": "商业航天",
+      "description": "覆盖推进剂与关键部件、运载火箭、卫星制造与载荷、动力制导控制、航天制造测试装备、发射测运控地面系统，以及卫星通信与航天信息应用。",
+      "membership_updated_at": "2026-07-24T10:43:52.253Z",
+      "enterprise_count": 2523
+    }
+  ],
+  "count_note": "本企业库仅收录上市公司、高新技术企业、科技型中小企业、国家级专精特新“小巨人”等标签企业，不覆盖所有企业。图谱与名单展示其中已归属本产业链的企业，不代表全行业企业总量，也不能将全部收录企业视为上市公司。企业数按主体去重，同一企业可属于多个环节，各环节数量不可直接相加；产业链归属不表示企业之间存在供销关系。",
+  "temporal_semantics": {
+    "membership_updated_at": {
+      "kind": "update_time",
+      "label": "产业链归属更新时间"
+    },
+    "profile_updated_at": {
+      "kind": "update_time",
+      "label": "企业资料更新时间"
+    },
+    "founded_at": {
+      "kind": "event_date",
+      "label": "成立日期"
+    },
+    "recognition_year": {
+      "kind": "event_year",
+      "label": "认定年份"
+    },
+    "valid_from_year": {
+      "kind": "validity_year",
+      "label": "有效期起始年份"
+    },
+    "valid_to_year": {
+      "kind": "validity_year",
+      "label": "有效期结束年份"
+    }
+  },
+  "source": {
+    "source_name": "知城企业数据库",
+    "source_url": "https://www.datayicai.com/city-data?section=city_industry"
+  }
+}

@@ -1,0 +1,311 @@
+{
+  "query": {
+    "catalog": "products",
+    "catalog_scope": "all",
+    "view": "metrics",
+    "limit": 50,
+    "offset": 0
+  },
+  "data": [
+    {
+      "product_id": "city_charm",
+      "product_name": "城市魅力指数",
+      "description": "第一财经城市研究所编制的年度城市评价产品，汇集商业、交通、人口、消费与产业等数据，呈现城市综合魅力及各维度的发展表现。历年评价范围、指标体系和方法见相应年度说明。",
+      "versions": [
+        {
+          "product_version_id": "city_charm.2026",
+          "version_code": "2026",
+          "version_name": "2026新一线城市魅力指数报告",
+          "description": "2026年版覆盖337座城市，从商业资源集聚度、城市枢纽性、城市人活跃度、新经济竞争力和未来可塑性五大维度，呈现城市综合魅力及分维度表现。 总指标展示当年源表的标准化分，最高100分、最低0分。分项比较指数统一为0—100分，并可关联查看原始供数与来源发布值，不能用分项比较分回算总榜。",
+          "methodology": "第一财经城市研究所汇集统计资料与平台数据，按照2026年指标体系形成城市基础指标和可比结果；二级维度依据三级维度采用主成分分析形成，五大维度共同构成城市魅力综合评价。",
+          "update_frequency": "annual",
+          "place_group_id": "administrative-division-2023-prefecture-division",
+          "is_current": true,
+          "valid_from": "2026-05-28",
+          "valid_to": null,
+          "node_count": 134,
+          "bound_node_count": 134,
+          "binding_status": "fully_bound",
+          "fact_coverage": {
+            "expected_cells": 45158,
+            "matched_cells": 45158,
+            "unique_cells": 45158,
+            "missing_cells": 0,
+            "duplicate_cells": 0,
+            "status": "complete"
+          }
+        },
+        {
+          "product_version_id": "city_charm.2025",
+          "version_code": "2025",
+          "version_name": "2025新一线城市魅力排行榜",
+          "description": "2025年版覆盖337座城市，从商业资源集聚度、城市枢纽性、城市人活跃度、新经济竞争力和未来可塑性五大维度，呈现城市综合魅力及分维度表现。 总指标展示当年源表的标准化分，最高100分、最低0分。分项比较指数统一为0—100分，并可关联查看原始供数与来源发布值，不能用分项比较分回算总榜。",
+          "methodology": "2025版沿用2024年升级后的商业资源集聚度、城市枢纽性、城市人活跃度、新经济竞争力和未来可塑性五大维度，评价337座地级及以上城市。一级与二级维度的权重由新一线城市研究所专家委员会打分确定；二级维度以下指标数据采用主成分分析法。细分指标主要使用2024年全年或截至2025年年初的数据。",
+          "update_frequency": "annual",
+          "place_group_id": "administrative-division-2023-prefecture-division",
+          "is_current": false,
+          "valid_from": "2025-05-28",
+          "valid_to": "2026-05-27",
+          "node_count": 118,
+          "bound_node_count": 118,
+          "binding_status": "fully_bound",
+          "fact_coverage": {
+            "expected_cells": 39766,
+            "matched_cells": 39765,
+            "unique_cells": 39765,
+            "missing_cells": 1,
+            "duplicate_cells": 0,
+            "status": "incomplete"
+          }
+        },
+        {
+          "product_version_id": "city_charm.2024",
+          "version_code": "2024",
+          "version_name": "2024新一线城市魅力排行榜",
+          "description": "2024年版覆盖337座城市，从商业资源集聚度、城市枢纽性、城市人活跃度、新经济竞争力和未来可塑性五大维度，呈现城市综合魅力及分维度表现。 总指标展示当年源表的标准化分，最高100分、最低0分。分项按年度指标说明展示来源发布分值或标准化比较值，并可关联查看原始供数与来源发布值，不能用分项比较分回算总榜。",
+          "methodology": "整合合作机构和第一财经城市研究所的城市数据，按五大维度构建指标体系。一级与二级维度权重依据专家委员会打分，二级以下指标采用主成分分析法；各指标使用的具体时间与处理方法见本年度指标说明。",
+          "update_frequency": "annual",
+          "place_group_id": "administrative-division-2023-prefecture-division",
+          "is_current": false,
+          "valid_from": "2024-05-30",
+          "valid_to": "2025-05-27",
+          "node_count": 81,
+          "bound_node_count": 81,
+          "binding_status": "fully_bound",
+          "fact_coverage": {
+            "expected_cells": 27297,
+            "matched_cells": 27295,
+            "unique_cells": 27295,
+            "missing_cells": 2,
+            "duplicate_cells": 0,
+            "status": "incomplete"
+          }
+        },
+        {
+          "product_version_id": "city_charm.2023",
+          "version_code": "2023",
+          "version_name": "2023城市商业魅力排行榜",
+          "description": "2023年版覆盖337座城市，从商业资源集聚度、城市枢纽性、城市人活跃度、生活方式多样性和未来可塑性五大维度，呈现城市综合魅力及分维度表现。 总指标展示当年源表的标准化分，最高100分、最低0分。分项比较指数统一为0—100分，并可关联查看原始供数与来源发布值，不能用分项比较分回算总榜。",
+          "methodology": "2023版围绕商业资源集聚度、城市枢纽性、城市人活跃度、生活方式多样性和未来可塑性五大维度，评价337座地级及以上城市。一级与二级维度权重由新一线城市研究所专家委员会打分确定；二级维度以下指标数据采用主成分分析法。细分指标主要采用2022年全年或截至2023年年初的数据。 各年度指标与城市范围存在调整，指数分值不宜直接用于计算跨年增长率。",
+          "update_frequency": "annual",
+          "place_group_id": "administrative-division-2023-prefecture-division",
+          "is_current": false,
+          "valid_from": "2023-05-30",
+          "valid_to": "2024-05-29",
+          "node_count": 98,
+          "bound_node_count": 98,
+          "binding_status": "fully_bound",
+          "fact_coverage": {
+            "expected_cells": 33026,
+            "matched_cells": 33026,
+            "unique_cells": 33026,
+            "missing_cells": 0,
+            "duplicate_cells": 0,
+            "status": "complete"
+          }
+        },
+        {
+          "product_version_id": "city_charm.2022",
+          "version_code": "2022",
+          "version_name": "2022城市商业魅力排行榜",
+          "description": "2022年版覆盖337座城市，从商业资源集聚度、城市枢纽性、城市人活跃度、生活方式多样性和未来可塑性五大维度，呈现城市综合魅力及分维度表现。 总指标展示当年源表的标准化分，最高100分、最低0分。分项比较指数统一为0—100分，并可关联查看原始供数与来源发布值，不能用分项比较分回算总榜。",
+          "methodology": "按照2022年指标体系，结合商业、交通、人口及生活消费等数据，评价城市在五大维度的表现。综合评价结合主成分分析与专家委员会权重评分；各项指标的具体组成和取数时间见本年度指标说明。榜单年份表示评价版次，不代表所有基础数据均采自同一年；各年度指标与城市范围存在调整，指数分值不宜直接用于计算跨年增长率。",
+          "update_frequency": "annual",
+          "place_group_id": "administrative-division-2023-prefecture-division",
+          "is_current": false,
+          "valid_from": "2022-06-01",
+          "valid_to": "2023-05-29",
+          "node_count": 100,
+          "bound_node_count": 100,
+          "binding_status": "fully_bound",
+          "fact_coverage": {
+            "expected_cells": 33700,
+            "matched_cells": 33700,
+            "unique_cells": 33700,
+            "missing_cells": 0,
+            "duplicate_cells": 0,
+            "status": "complete"
+          }
+        },
+        {
+          "product_version_id": "city_charm.2021",
+          "version_code": "2021",
+          "version_name": "2021城市商业魅力排行榜",
+          "description": "2021年版覆盖337座城市，从商业资源集聚度、城市枢纽性、城市人活跃度、生活方式多样性和未来可塑性五大维度，呈现城市综合魅力及分维度表现。 总指标展示当年源表的标准化分，最高100分、最低0分。分项比较指数统一为0—100分，并可关联查看原始供数与来源发布值，不能用分项比较分回算总榜。",
+          "methodology": "按照2021年指标体系，结合商业、交通、人口及生活消费等数据，评价城市在五大维度的表现。综合评价结合主成分分析与专家委员会权重评分；各项指标的具体组成和取数时间见本年度指标说明。榜单年份表示评价版次，不代表所有基础数据均采自同一年；各年度指标与城市范围存在调整，指数分值不宜直接用于计算跨年增长率。",
+          "update_frequency": "annual",
+          "place_group_id": "administrative-division-2023-prefecture-division",
+          "is_current": false,
+          "valid_from": "2021-05-27",
+          "valid_to": "2022-05-31",
+          "node_count": 97,
+          "bound_node_count": 97,
+          "binding_status": "fully_bound",
+          "fact_coverage": {
+            "expected_cells": 32689,
+            "matched_cells": 32689,
+            "unique_cells": 32689,
+            "missing_cells": 0,
+            "duplicate_cells": 0,
+            "status": "complete"
+          }
+        },
+        {
+          "product_version_id": "city_charm.2020",
+          "version_code": "2020",
+          "version_name": "2020城市商业魅力排行榜",
+          "description": "2020年版覆盖337座城市，从商业资源集聚度、城市枢纽性、城市人活跃度、生活方式多样性和未来可塑性五大维度，呈现城市综合魅力及分维度表现。 总指标展示当年源表的标准化分，最高100分、最低0分。分项比较指数统一为0—100分，并可关联查看原始供数与来源发布值，不能用分项比较分回算总榜。",
+          "methodology": "按照2020年指标体系，结合商业、交通、人口及生活消费等数据，评价城市在五大维度的表现。综合评价结合主成分分析与专家委员会权重评分；各项指标的具体组成和取数时间见本年度指标说明。榜单年份表示评价版次，不代表所有基础数据均采自同一年；各年度指标与城市范围存在调整，指数分值不宜直接用于计算跨年增长率。",
+          "update_frequency": "annual",
+          "place_group_id": "administrative-division-2023-prefecture-division",
+          "is_current": false,
+          "valid_from": "2020-05-29",
+          "valid_to": "2021-05-26",
+          "node_count": 142,
+          "bound_node_count": 142,
+          "binding_status": "fully_bound",
+          "fact_coverage": {
+            "expected_cells": 47854,
+            "matched_cells": 47854,
+            "unique_cells": 47854,
+            "missing_cells": 0,
+            "duplicate_cells": 0,
+            "status": "complete"
+          }
+        },
+        {
+          "product_version_id": "city_charm.2019",
+          "version_code": "2019",
+          "version_name": "2019城市商业魅力排行榜",
+          "description": "2019年版覆盖337座城市，从商业资源集聚度、城市枢纽性、城市人活跃度、生活方式多样性和未来可塑性五大维度，呈现城市综合魅力及分维度表现。 总指标展示当年源表的标准化分，最高100分、最低0分。分项比较指数统一为0—100分，并可关联查看原始供数与来源发布值，不能用分项比较分回算总榜。",
+          "methodology": "按照2019年指标体系，结合商业、交通、人口及生活消费等数据，评价城市在五大维度的表现。综合评价结合主成分分析与专家委员会权重评分；各项指标的具体组成和取数时间见本年度指标说明。榜单年份表示评价版次，不代表所有基础数据均采自同一年；各年度指标与城市范围存在调整，指数分值不宜直接用于计算跨年增长率。",
+          "update_frequency": "annual",
+          "place_group_id": "city-charm-2019-source-cities",
+          "is_current": false,
+          "valid_from": "2019-05-24",
+          "valid_to": "2020-05-28",
+          "node_count": 124,
+          "bound_node_count": 124,
+          "binding_status": "fully_bound",
+          "fact_coverage": {
+            "expected_cells": 41788,
+            "matched_cells": 41788,
+            "unique_cells": 41788,
+            "missing_cells": 0,
+            "duplicate_cells": 0,
+            "status": "complete"
+          }
+        },
+        {
+          "product_version_id": "city_charm.2018",
+          "version_code": "2018",
+          "version_name": "2018城市商业魅力排行榜",
+          "description": "2018年版覆盖337座城市，从商业资源集聚度、城市枢纽性、城市人活跃度、生活方式多样性和未来可塑性五大维度，呈现城市综合魅力及分维度表现。 总指标展示当年源表的标准化分，最高100分、最低0分。分项比较指数统一为0—100分，并可关联查看原始供数与来源发布值，不能用分项比较分回算总榜。",
+          "methodology": "按照2018年指标体系，结合商业、交通、人口及生活消费等数据，评价城市在五大维度的表现。综合评价结合主成分分析与专家委员会权重评分；各项指标的具体组成和取数时间见本年度指标说明。榜单年份表示评价版次，不代表所有基础数据均采自同一年；各年度指标与城市范围存在调整，指数分值不宜直接用于计算跨年增长率。",
+          "update_frequency": "annual",
+          "place_group_id": "city-charm-2018-source-cities",
+          "is_current": false,
+          "valid_from": "2018-04-26",
+          "valid_to": "2019-05-23",
+          "node_count": 132,
+          "bound_node_count": 132,
+          "binding_status": "fully_bound",
+          "fact_coverage": {
+            "expected_cells": 44484,
+            "matched_cells": 44484,
+            "unique_cells": 44484,
+            "missing_cells": 0,
+            "duplicate_cells": 0,
+            "status": "complete"
+          }
+        },
+        {
+          "product_version_id": "city_charm.2017",
+          "version_code": "2017",
+          "version_name": "2017城市商业魅力排行榜",
+          "description": "2017年版覆盖337座城市，从商业资源集聚度、城市枢纽性、城市人活跃度、生活方式多样性和未来可塑性五大维度，呈现城市综合魅力及分维度表现。 总指标展示当年源表的标准化分，最高100分、最低0分。分项比较指数统一为0—100分，并可关联查看原始供数与来源发布值，不能用分项比较分回算总榜。",
+          "methodology": "按照2017年指标体系，结合商业、交通、人口及生活消费等数据，评价城市在五大维度的表现。综合评价结合主成分分析与专家委员会权重评分；各项指标的具体组成和取数时间见本年度指标说明。榜单年份表示评价版次，不代表所有基础数据均采自同一年；各年度指标与城市范围存在调整，指数分值不宜直接用于计算跨年增长率。",
+          "update_frequency": "annual",
+          "place_group_id": "city-charm-2017-source-cities",
+          "is_current": false,
+          "valid_from": "2017-05-25",
+          "valid_to": "2018-04-25",
+          "node_count": 133,
+          "bound_node_count": 133,
+          "binding_status": "fully_bound",
+          "fact_coverage": {
+            "expected_cells": 44821,
+            "matched_cells": 44821,
+            "unique_cells": 44821,
+            "missing_cells": 0,
+            "duplicate_cells": 0,
+            "status": "complete"
+          }
+        },
+        {
+          "product_version_id": "city_charm.2016",
+          "version_code": "2016",
+          "version_name": "2016城市商业魅力排行榜",
+          "description": "2016年版覆盖337座城市，从商业资源集聚度、城市枢纽性、城市人活跃度、生活方式多样性和未来可塑性五大维度，呈现城市综合魅力及分维度表现。本版提供综合指数与五大维度的评价结果。总指标展示当年源表的标准化分，最高100分、最低0分。",
+          "methodology": "按照2016年指标体系，结合商业、交通、人口及生活消费等数据，评价城市在五大维度的表现。本版不提供细分指标与各维度的权重信息。榜单年份表示评价版次，不代表所有基础数据均采自同一年；各年度指标与城市范围存在调整，指数分值不宜直接用于计算跨年增长率。",
+          "update_frequency": "annual",
+          "place_group_id": "city-charm-2016-source-cities",
+          "is_current": false,
+          "valid_from": "2016-04-25",
+          "valid_to": "2017-05-24",
+          "node_count": 6,
+          "bound_node_count": 6,
+          "binding_status": "fully_bound",
+          "fact_coverage": {
+            "expected_cells": 2022,
+            "matched_cells": 2022,
+            "unique_cells": 2022,
+            "missing_cells": 0,
+            "duplicate_cells": 0,
+            "status": "complete"
+          }
+        }
+      ]
+    },
+    {
+      "product_id": "city_industry",
+      "product_name": "城市产业魅力指数",
+      "description": "反映合格上市成分企业的市场表现，并提供企业规模与行业结构概况。",
+      "versions": [
+        {
+          "product_version_id": "city_industry.v3_5",
+          "version_code": "v3.5",
+          "version_name": "城市产业魅力指数（3.5版）",
+          "description": "按月持续更新；valid_from为本库产品版本登记启用日，历史事实从2016年1月起。",
+          "methodology": "采用来源计算版本v3.5_20160104_20260729_fast_entry_after_20d_capped_free_float_mv_tushare_pct_chg_historical_region_override。2016-01-04为基日，1000点为基值；覆盖基日合格上市成分企业不少于10家、当前批准样本不少于20家的50城。指数以完整月份最后开放交易日统一取值，不前值填充；同比比较上年同月月末。总市值采用当月行业快照的市值合计，与行业占比统一分母；沿用来源快照对成分企业缺当日市值的最近可用值处理，不新增企业级填补。行业份额和容差0.005，份额与行业市值分母误差不超过0.000001；指数侧市值差额留档，不作为结构缺失依据。行业快照内部校验失败时，总市值和3项结构指标均缺失。来源行业标签保留原分类；未重算指数或修改上游数据。每月追加事实并更新默认统计期，不改变指数方法版本。",
+          "update_frequency": "monthly",
+          "place_group_id": "industry-index-city-2023",
+          "is_current": true,
+          "valid_from": "2026-10-12",
+          "valid_to": null,
+          "node_count": 106,
+          "bound_node_count": 106,
+          "binding_status": "fully_bound",
+          "fact_coverage": {
+            "expected_cells": 5300,
+            "matched_cells": 5300,
+            "unique_cells": 5300,
+            "missing_cells": 0,
+            "duplicate_cells": 0,
+            "status": "complete"
+          }
+        }
+      ]
+    }
+  ],
+  "computed": [],
+  "alignment": [],
+  "sources": [],
+  "caveats": [],
+  "coverage": {
+    "returned_products": 2,
+    "matched_products": 2
+  },
+  "truncated": false,
+  "next_offset": null
+}

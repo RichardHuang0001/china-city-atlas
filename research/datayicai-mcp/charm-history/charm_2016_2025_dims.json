@@ -1,0 +1,382 @@
+{
+  "2016": [
+    {
+      "metric_id": "urban_composite.overall_urban_performance.city_charm_index",
+      "name": "城市魅力指数",
+      "depth": 0,
+      "weight": null
+    },
+    {
+      "metric_id": "urban_composite.overall_urban_performance.commercial_resource_score",
+      "name": "商业资源集聚度",
+      "depth": 1,
+      "weight": null
+    },
+    {
+      "metric_id": "urban_composite.overall_urban_performance.urban_hub_score",
+      "name": "城市枢纽性",
+      "depth": 1,
+      "weight": null
+    },
+    {
+      "metric_id": "urban_composite.overall_urban_performance.urban_activity_score",
+      "name": "城市人活跃度",
+      "depth": 1,
+      "weight": null
+    },
+    {
+      "metric_id": "urban_composite.overall_urban_performance.lifestyle_diversity_score",
+      "name": "生活方式多样性",
+      "depth": 1,
+      "weight": null
+    },
+    {
+      "metric_id": "urban_composite.overall_urban_performance.future_potential_score",
+      "name": "未来可塑性",
+      "depth": 1,
+      "weight": null
+    }
+  ],
+  "2017": [
+    {
+      "metric_id": "urban_composite.overall_urban_performance.city_charm_index",
+      "name": "城市魅力指数",
+      "depth": 0,
+      "weight": 1
+    },
+    {
+      "metric_id": "urban_composite.overall_urban_performance.commercial_resource_score",
+      "name": "商业资源集聚度",
+      "depth": 1,
+      "weight": 0.25
+    },
+    {
+      "metric_id": "urban_composite.overall_urban_performance.urban_hub_score",
+      "name": "城市枢纽性",
+      "depth": 1,
+      "weight": 0.175
+    },
+    {
+      "metric_id": "urban_composite.overall_urban_performance.urban_activity_score",
+      "name": "城市人活跃度",
+      "depth": 1,
+      "weight": 0.1775
+    },
+    {
+      "metric_id": "urban_composite.overall_urban_performance.lifestyle_diversity_score",
+      "name": "生活方式多样性",
+      "depth": 1,
+      "weight": 0.1975
+    },
+    {
+      "metric_id": "urban_composite.overall_urban_performance.future_potential_score",
+      "name": "未来可塑性",
+      "depth": 1,
+      "weight": 0.2
+    }
+  ],
+  "2018": [
+    {
+      "metric_id": "urban_composite.overall_urban_performance.city_charm_index",
+      "name": "城市魅力指数",
+      "depth": 0,
+      "weight": 1
+    },
+    {
+      "metric_id": "urban_composite.overall_urban_performance.commercial_resource_score",
+      "name": "商业资源集聚度",
+      "depth": 1,
+      "weight": 0.25
+    },
+    {
+      "metric_id": "urban_composite.overall_urban_performance.urban_hub_score",
+      "name": "城市枢纽性",
+      "depth": 1,
+      "weight": 0.214286
+    },
+    {
+      "metric_id": "urban_composite.overall_urban_performance.urban_activity_score",
+      "name": "城市人活跃度",
+      "depth": 1,
+      "weight": 0.171429
+    },
+    {
+      "metric_id": "urban_composite.overall_urban_performance.lifestyle_diversity_score",
+      "name": "生活方式多样性",
+      "depth": 1,
+      "weight": 0.185714
+    },
+    {
+      "metric_id": "urban_composite.overall_urban_performance.future_potential_score",
+      "name": "未来可塑性",
+      "depth": 1,
+      "weight": 0.192857
+    }
+  ],
+  "2019": [
+    {
+      "metric_id": "urban_composite.overall_urban_performance.city_charm_index",
+      "name": "城市魅力指数",
+      "depth": 0,
+      "weight": 1
+    },
+    {
+      "metric_id": "urban_composite.overall_urban_performance.commercial_resource_score",
+      "name": "商业资源集聚度",
+      "depth": 1,
+      "weight": 0.22875
+    },
+    {
+      "metric_id": "urban_composite.overall_urban_performance.urban_hub_score",
+      "name": "城市枢纽性",
+      "depth": 1,
+      "weight": 0.17375
+    },
+    {
+      "metric_id": "urban_composite.overall_urban_performance.urban_activity_score",
+      "name": "城市人活跃度",
+      "depth": 1,
+      "weight": 0.21125
+    },
+    {
+      "metric_id": "urban_composite.overall_urban_performance.lifestyle_diversity_score",
+      "name": "生活方式多样性",
+      "depth": 1,
+      "weight": 0.19125
+    },
+    {
+      "metric_id": "urban_composite.overall_urban_performance.future_potential_score",
+      "name": "未来可塑性",
+      "depth": 1,
+      "weight": 0.195
+    }
+  ],
+  "2020": [
+    {
+      "metric_id": "urban_composite.overall_urban_performance.city_charm_index",
+      "name": "城市魅力指数",
+      "depth": 0,
+      "weight": 1
+    },
+    {
+      "metric_id": "urban_composite.overall_urban_performance.commercial_resource_score",
+      "name": "商业资源集聚度",
+      "depth": 1,
+      "weight": 0.218333
+    },
+    {
+      "metric_id": "urban_composite.overall_urban_performance.urban_hub_score",
+      "name": "城市枢纽性",
+      "depth": 1,
+      "weight": 0.201667
+    },
+    {
+      "metric_id": "urban_composite.overall_urban_performance.urban_activity_score",
+      "name": "城市人活跃度",
+      "depth": 1,
+      "weight": 0.185
+    },
+    {
+      "metric_id": "urban_composite.overall_urban_performance.lifestyle_diversity_score",
+      "name": "生活方式多样性",
+      "depth": 1,
+      "weight": 0.175
+    },
+    {
+      "metric_id": "urban_composite.overall_urban_performance.future_potential_score",
+      "name": "未来可塑性",
+      "depth": 1,
+      "weight": 0.22
+    }
+  ],
+  "2021": [
+    {
+      "metric_id": "urban_composite.overall_urban_performance.city_charm_index",
+      "name": "城市魅力指数",
+      "depth": 0,
+      "weight": 1
+    },
+    {
+      "metric_id": "urban_composite.overall_urban_performance.commercial_resource_score",
+      "name": "商业资源集聚度",
+      "depth": 1,
+      "weight": 0.19
+    },
+    {
+      "metric_id": "urban_composite.overall_urban_performance.urban_hub_score",
+      "name": "城市枢纽性",
+      "depth": 1,
+      "weight": 0.22
+    },
+    {
+      "metric_id": "urban_composite.overall_urban_performance.urban_activity_score",
+      "name": "城市人活跃度",
+      "depth": 1,
+      "weight": 0.2
+    },
+    {
+      "metric_id": "urban_composite.overall_urban_performance.lifestyle_diversity_score",
+      "name": "生活方式多样性",
+      "depth": 1,
+      "weight": 0.16
+    },
+    {
+      "metric_id": "urban_composite.overall_urban_performance.future_potential_score",
+      "name": "未来可塑性",
+      "depth": 1,
+      "weight": 0.23
+    }
+  ],
+  "2022": [
+    {
+      "metric_id": "urban_composite.overall_urban_performance.city_charm_index",
+      "name": "城市魅力指数",
+      "depth": 0,
+      "weight": 1
+    },
+    {
+      "metric_id": "urban_composite.overall_urban_performance.commercial_resource_score",
+      "name": "商业资源集聚度",
+      "depth": 1,
+      "weight": 0.26
+    },
+    {
+      "metric_id": "urban_composite.overall_urban_performance.urban_hub_score",
+      "name": "城市枢纽性",
+      "depth": 1,
+      "weight": 0.23
+    },
+    {
+      "metric_id": "urban_composite.overall_urban_performance.urban_activity_score",
+      "name": "城市人活跃度",
+      "depth": 1,
+      "weight": 0.21
+    },
+    {
+      "metric_id": "urban_composite.overall_urban_performance.lifestyle_diversity_score",
+      "name": "生活方式多样性",
+      "depth": 1,
+      "weight": 0.15
+    },
+    {
+      "metric_id": "urban_composite.overall_urban_performance.future_potential_score",
+      "name": "未来可塑性",
+      "depth": 1,
+      "weight": 0.15
+    }
+  ],
+  "2023": [
+    {
+      "metric_id": "urban_composite.overall_urban_performance.city_charm_index",
+      "name": "城市魅力指数",
+      "depth": 0,
+      "weight": 1
+    },
+    {
+      "metric_id": "urban_composite.overall_urban_performance.commercial_resource_score",
+      "name": "商业资源集聚度",
+      "depth": 1,
+      "weight": 0.22
+    },
+    {
+      "metric_id": "urban_composite.overall_urban_performance.urban_hub_score",
+      "name": "城市枢纽性",
+      "depth": 1,
+      "weight": 0.19
+    },
+    {
+      "metric_id": "urban_composite.overall_urban_performance.urban_activity_score",
+      "name": "城市人活跃度",
+      "depth": 1,
+      "weight": 0.2
+    },
+    {
+      "metric_id": "urban_composite.overall_urban_performance.lifestyle_diversity_score",
+      "name": "生活方式多样性",
+      "depth": 1,
+      "weight": 0.17
+    },
+    {
+      "metric_id": "urban_composite.overall_urban_performance.future_potential_score",
+      "name": "未来可塑性",
+      "depth": 1,
+      "weight": 0.22
+    }
+  ],
+  "2024": [
+    {
+      "metric_id": "urban_composite.overall_urban_performance.city_charm_index",
+      "name": "城市魅力指数",
+      "depth": 0,
+      "weight": 1
+    },
+    {
+      "metric_id": "urban_composite.overall_urban_performance.commercial_resource_score",
+      "name": "商业资源集聚度",
+      "depth": 1,
+      "weight": 0.195833
+    },
+    {
+      "metric_id": "urban_composite.overall_urban_performance.urban_hub_score",
+      "name": "城市枢纽性",
+      "depth": 1,
+      "weight": 0.200833
+    },
+    {
+      "metric_id": "urban_composite.overall_urban_performance.urban_activity_score",
+      "name": "城市人活跃度",
+      "depth": 1,
+      "weight": 0.215
+    },
+    {
+      "metric_id": "urban_composite.overall_urban_performance.new_economy_score",
+      "name": "新经济竞争力",
+      "depth": 1,
+      "weight": 0.203333
+    },
+    {
+      "metric_id": "urban_composite.overall_urban_performance.future_potential_score",
+      "name": "未来可塑性",
+      "depth": 1,
+      "weight": 0.185
+    }
+  ],
+  "2025": [
+    {
+      "metric_id": "urban_composite.overall_urban_performance.city_charm_index",
+      "name": "城市魅力指数",
+      "depth": 0,
+      "weight": 1
+    },
+    {
+      "metric_id": "urban_composite.overall_urban_performance.commercial_resource_score",
+      "name": "商业资源集聚度",
+      "depth": 1,
+      "weight": 0.234
+    },
+    {
+      "metric_id": "urban_composite.overall_urban_performance.urban_hub_score",
+      "name": "城市枢纽性",
+      "depth": 1,
+      "weight": 0.166
+    },
+    {
+      "metric_id": "urban_composite.overall_urban_performance.urban_activity_score",
+      "name": "城市人活跃度",
+      "depth": 1,
+      "weight": 0.224
+    },
+    {
+      "metric_id": "urban_composite.overall_urban_performance.new_economy_score",
+      "name": "新经济竞争力",
+      "depth": 1,
+      "weight": 0.22
+    },
+    {
+      "metric_id": "urban_composite.overall_urban_performance.future_potential_score",
+      "name": "未来可塑性",
+      "depth": 1,
+      "weight": 0.156
+    }
+  ]
+}
