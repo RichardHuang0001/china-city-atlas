@@ -1,0 +1,144 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="description" content="按地图、省份和榜单线级查阅 2025 年中国地级市分布。">
+  <title>中国城市分级地图 · 2025</title>
+  <link rel="stylesheet" href="assets/style.css">
+  <script defer src="assets/data.js"></script>
+  <script defer src="assets/map-data.js"></script>
+  <script defer src="assets/map-labels.js"></script>
+  <script defer src="assets/app.js"></script>
+</head>
+<body>
+<main>
+  <header class="masthead">
+    <div class="edition">
+      <span class="edition-year">2025 年版</span>
+      <nav aria-label="页面导航">
+        <a href="#directory">城市名录</a>
+        <a href="#sources" id="sources-link">来源与口径</a>
+
+      </nav>
+    </div>
+    <div class="hero">
+      <div class="hero-copy">
+        <h1>中国城市分级地图</h1>
+        <p>按第一财经城市魅力榜，查看六档城市在各省份的分布。</p>
+      </div>
+      <dl class="hero-stats" aria-label="收录范围">
+        <div><dt>地级市</dt><dd>293</dd></div>
+        <div><dt>直辖市参考</dt><dd>4</dd></div>
+      </dl>
+    </div>
+  </header>
+
+  <div class="workspace">
+    <section class="panel map-panel" aria-labelledby="map-title">
+      <div class="panel-head map-head">
+        <div class="map-heading">
+          <h2 id="map-title">全国</h2>
+          <div class="map-tools">
+            <button id="national" hidden>返回全国</button>
+            <button id="inset" hidden>查看南海附图</button>
+          </div>
+        </div>
+        <div class="controls" role="group" aria-label="地图与名录筛选">
+          <div class="search-field">
+            <label for="query" class="sr-only">城市搜索</label>
+            <svg viewBox="0 0 20 20" width="16" height="16" aria-hidden="true"><circle cx="8.5" cy="8.5" r="4.75"></circle><path d="M12 12l4 4"></path></svg>
+            <input id="query" type="search" placeholder="搜索城市" autocomplete="off">
+          </div>
+          <label for="province" class="sr-only">所在省份</label>
+          <select id="province"><option value="">全国</option></select>
+          <button id="reset">重置</button>
+        </div>
+      </div>
+      <fieldset class="map-filter">
+        <legend class="sr-only">显示地图标记</legend>
+        <span class="filter-label" aria-hidden="true">显示线级</span>
+        <div class="legend" id="legend"></div>
+        <span id="marker-count" aria-live="polite"></span>
+      </fieldset>
+      <div id="map-stage">
+        <svg id="atlas" xmlns="http://www.w3.org/2000/svg" role="group" aria-label="城市分布互动地图" aria-describedby="map-hint" tabindex="0">
+          <title>中国城市分布</title>
+          <g id="provinces"></g>
+          <path id="district-lines" fill-rule="evenodd"></path>
+          <path id="boundaries"></path>
+          <g id="province-labels"></g>
+          <g id="sea-detail" hidden><path class="sea-land" fill-rule="evenodd"></path><path class="sea-boundary"></path></g>
+          <g id="city-leaders" aria-hidden="true"></g>
+          <g id="points"></g>
+          <g id="city-labels" aria-hidden="true"></g>
+        </svg>
+        <div class="zoom-tools" role="group" aria-label="地图缩放">
+          <button type="button" id="zoom-in" aria-label="放大地图" title="放大地图">+</button>
+          <button type="button" id="zoom-out" aria-label="缩小地图" title="缩小地图">−</button>
+          <button type="button" id="zoom-fit" title="恢复当前地图的全览">全览</button>
+        </div>
+        <div id="sea-card" aria-label="南海诸岛附图">
+          <button type="button" id="sea-open" aria-label="放大南海诸岛附图">南海诸岛 <span aria-hidden="true">↗</span></button>
+          <svg id="sea-mini" role="group" aria-label="南海诸岛地图">
+            <path class="sea-land" fill-rule="evenodd"></path><path class="sea-boundary"></path><g id="sea-points"></g><g id="sea-labels" aria-hidden="true"></g>
+          </svg>
+        </div>
+        <div id="tooltip" role="tooltip" hidden></div>
+      </div>
+      <div class="map-under">
+        <span id="map-hint">点击城市名查看详情。放大地图可看到更多城市名。</span>
+        <span class="map-credit">天地图区划数据 · 开源矢量底图</span>
+      </div>
+      <p id="city-detail" hidden aria-live="polite"></p>
+    </section>
+
+    <section class="panel index-panel" id="directory" aria-labelledby="index-title">
+      <div class="panel-head">
+        <h2 id="index-title">城市名录 <span><b id="total">293</b> 座地级市</span></h2>
+        <div class="table-tools">
+        <label for="table-tier" class="sr-only">名录线级</label>
+        <select id="table-tier"><option value="">全部线级</option></select>
+        <label for="sort" class="sr-only">排序方式</label>
+        <select id="sort"><option value="rank">榜单图序</option><option value="province">省份</option><option value="tier">线级</option><option value="name">城市名</option></select>
+        </div>
+      </div>
+      <div id="counts" class="counts" aria-live="polite"></div>
+      <div class="rows" role="region" aria-label="城市表格" tabindex="0">
+        <table aria-label="地级市">
+          <thead><tr><th scope="col">线内图序</th><th scope="col">城市</th><th scope="col">省份</th><th scope="col">线级</th></tr></thead>
+          <tbody id="city-rows"></tbody>
+        </table>
+        <p id="empty" class="empty" hidden>当前没有符合条件的地级市。</p>
+      </div>
+      <details id="reference" open>
+        <summary>直辖市参考 <span id="reference-count"></span></summary>
+        <div id="reference-rows"></div>
+      </details>
+    </section>
+  </div>
+  <noscript><p>交互、搜索与表格需要启用浏览器的 JavaScript。来源与统计口径可直接查看。</p></noscript>
+
+  <details class="sources" id="province-stats">
+    <summary>各省份线级分布</summary>
+    <div class="stats-scroll" role="region" aria-label="各省份地级市统计" tabindex="0">
+      <table aria-label="各省份地级市统计">
+        <thead><tr><th scope="col">省份</th><th scope="col">地级市</th><th scope="col">一线</th><th scope="col">新一线</th><th scope="col">二线</th><th scope="col">三线</th><th scope="col">四线</th><th scope="col">五线</th></tr></thead>
+        <tbody id="province-summary"></tbody>
+      </table>
+    </div>
+  </details>
+
+  <details class="sources" id="sources">
+    <summary>来源与统计口径</summary>
+    <div class="sources-grid">
+      <div><h3>城市线级</h3><p>采用第一财经新一线城市研究所 2025 年 5 月发布的完整分级图。线内图序指原图从左到右、从上到下的序号，保留原图中其他地级行政区的占位。序号出现跳号属于正常情况。未展示分数及全榜总名次。</p><a href="https://www.yicai.com/news/102638963.html" target="_blank" rel="noopener">第一财经发布原文 ↗</a></div>
+      <div><h3>行政区划</h3><p>以 2024 年末县以上行政区划代码与 2025 年名录交叉核对。293 座地级市为统计主体，4 座直辖市另列。榜单其余 40 个对象为自治州、地区和盟。港澳台出现在底图中，无本榜数据。</p><a href="https://dmfw.mca.gov.cn/XzqhVersionPublish.html" target="_blank" rel="noopener">民政部国家地名信息库 ↗</a> · <a href="https://github.com/yescallop/areacodes" target="_blank" rel="noopener">区划代码存档 ↗</a></div>
+      <div><h3>底图与标记</h3><p>底图来自开源仓库整理的天地图省级、地级边界。全国和南海附图保留离岸岛屿及断续线，省级视图显示数据源提供的地级边界。页面重新投影和配色，未单独送审。</p><a href="https://github.com/JayMuShui/chinese-global-compliant-geodata" target="_blank" rel="noopener">开源数据仓库 ↗</a> · <a href="https://cloudcenter.tianditu.gov.cn/administrativeDivision/" target="_blank" rel="noopener">天地图数据 ↗</a> · <a href="licenses/map-source.txt">MIT 声明</a></div>
+      <div><h3>城市定位</h3><p>标记为近似位置。来源为公开的 WGS 84 驻地地理编码，结合独立的城市定位数据排查明显偏差。部分城市使用城区参考点，详情中有说明。位置数据未逐笔核实到政府现址。</p><a href="https://gaohr.win/site/blogs/2022/2022-03-29-location-of-gov.html" target="_blank" rel="noopener">GaoHR 驻地数据 ↗</a> · <a href="https://datav.aliyun.com/portal/school/atlas/area_selector" target="_blank" rel="noopener">DataV 城市定位参考 ↗</a></div>
+    </div>
+  </details>
+  <footer>离线可用 · 外部来源链接按需打开</footer>
+</main>
+</body>
+</html>

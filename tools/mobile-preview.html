@@ -1,0 +1,51 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>城市地图 · 本地手机预览</title>
+  <style>
+    :root { color-scheme:light; font:14px/1.5 system-ui,-apple-system,"PingFang SC",sans-serif; color:#35252b; background:#f4e9e6; }
+    * { box-sizing:border-box; }
+    body { margin:0; }
+    main { max-width:680px; margin:auto; padding:18px 12px; }
+    header { display:flex; align-items:center; justify-content:space-between; flex-wrap:wrap; gap:8px 16px; padding-bottom:14px; }
+    h1 { margin:0; color:#8b3d52; font-size:clamp(18px,4vw,23px); }
+    .tools { display:flex; gap:8px; align-items:center; flex-wrap:wrap; }
+    select, a { font:inherit; }
+    select { padding:6px 8px; border:1px solid #d8bfc3; background:#fffdf9; color:#35252b; border-radius:7px; }
+    a { color:#8b3d52; text-underline-offset:3px; }
+    :focus-visible { outline:2px solid #8b3d52; outline-offset:3px; }
+    .viewport { width:min(var(--phone-width,390px),100%); margin:auto; }
+    iframe { display:block; width:100%; height:calc(100svh - 96px); min-height:360px; border:0; border-radius:10px; background:#fbf5f1; box-shadow:0 0 0 1px #d8bfc3, 0 9px 32px #4e243a16; }
+  </style>
+</head>
+<body>
+<main>
+  <header>
+    <h1>本地手机预览</h1>
+    <div class="tools">
+      <label for="width">视口宽度</label>
+      <select id="width">
+        <option value="360">360 px</option>
+        <option value="390" selected>390 px</option>
+        <option value="430">430 px</option>
+      </select>
+      <a href="../site/index.html">打开正式页面</a>
+    </div>
+  </header>
+  <div class="viewport">
+    <iframe src="../site/index.html" title="手机宽度下的城市地图"></iframe>
+  </div>
+</main>
+<script>
+  const width = document.getElementById('width');
+  const viewport = document.querySelector('.viewport');
+  function setWidth() {
+    viewport.style.setProperty('--phone-width', width.value + 'px');
+  }
+  width.addEventListener('change', setWidth);
+  setWidth();
+</script>
+</body>
+</html>
