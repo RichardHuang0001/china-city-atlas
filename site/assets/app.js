@@ -193,7 +193,7 @@
     }
 
     const focus = state.selected || (mainMarkers.length === 1 ? mainMarkers[0].city[1] : '');
-    const level = zoomSteps.indexOf(camera.zoom);
+    const level = zoomLevel(camera.zoom);
     const local = !!state.province;
     const placed = labelLayout.place({
       markers: mainMarkers, width: rect.width, height: rect.height, left, top, units,
@@ -205,9 +205,10 @@
     const tier = labelLayout.priorityTier(rect.width, level, local);
     const zoomTag = camera.zoom > 1 ? '（' + camera.zoom.toFixed(2).replace(/\.?0+$/, '') + '×）' : '';
     ui['map-hint'].textContent = state.inset ? '三沙位于永兴岛附近。' :
-      wide && tier < 5 ? '当前' + zoomTag + '优先显示' + tiers[tier] + '及以上，点击 ＋ 展开' + tiers[tier + 1] + '城市名。' :
-      wide ? '当前' + zoomTag + '显示视野内的各档城市名，点击名称查看详情。' :
-        (camera.zoom > 1 ? '当前 ' + zoomTag.slice(1, -1) + '，可单指拖动地图，' : '放大可逐级看到更多城市名，') +
+      wide && tier < 5 ? '当前' + zoomTag + '优先显示' + tiers[tier] + '及以上，' +
+        (local ? '拖动可浏览邻省，' : '') + '点击 ＋ 展开' + tiers[tier + 1] + '城市名。' :
+      wide ? '当前' + zoomTag + '显示视野内的各档城市名，' + (local ? '拖动可浏览邻省，' : '') + '点击名称查看详情。' :
+        (local ? '可单指拖动浏览邻省，' : camera.zoom > 1 ? '当前 ' + zoomTag.slice(1, -1) + '，可单指拖动地图，' : '放大可逐级看到更多城市名，') +
         '点击名称查看详情。';
   }
 
@@ -225,6 +226,14 @@
     }
   }
 
+  function zoomLevel(zoom) {
+    let best = 0;
+    for (let i = 1; i < zoomSteps.length; i++) {
+      if (zoom >= (zoomSteps[i - 1] + zoomSteps[i]) / 2) best = i;
+    }
+    return best;
+  }
+
   function paintCamera() {
     updateDistrictLines();
     const {center: [x, y], width, height} = currentView();
@@ -239,8 +248,8 @@
       markerScale = scale;
     }
     if (!drag?.moved) paintLabels(left, top, width);
-    ui.atlas.toggleAttribute('data-zoomed', camera.zoom > 1);
-    ui['zoom-in'].disabled = camera.zoom === zoomSteps.at(-1);
+    ui.atlas.toggleAttribute('data-zoomed', camera.zoom > 1 || (!!state.province && !state.inset));
+    ui['zoom-in'].disabled = camera.zoom >= zoomSteps.at(-1);
     ui['zoom-out'].disabled = camera.zoom <= 1;
     ui['zoom-fit'].disabled = camera.zoom <= 1;
   }
@@ -251,8 +260,17 @@
   }
 
   function changeZoom(step) {
-    const index = zoomSteps.indexOf(camera.zoom);
-    const next = zoomSteps[index + step];
+    let next;
+    if (step > 0) {
+      next = zoomSteps.find(z => z > camera.zoom * 1.03);
+    } else {
+      for (let i = zoomSteps.length - 1; i >= 0; i--) {
+        if (zoomSteps[i] < camera.zoom * .97) {
+          next = zoomSteps[i];
+          break;
+        }
+      }
+    }
     if (next === undefined) return;
     camera.zoom = next;
     clampCenter();
@@ -449,7 +467,7 @@
   function mapHover(event) {
     if (drag?.moved || event.pointerType === 'touch') return;
     const cityNode = event.target.closest('[data-city]');
-    const provinceNode = !state.province && event.target.closest('[data-province]');
+    const provinceNode = state.province ? null : event.target.closest('[data-province]');
     const city = cityNode && lookup.get(cityNode.dataset.city);
     const province = provinceNode?.dataset.province;
     if (!city && !province) {
@@ -468,7 +486,7 @@
 
   function mapClick(event) {
     const cityNode = event.target.closest('[data-city]');
-    const provinceNode = !state.province && event.target.closest('[data-province]');
+    const provinceNode = state.province ? null : event.target.closest('[data-province]');
     if (cityNode) selectCity(cityNode.dataset.city, 'map');
     else if (provinceNode) selectProvince(provinceNode.dataset.province);
     hideTooltip();
@@ -493,6 +511,28 @@
     paintCamera();
   });
 
+  function exitProvinceToPan(clientY) {
+    const prevView = currentView();
+    const prevRect = ui.atlas.getBoundingClientRect();
+    const worldPerPx = prevView.width / (prevRect.width || 1);
+    const py = clientY - prevRect.top;
+    const anchorY = (prevView.center[1] - prevView.height / 2) + py * worldPerPx;
+
+    state.province = '';
+    state.selected = '';
+    mapScope = '';
+    ui['map-stage'].toggleAttribute('data-local', false);
+    const newRect = ui.atlas.getBoundingClientRect();
+    const nationalFitted = fittedBox(ui.atlas, map.frame, 1.065);
+    camera.zoom = Math.max(1, Math.min(20, nationalFitted.width / (worldPerPx * (newRect.width || 1))));
+    const newWorldPerPx = nationalFitted.width / camera.zoom / (newRect.width || 1);
+    const newTop = anchorY - py * newWorldPerPx;
+    camera.center = [prevView.center[0], newTop + (newRect.height * newWorldPerPx) / 2];
+    fittedView = nationalFitted;
+    clampCenter();
+    render();
+  }
+
   let drag;
   let suppressClick = false;
   ui.atlas.addEventListener('pointerdown', event => {
@@ -502,7 +542,8 @@
       drag = undefined;
       return;
     }
-    if ((event.pointerType === 'mouse' && event.button !== 0) || camera.zoom <= 1) return;
+    const pannable = camera.zoom > 1 || (!!state.province && !state.inset);
+    if ((event.pointerType === 'mouse' && event.button !== 0) || !pannable) return;
     drag = {
       id: event.pointerId, x: event.clientX, y: event.clientY,
       moved: false, threshold: event.pointerType === 'touch' ? 7 : 5,
@@ -514,6 +555,7 @@
     const dy = event.clientY - drag.y;
     if (!drag.moved) {
       if (Math.hypot(dx, dy) < drag.threshold) return;
+      if (state.province && !state.inset) exitProvinceToPan(event.clientY);
       drag.moved = true;
       suppressClick = true;
       hideTooltip();
