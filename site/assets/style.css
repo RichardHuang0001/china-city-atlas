@@ -245,7 +245,7 @@ button:disabled { cursor: default; }
 #map-stage[data-local] #atlas { aspect-ratio: auto; height: clamp(465px, 70svh, 790px); }
 #atlas:focus { outline: none; }
 #atlas:focus-visible { outline: 2px solid var(--wine); outline-offset: -3px; }
-#atlas[data-zoomed] { cursor: grab; }
+#atlas[data-zoomed] { cursor: grab; touch-action: none; }
 #atlas.dragging, #atlas.dragging * { cursor: grabbing !important; }
 #provinces path, .sea-land {
   fill: #f8edd8;
@@ -396,8 +396,34 @@ button:disabled { cursor: default; }
   font-size: 12px;
 }
 .counts span { white-space: nowrap; }
-.rows, .stats-scroll { overflow: auto; scrollbar-width: thin; }
-.rows { max-height: 530px; }
+.rows, .stats-scroll {
+  overflow: auto;
+  border: 1px solid var(--line-strong);
+  border-radius: 10px;
+  background: var(--white);
+  box-shadow: inset 0 2px 6px #7142520a;
+  scrollbar-width: thin;
+  scrollbar-color: #c7a2aa #f7ecee;
+}
+.rows::-webkit-scrollbar, .stats-scroll::-webkit-scrollbar { width: 7px; height: 7px; }
+.rows::-webkit-scrollbar-track, .stats-scroll::-webkit-scrollbar-track {
+  background: #f7ecee;
+  border-radius: 0 9px 9px 0;
+}
+.rows::-webkit-scrollbar-thumb, .stats-scroll::-webkit-scrollbar-thumb {
+  background: #c7a2aa;
+  border-radius: 999px;
+  border: 1.5px solid #f7ecee;
+}
+.rows::-webkit-scrollbar-thumb:hover, .stats-scroll::-webkit-scrollbar-thumb:hover { background: var(--wine); }
+.rows-wrap { padding: 0 19px 12px; }
+.rows { max-height: 520px; }
+.rows-note {
+  margin: 7px 2px 0;
+  color: var(--muted);
+  font-size: 11.5px;
+  text-align: right;
+}
 .stats-scroll { max-height: 430px; margin-top: 10px; }
 table {
   width: 100%;
@@ -417,8 +443,8 @@ thead th {
   white-space: nowrap;
 }
 th, td { padding: 7px 10px; border-bottom: 1px solid var(--line); }
-th:first-child, td:first-child { padding-inline-start: 19px; }
-th:last-child, td:last-child { padding-inline-end: 16px; }
+th:first-child, td:first-child { padding-inline-start: 14px; }
+th:last-child, td:last-child { padding-inline-end: 14px; }
 tbody td:first-child, tbody td:nth-child(3) { color: var(--muted); }
 td:last-child, .stats-scroll :is(th, td) { white-space: nowrap; }
 tbody tr:hover, tbody tr.active { background: #f8ebe9; }
@@ -454,6 +480,11 @@ footer { margin-top: 13px; color: var(--muted); font-size: 12px; }
   #atlas { min-height: 365px; }
   #map-stage[data-local] #atlas { height: clamp(350px, 61svh, 600px); }
   #province-labels { font-size: 20px; }
+}
+
+@media (max-width: 720px) {
+  .rows { max-height: clamp(250px, 42svh, 330px); }
+  .stats-scroll { max-height: clamp(240px, 42svh, 330px); }
 }
 
 @media (max-width: 560px) {
@@ -504,6 +535,10 @@ footer { margin-top: 13px; color: var(--muted); font-size: 12px; }
   .marker-badge { stroke-width: .75px; }
   .table-tools select { min-height: 36px; padding-inline: 5px; font-size: 12px; }
   .counts { padding-inline: 12px; }
+  .rows-wrap { padding: 0 12px 10px; }
+  .rows { max-height: clamp(250px, 42svh, 330px); }
+  .stats-scroll { max-height: clamp(240px, 42svh, 330px); }
+  .rows-note { text-align: left; }
   .sources-grid { grid-template-columns: minmax(0, 1fr); }
 }
 

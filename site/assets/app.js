@@ -204,7 +204,8 @@
     ui['map-hint'].textContent = state.inset ? '三沙位于永兴岛附近。' :
       wide && tier < 5 ? '当前' + zoomTag + '优先显示' + tiers[tier] + '及以上，点击 ＋ 展开' + tiers[tier + 1] + '城市名。' :
       wide ? '当前' + zoomTag + '显示视野内的各档城市名，点击名称查看详情。' :
-        (camera.zoom > 1 ? '当前 ' + zoomTag.slice(1, -1) + '，' : '') + '放大可逐级看到更多城市名。点击名称查看详情。';
+        (camera.zoom > 1 ? '当前 ' + zoomTag.slice(1, -1) + '，可单指拖动地图，' : '放大可逐级看到更多城市名，') +
+        '点击名称查看详情。';
   }
 
   function paintCamera() {
@@ -428,7 +429,7 @@
   }
 
   function mapHover(event) {
-    if (drag?.moved) return;
+    if (drag?.moved || event.pointerType === 'touch') return;
     const cityNode = event.target.closest('[data-city]');
     const provinceNode = !state.province && event.target.closest('[data-province]');
     const city = cityNode && lookup.get(cityNode.dataset.city);
@@ -478,15 +479,23 @@
   let suppressClick = false;
   ui.atlas.addEventListener('pointerdown', event => {
     suppressClick = false;
-    if (event.button !== 0 || event.pointerType === 'touch' || camera.zoom <= 1) return;
-    drag = {id: event.pointerId, x: event.clientX, y: event.clientY, moved: false};
+    if (!event.isPrimary) {
+      ui.atlas.classList.remove('dragging');
+      drag = undefined;
+      return;
+    }
+    if ((event.pointerType === 'mouse' && event.button !== 0) || camera.zoom <= 1) return;
+    drag = {
+      id: event.pointerId, x: event.clientX, y: event.clientY,
+      moved: false, threshold: event.pointerType === 'touch' ? 7 : 5,
+    };
   });
   ui.atlas.addEventListener('pointermove', event => {
     if (!drag || drag.id !== event.pointerId) return;
     const dx = event.clientX - drag.x;
     const dy = event.clientY - drag.y;
     if (!drag.moved) {
-      if (Math.hypot(dx, dy) < 5) return;
+      if (Math.hypot(dx, dy) < drag.threshold) return;
       drag.moved = true;
       suppressClick = true;
       hideTooltip();

@@ -107,12 +107,15 @@
         </div>
       </div>
       <div id="counts" class="counts" aria-live="polite"></div>
-      <div class="rows" role="region" aria-label="城市表格" tabindex="0">
-        <table aria-label="地级市">
-          <thead><tr><th scope="col">线内图序</th><th scope="col">城市</th><th scope="col">省份</th><th scope="col">线级</th></tr></thead>
-          <tbody id="city-rows"></tbody>
-        </table>
-        <p id="empty" class="empty" hidden>当前没有符合条件的地级市。</p>
+      <div class="rows-wrap">
+        <div class="rows" role="region" aria-label="城市表格" tabindex="0">
+          <table aria-label="地级市">
+            <thead><tr><th scope="col">线内图序</th><th scope="col">城市</th><th scope="col">省份</th><th scope="col">线级</th></tr></thead>
+            <tbody id="city-rows"></tbody>
+          </table>
+          <p id="empty" class="empty" hidden>当前没有符合条件的地级市。</p>
+        </div>
+        <p class="rows-note">名录框内可上下滑动 · 点击城市名联动地图</p>
       </div>
       <details id="reference" open>
         <summary>直辖市参考 <span id="reference-count"></span></summary>
