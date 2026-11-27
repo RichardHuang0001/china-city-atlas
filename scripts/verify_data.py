@@ -111,6 +111,20 @@ if prof_path.is_file():
         assert isinstance(item["ec"], list) and len(item["ec"]) == 6, code
         assert isinstance(item["tr"], list) and len(item["tr"]) == 14, code
 
+decade_path = assets / "city-decade-ranks.js"
+if decade_path.is_file():
+    decade_prefix = "window.atlasDecadeRanks = "
+    decade_src = decade_path.read_text(encoding="utf-8").strip()
+    assert decade_src.startswith(decade_prefix) and decade_src.endswith(";")
+    decade_ranks = json.loads(decade_src[len(decade_prefix):-1])
+    assert set(decade_ranks.keys()) == {city[1] for city in cities}
+    tier_set = {item["name"] for item in tiers_meta}
+    for code, item in decade_ranks.items():
+        assert isinstance(item, list) and len(item) == 3, code
+        ranks_11, tiers_11, _mult = item
+        assert len(ranks_11) == 11 and all(1 <= r <= 337 for r in ranks_11), (code, ranks_11)
+        assert len(tiers_11) == 11 and all(t in tier_set for t in tiers_11), (code, tiers_11)
+
 print(
     f"{meta['year']} 年版：333 个地级行政区、4 座直辖市、34 个省级图层、"
     f"{len(district_provinces)} 个懒加载地市分片、线级数量、定位字段与南海附图均通过。"

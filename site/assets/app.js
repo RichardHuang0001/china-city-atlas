@@ -4,6 +4,7 @@
   const map = window.atlasMap;
   const labelLayout = window.atlasLabels;
   window.atlasProfiles = window.atlasProfiles || {};
+  window.atlasDecadeRanks = window.atlasDecadeRanks || {};
   window.atlasDistricts = window.atlasDistricts || {};
   window.atlasSubdistricts = window.atlasSubdistricts || {};
   if (map.districts) Object.assign(window.atlasDistricts, map.districts);
@@ -122,6 +123,15 @@
   }
 
   let profilesReady = Object.keys(window.atlasProfiles).length > 0;
+  let decadeRanksReady = Object.keys(window.atlasDecadeRanks).length > 0;
+  function refreshSelectedDetail() {
+    if (!state.selected) return;
+    const selected = lookup.get(state.selected);
+    if (selected) {
+      renderedDetailKey = '';
+      renderCityDetail(selected);
+    }
+  }
   function ensureProfiles() {
     if (profilesReady || Object.keys(window.atlasProfiles).length > 0) {
       profilesReady = true;
@@ -130,16 +140,23 @@
     return loadScriptOnce('profiles', 'assets/city-profiles.js')
       .then(() => {
         profilesReady = true;
-        if (state.selected) {
-          const selected = lookup.get(state.selected);
-          if (selected) {
-            renderedDetailKey = '';
-            renderCityDetail(selected);
-          }
-        }
+        refreshSelectedDetail();
         return window.atlasProfiles;
       })
       .catch(() => window.atlasProfiles);
+  }
+  function ensureDecadeRanks() {
+    if (decadeRanksReady || Object.keys(window.atlasDecadeRanks).length > 0) {
+      decadeRanksReady = true;
+      return Promise.resolve(window.atlasDecadeRanks);
+    }
+    return loadScriptOnce('decadeRanks', 'assets/city-decade-ranks.js')
+      .then(() => {
+        decadeRanksReady = true;
+        refreshSelectedDetail();
+        return window.atlasDecadeRanks;
+      })
+      .catch(() => window.atlasDecadeRanks);
   }
 
   const el = (tag, className, text) => {
@@ -237,6 +254,181 @@
     ];
   }
 
+  const DECADE_YEARS = [2016, 2017, 2018, 2019, 2020, 2021, 2022, 2023, 2024, 2025, 2026];
+  function mixHex(a, b, t) {
+    const k = Math.max(0, Math.min(1, t));
+    const pa = i => parseInt(a.slice(i, i + 2), 16);
+    const pb = i => parseInt(b.slice(i, i + 2), 16);
+    const ch = (v1, v2) => Math.round(v1 + (v2 - v1) * k).toString(16).padStart(2, '0');
+    return '#' + ch(pa(1), pb(1)) + ch(pa(3), pb(3)) + ch(pa(5), pb(5));
+  }
+
+  function rankDropSeverity(rk, rStart) {
+    if (rk <= rStart) return 0;
+    const dropAbs = rk - rStart;
+    const dropRel = dropAbs / Math.max(15, rStart);
+    return Math.max(0, Math.min(1, ((dropAbs - 2) / 38) * 0.55 + (dropRel / 0.85) * 0.45));
+  }
+
+  function rankEnvelope(ranks) {
+    const best = Math.min(...ranks);
+    const worst = Math.max(...ranks);
+    const span = worst - best;
+    if (span === 0) {
+      const pad = Math.max(4, Math.min(8, Math.round(best * 0.8)));
+      const yTop = Math.max(1, best - pad);
+      const yBottom = Math.min(337, yTop + pad * 2);
+      return {best, worst, yTop, yBottom};
+    }
+    const padTop = Math.max(1, Math.min(18, Math.ceil(span * 0.22)));
+    const padBot = Math.max(2, Math.min(20, Math.ceil(span * 0.28)));
+    let yTop = Math.max(1, best - padTop);
+    let yBottom = Math.min(337, worst + padBot);
+    if (yBottom - yTop < 4) {
+      yBottom = Math.min(337, yTop + 4);
+      yTop = Math.max(1, yBottom - 4);
+    }
+    return {best, worst, yTop, yBottom};
+  }
+
+  const rankHeightPct = (r, yTop, yBottom) => 14 + 78 * ((yBottom - r) / (yBottom - yTop));
+
+  function buildDecadeRankCard(selected, entry) {
+    const card = el('section', 'detail-card detail-card--decade');
+    card.setAttribute('aria-label', selected[FIELD.name] + ' 2016-2026 全国排名变化');
+    const head = el('div', 'detail-card-head');
+    head.append(el('h4', '', '2016-2026'));
+
+    if (!entry) {
+      head.append(el('span', 'detail-card-sub', '历年全国排名变迁'));
+      card.append(head, el('p', 'city-detail-loading', '正在按需加载 2016–2026 排名数据…'));
+      return card;
+    }
+
+    const [ranks, tiersHistory, realMult] = entry;
+    const {best, worst, yTop, yBottom} = rankEnvelope(ranks);
+    const rStart = ranks[0];
+    const rEnd = ranks[10];
+    const delta = rStart - rEnd;
+    const endSev = rankDropSeverity(rEnd, rStart);
+
+    const kpis = el('div', 'decade-kpis');
+    kpis.append(el('span', 'decade-lvl', '第 ' + rEnd + ' 名'));
+    const deltaText = delta > 0 ? '↑' + delta + '位' : delta < 0 ? '↓' + Math.abs(delta) + '位' : '持平';
+    const deltaTone = delta > 0 ? 'is-up' : delta === 0 ? 'is-flat' : endSev >= 0.45 ? 'is-down' : 'is-mild-down';
+    kpis.append(el('span', 'decade-delta ' + deltaTone, deltaText));
+    head.append(kpis);
+
+    const multNote = realMult ? ' · 16–25实增 ' + realMult.toFixed(2) + '×' : '';
+    const defaultReadout = '2016 #' + rStart + ' → 2026 #' + rEnd + ' · 区间 #' + best + '–#' + worst + multNote;
+    const readout = el('div', 'decade-readout', defaultReadout);
+
+    const plot = el('div', 'decade-plot');
+    const guides = el('div', 'decade-guides');
+    guides.setAttribute('aria-hidden', 'true');
+    const midRank = Math.round((yTop + yBottom) / 2);
+    const addGuide = (rankVal) => {
+      const g = el('div', 'decade-guide');
+      g.style.bottom = rankHeightPct(rankVal, yTop, yBottom).toFixed(1) + '%';
+      g.append(el('span', '', '#' + rankVal));
+      guides.append(g);
+    };
+    addGuide(yTop);
+    if (midRank !== yTop && midRank !== yBottom) addGuide(midRank);
+    addGuide(yBottom);
+
+    const baseHeight = rankHeightPct(rStart, yTop, yBottom);
+    const baseLine = el('div', 'decade-base-line');
+    baseLine.style.bottom = baseHeight.toFixed(2) + '%';
+    guides.append(baseLine);
+
+    const barsWrap = el('div', 'decade-bars');
+    ranks.forEach((rk, idx) => {
+      const h = rankHeightPct(rk, yTop, yBottom);
+      const y = DECADE_YEARS[idx];
+      const tr = tiersHistory[idx];
+      const diff = rStart - rk;
+      const diffStr = diff > 0 ? '（较16年 ↑' + diff + '）' : diff < 0 ? '（较16年 ↓' + Math.abs(diff) + '）' : '（与16年持平）';
+
+      const col = document.createElement('button');
+      col.type = 'button';
+      col.className = 'decade-bar-col' + (idx === 10 ? ' is-latest' : '') + (rk > rStart ? ' is-dip' : '');
+      col.setAttribute('aria-label', y + '年 第' + rk + '名');
+
+      const track = el('div', 'decade-bar-track');
+      if (rk < rStart) {
+        track.style.height = h.toFixed(2) + '%';
+        const gainT = Math.min(1, (rStart - rk) / 14);
+        const capTop = mixHex('#e78a94', '#e8556b', gainT);
+        const capBot = mixHex('#d16b7a', '#cb3c54', gainT);
+        const liftSeg = el('span', 'decade-seg-lift');
+        liftSeg.style.height = (((h - baseHeight) / h) * 100).toFixed(2) + '%';
+        liftSeg.style.background = 'linear-gradient(180deg, ' + capTop + ' 0%, ' + capBot + ' 100%)';
+        const baseSeg = el('span', 'decade-seg-base');
+        track.append(liftSeg, baseSeg);
+      } else if (rk > rStart) {
+        const sev = rankDropSeverity(rk, rStart);
+        let fillTop, fillBot;
+        if (sev <= 0.45) {
+          const k = sev / 0.45;
+          fillTop = mixHex('#c88692', '#b07b87', k);
+          fillBot = mixHex('#ae6977', '#945f6d', k);
+        } else {
+          const k = (sev - 0.45) / 0.55;
+          fillTop = mixHex('#b07b87', '#958b98', k);
+          fillBot = mixHex('#945f6d', '#756b78', k);
+        }
+        track.style.height = baseHeight.toFixed(2) + '%';
+        const defSeg = el('span', 'decade-seg-deficit');
+        defSeg.style.height = (((baseHeight - h) / baseHeight) * 100).toFixed(2) + '%';
+        defSeg.style.opacity = (0.38 + 0.62 * sev).toFixed(2);
+        const baseSeg = el('span', 'decade-seg-base');
+        baseSeg.style.background = 'linear-gradient(180deg, ' + fillTop + ' 0%, ' + fillBot + ' 100%)';
+        track.append(defSeg, baseSeg);
+      } else {
+        track.style.height = h.toFixed(2) + '%';
+        track.append(el('span', 'decade-seg-base'));
+      }
+
+      col.append(track);
+      const showTip = () => {
+        for (const child of barsWrap.children) child.classList.remove('is-active');
+        col.classList.add('is-active');
+        readout.replaceChildren(
+          el('strong', '', y + '年'),
+          document.createTextNode(' · 全国 '),
+          el('strong', '', '第 ' + rk + ' 名'),
+          document.createTextNode('（' + tr + '）' + (idx > 0 ? diffStr : ' · 起始基准')),
+        );
+      };
+      col.addEventListener('pointerenter', showTip);
+      col.addEventListener('focus', showTip);
+      col.addEventListener('click', showTip);
+      barsWrap.append(col);
+    });
+
+    plot.addEventListener('pointerleave', () => {
+      for (const child of barsWrap.children) child.classList.remove('is-active');
+      readout.textContent = defaultReadout;
+    });
+    plot.append(guides, barsWrap);
+
+    const xAxis = el('div', 'decade-x-axis');
+    xAxis.setAttribute('aria-hidden', 'true');
+    DECADE_YEARS.forEach((y, idx) => {
+      xAxis.append(el('span', idx === 10 ? 'is-latest' : '', '\'' + String(y).slice(2)));
+    });
+
+    const foot = el('div', 'decade-foot');
+    foot.append(
+      el('span', '', '纵轴：全国排名（越高越靠前）'),
+      el('span', '', '峰值 #' + best + ' · 谷值 #' + worst),
+    );
+
+    card.append(head, readout, plot, xAxis, foot);
+    return card;
+  }
+
   function renderCityDetail(selected) {
     if (!selected) {
       ui['city-detail'].hidden = true;
@@ -247,8 +439,10 @@
     const tier = selected[FIELD.tier];
     const markerHidden = !state.tiers.has(tier);
     const profiles = window.atlasProfiles || {};
+    const decadeRanks = window.atlasDecadeRanks || {};
     const prof = profiles[code];
-    const nextKey = code + '|' + (markerHidden ? '0' : '1') + '|' + (prof ? '1' : '0');
+    const decadeEntry = decadeRanks[code];
+    const nextKey = code + '|' + (markerHidden ? '0' : '1') + '|' + (prof ? '1' : '0') + '|' + (decadeEntry ? '1' : '0');
     ui['city-detail'].hidden = false;
     if (nextKey === renderedDetailKey) return;
     renderedDetailKey = nextKey;
@@ -344,7 +538,8 @@
       }
       trCard.append(trHead, trList);
 
-      grid.append(econCard, trCard);
+      grid.append(econCard, trCard, buildDecadeRankCard(selected, decadeEntry));
+      if (!decadeEntry && !decadeRanksReady) ensureDecadeRanks();
       nodes.push(grid);
     } else if (!profilesReady) {
       nodes.push(el('p', 'city-detail-loading', '正在按需加载该城市人文简介、经济与交通数据…'));
@@ -1170,5 +1365,6 @@
   const scheduleIdle = window.requestIdleCallback || (fn => setTimeout(fn, 80));
   scheduleIdle(() => {
     ensureProfiles();
+    ensureDecadeRanks();
   });
 })();
