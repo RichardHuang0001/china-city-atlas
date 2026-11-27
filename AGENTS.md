@@ -4,8 +4,9 @@
 
 这是 **中国城市分级地图 · 2026**。源码在本目录，公开仓库为 `RichardHuang0001/china-city-atlas`，线上站点为 `https://citiescn.hiww.top/`。开发入口是 `site/index.html`。浏览器直接加载同目录资源，使用原生 HTML、CSS、JavaScript 和 SVG。不要引入框架、后端、CDN、在线瓦片、字体下载或 API Key 来实现常规功能。
 
-- `site/index.html` 定义地图、筛选、城市名录和来源说明。脚本用 `defer` 按顺序加载 `data.js → map-data.js → map-labels.js → app.js`。保持相对路径和普通脚本，本地 `file://` 与静态托管子路径均需可用。
-- `site/assets/app.js` 是交互入口。筛选状态和相机状态分开维护。完整 `render()` 同步地图和表格，`paintCamera()` 更新 SVG 的 `viewBox` 并按缩放状态更新地市界线。拖动期间沿用现有标签，松手后重新避让。
+- `site/index.html` 定义地图、筛选、城市名录和来源说明。`<head>` 仅通过 `<link rel="preload">` + `defer` 加载首屏关键脚本：`data.js → map-base.js → map-labels.js → app.js`；其余体量较大的详情数据（`city-profiles.js`）和按省分片的地市边界（`districts/<prov>.js`）由 `app.js` 在首帧绘制后通过动态 `<script>` 按需/空闲懒加载（不用 `fetch()`，保持本地 `file://` 与静态托管子路径均可用）。
+- `site/assets/app.js` 是交互入口。筛选状态和相机状态分开维护。完整 `render()` 同步地图和表格，`paintCamera()` 更新 SVG 的 `viewBox` 并按当前可视区域与缩放状态按需加载并更新地市界线。拖动期间沿用现有标签且不发起分片请求，松手后重新避让与补全边界。
+- **性能与渐进加载规范（长期准则）**：详见 [docs/performance-architecture.md](docs/performance-architecture.md)。后续扩展功能时，首屏关键 JS/CSS 总传输预算控制在 **≤ 350 KB gzip**；新增大型数据或专题图层须拆为懒加载脚本，由 `loadScriptOnce` 挂载全局变量并在 UI 层支持骨架占位与就绪后原地刷新。
 - `site/assets/map-labels.js` 根据当前画布像素、视野、缩放步进和城市线级决定名称与微调避让。标签和标记用同一个六位行政区划代码关联，通过 `data-city` 与 `data-leader-for` 联动悬停高亮。
 - `tools/mobile-preview.html` 是开发者入口。通过嵌入正式页面验证 360／390／430 px。禁止在正式页面加入预览按钮或把 `tools/` 放进部署包。
 - `research/` 存放支撑项目的原始报告、官方统计公报、区划代码与地图规范，仅用于溯源与研究，不参与构建和部署。
@@ -39,7 +40,7 @@
   .venv/bin/python scripts/build_map.py /path/to/chn/global
   python3 scripts/verify_data.py
   ```
-- `site/assets/map-data.js` 是本地生成文件，保持 Git 忽略；公开仓库不分发，运行和部署均需要。数据出处和限制见 `docs/sources.md`。
+- `site/assets/map-data.js`、`site/assets/map-base.js` 和 `site/assets/districts/` 是本地生成文件，保持 Git 忽略；公开仓库不分发，运行和部署均需要。改动 `map-data.js` 后可用 `python3 scripts/split_map_assets.py` 重新生成核心底图与分片。数据出处和限制见 `docs/sources.md`。
 
 ## 检查与部署
 

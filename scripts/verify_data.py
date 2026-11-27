@@ -8,10 +8,7 @@ source = (assets / "data.js").read_text(encoding="utf-8").strip()
 prefix = "window.atlasData = "
 assert source.startswith(prefix) and source.endswith(";")
 data = json.loads(source[len(prefix):-1])
-map_prefix = "window.atlasMap = "
-map_source = (assets / "map-data.js").read_text(encoding="utf-8").strip()
-assert map_source.startswith(map_prefix) and map_source.endswith(";")
-atlas_map = json.loads(map_source[len(map_prefix):-1])
+
 cities = data["cities"]
 meta = data["meta"]
 tiers_meta = meta["tiers"]
@@ -28,17 +25,51 @@ assert len({city[1] for city in cities}) == len(cities)
 assert len({city[0] for city in cities}) == len(cities)
 assert len({(city[3], city[4]) for city in cities}) == len(cities)
 assert len(data["provinces"]) == 34
-assert set(data["provinces"]) == set(atlas_map["bounds"]) == set(atlas_map["provinces"])
-assert all(path.startswith("M") for path, _ in atlas_map["provinces"].values())
-assert atlas_map["seaBoundary"].count("M") == 10
-assert atlas_map["seaLand"].startswith("M")
-assert atlas_map["districts"]["51"]["510100"].startswith("M")
-assert atlas_map["seaCities"]["460300"].startswith("M")
+
+# 1. Verify progressive core map-base.js + per-province district chunks
+base_prefix = "window.atlasMap = "
+base_path = assets / "map-base.js"
+assert base_path.is_file(), "Missing site/assets/map-base.js (run scripts/split_map_assets.py)"
+base_source = base_path.read_text(encoding="utf-8").strip()
+assert base_source.startswith(base_prefix) and base_source.endswith(";")
+atlas_base = json.loads(base_source[len(base_prefix):-1])
+
+assert set(data["provinces"]) == set(atlas_base["bounds"]) == set(atlas_base["provinces"])
+assert all(path.startswith("M") for path, _ in atlas_base["provinces"].values())
+assert atlas_base["seaBoundary"].count("M") == 10
+assert atlas_base["seaLand"].startswith("M")
+assert atlas_base["seaCities"]["460300"].startswith("M")
+
+districts_dir = assets / "districts"
+district_provinces = atlas_base.get("districtProvinces")
+assert isinstance(district_provinces, list) and len(district_provinces) == 27
+loaded_districts = {}
+for prov in district_provinces:
+    chunk_path = districts_dir / f"{prov}.js"
+    assert chunk_path.is_file(), f"Missing district chunk: {chunk_path}"
+    raw_lines = [line.strip() for line in chunk_path.read_text(encoding="utf-8").splitlines() if line.strip()]
+    assert raw_lines[0] == "window.atlasDistricts = window.atlasDistricts || {};"
+    assign_prefix = f'window.atlasDistricts["{prov}"] = '
+    assert raw_lines[1].startswith(assign_prefix) and raw_lines[1].endswith(";")
+    loaded_districts[prov] = json.loads(raw_lines[1][len(assign_prefix):-1])
+
+assert loaded_districts["51"]["510100"].startswith("M")
 for city in main:
     code, province = city[1], city[2]
     if code == "460300":
         continue
-    assert atlas_map["districts"][province][code].startswith("M"), code
+    assert loaded_districts[province][code].startswith("M"), code
+
+# 2. Verify canonical full map-data.js if present locally
+full_map_path = assets / "map-data.js"
+if full_map_path.is_file():
+    map_source = full_map_path.read_text(encoding="utf-8").strip()
+    assert map_source.startswith(base_prefix) and map_source.endswith(";")
+    atlas_map = json.loads(map_source[len(base_prefix):-1])
+    assert set(atlas_map["districts"].keys()) == set(district_provinces)
+    for prov, mapping in atlas_map["districts"].items():
+        assert set(mapping.keys()) == set(loaded_districts[prov].keys())
+
 assert Counter(city[3] for city in main) == dict(enumerate(main_totals))
 for tier, total in enumerate(tier_totals):
     assert {city[4] for city in cities if city[3] == tier} == set(range(1, total + 1)), tier
@@ -50,7 +81,7 @@ for name, code, province, tier, position, _, coordinates, point, _ in cities:
     assert code[:2] == province and province in data["provinces"], name
     assert 1 <= position <= tier_totals[tier], name
     assert 73 <= coordinates[0] <= 135 and 16 <= coordinates[1] <= 54, name
-    frame = atlas_map["seaFrame"] if code == "460300" else atlas_map["frame"]
+    frame = atlas_base["seaFrame"] if code == "460300" else atlas_base["frame"]
     assert frame[0] <= point[0] <= frame[2] and frame[1] <= point[1] <= frame[3], name
 
 prof_path = assets / "city-profiles.js"
@@ -65,4 +96,7 @@ if prof_path.is_file():
         assert isinstance(item["ec"], list) and len(item["ec"]) == 6, code
         assert isinstance(item["tr"], list) and len(item["tr"]) == 14, code
 
-print(f"{meta['year']} 年版：333 个地级行政区、4 座直辖市、34 个省级图层、线级数量、定位字段与南海附图均通过。")
+print(
+    f"{meta['year']} 年版：333 个地级行政区、4 座直辖市、34 个省级图层、"
+    f"{len(district_provinces)} 个懒加载地市分片、线级数量、定位字段与南海附图均通过。"
+)

@@ -157,5 +157,9 @@ map_path = ASSETS / "map-data.js"
 map_path.write_text("window.atlasMap = {\n" + ",\n".join(
     "  " + compact(key) + ": " + compact(value) for key, value in map_data.items()
 ) + "\n};\n")
+
+from split_map_assets import write_progressive_map_assets
+base_path, chunks = write_progressive_map_assets(map_data, ASSETS)
 print(f"{len(provinces)} province polygons, {len(seen)} prefecture features, "
-      f"{len(inset_lines)} maritime segments, {map_path.stat().st_size:,} bytes")
+      f"{len(inset_lines)} maritime segments, {map_path.stat().st_size:,} bytes "
+      f"(base={base_path.stat().st_size:,} bytes, {len(chunks)} district shards)")

@@ -3,7 +3,9 @@
   const {meta = {}, cities, provinces} = window.atlasData;
   const map = window.atlasMap;
   const labelLayout = window.atlasLabels;
-  const profiles = window.atlasProfiles || {};
+  window.atlasProfiles = window.atlasProfiles || {};
+  window.atlasDistricts = window.atlasDistricts || {};
+  if (map.districts) Object.assign(window.atlasDistricts, map.districts);
   const FIELD = {
     name: 0, code: 1, province: 2, tier: 3, rank: 4,
     reference: 5, coord: 6, point: 7, urbanRef: 8,
@@ -53,7 +55,7 @@
   ];
   const byId = id => document.getElementById(id);
   const ui = Object.fromEntries([
-    'query', 'province', 'legend', 'reset', 'atlas', 'points', 'map-stage',
+    'query', 'province', 'legend', 'reset', 'atlas', 'points', 'map-stage', 'map-loading',
     'provinces', 'city-highlight', 'province-labels', 'district-lines', 'boundaries', 'sea-card',
     'sea-detail', 'sea-points', 'sea-mini', 'sea-open', 'marker-count', 'table-tier',
     'zoom-in', 'zoom-out', 'zoom-fit', 'city-leaders', 'city-labels', 'sea-labels',
@@ -77,10 +79,50 @@
   let cameraFrame;
   let mapScope;
   let districtScope = '';
-  let allDistricts;
   let mainMarkers = [];
   let markerScale;
   let renderedDetailKey = '';
+
+  const assetVersion = document.querySelector('meta[name="asset-version"]')?.content || '';
+  const withVersion = path => (assetVersion ? path + '?v=' + assetVersion : path);
+  const assetPromises = new Map();
+  function loadScriptOnce(key, src) {
+    if (assetPromises.has(key)) return assetPromises.get(key);
+    const promise = new Promise((resolve, reject) => {
+      const script = document.createElement('script');
+      script.src = withVersion(src);
+      script.async = true;
+      script.onload = () => resolve(true);
+      script.onerror = () => {
+        assetPromises.delete(key);
+        reject(new Error('Failed to load ' + src));
+      };
+      document.head.append(script);
+    });
+    assetPromises.set(key, promise);
+    return promise;
+  }
+
+  let profilesReady = Object.keys(window.atlasProfiles).length > 0;
+  function ensureProfiles() {
+    if (profilesReady || Object.keys(window.atlasProfiles).length > 0) {
+      profilesReady = true;
+      return Promise.resolve(window.atlasProfiles);
+    }
+    return loadScriptOnce('profiles', 'assets/city-profiles.js')
+      .then(() => {
+        profilesReady = true;
+        if (state.selected) {
+          const selected = lookup.get(state.selected);
+          if (selected) {
+            renderedDetailKey = '';
+            renderCityDetail(selected);
+          }
+        }
+        return window.atlasProfiles;
+      })
+      .catch(() => window.atlasProfiles);
+  }
 
   const el = (tag, className, text) => {
     const node = document.createElement(tag);
@@ -186,12 +228,13 @@
     const code = selected[FIELD.code];
     const tier = selected[FIELD.tier];
     const markerHidden = !state.tiers.has(tier);
-    const nextKey = code + '|' + (markerHidden ? '0' : '1');
+    const profiles = window.atlasProfiles || {};
+    const prof = profiles[code];
+    const nextKey = code + '|' + (markerHidden ? '0' : '1') + '|' + (prof ? '1' : '0');
     ui['city-detail'].hidden = false;
     if (nextKey === renderedDetailKey) return;
     renderedDetailKey = nextKey;
 
-    const prof = profiles[code];
     const coord = selected[FIELD.coord].map(n => n.toFixed(3));
     const head = el('div', 'city-detail-head');
     const titleRow = el('div', 'city-detail-title-row');
@@ -285,6 +328,9 @@
 
       grid.append(econCard, trCard);
       nodes.push(grid);
+    } else if (!profilesReady) {
+      nodes.push(el('p', 'city-detail-loading', '正在按需加载该城市人文简介、经济与交通数据…'));
+      ensureProfiles();
     }
 
     ui['city-detail'].replaceChildren(...nodes);
@@ -479,16 +525,59 @@
         '点击名称查看详情。';
   }
 
-  const provinceDistrictPath = code => {
-    const entry = map.districts[code];
-    return !entry ? '' : typeof entry === 'string' ? entry : Object.values(entry).join('');
-  };
+  const districtProvinceSet = new Set(
+    Array.isArray(map.districtProvinces)
+      ? map.districtProvinces
+      : Object.keys(window.atlasDistricts),
+  );
   const cityRegionPaths = new Map();
-  for (const entry of Object.values(map.districts)) {
-    if (typeof entry === 'object' && entry) {
+  const districtCombinedCache = new Map();
+  function registerDistrictChunk(prov) {
+    const entry = window.atlasDistricts?.[prov];
+    if (!entry || districtCombinedCache.has(prov)) return;
+    if (typeof entry === 'string') {
+      districtCombinedCache.set(prov, entry);
+    } else {
       for (const [code, path] of Object.entries(entry)) cityRegionPaths.set(code, path);
+      districtCombinedCache.set(prov, Object.values(entry).join(''));
     }
   }
+  for (const prov of Object.keys(window.atlasDistricts)) registerDistrictChunk(prov);
+
+  function ensureDistrict(prov) {
+    if (!prov || !districtProvinceSet.has(prov)) return Promise.resolve('');
+    if (window.atlasDistricts[prov]) {
+      registerDistrictChunk(prov);
+      return Promise.resolve(districtCombinedCache.get(prov) || '');
+    }
+    return loadScriptOnce('district:' + prov, 'assets/districts/' + prov + '.js')
+      .then(() => {
+        registerDistrictChunk(prov);
+        if (highlightedCity && lookup.get(highlightedCity)?.[FIELD.province] === prov) {
+          ui['city-highlight'].setAttribute('d', state.inset ? '' : cityRegionPath(highlightedCity));
+        }
+        updateDistrictLines();
+        return districtCombinedCache.get(prov) || '';
+      })
+      .catch(() => '');
+  }
+
+  function visibleDistrictProvinces() {
+    if (!fittedView) return [];
+    const {center: [cx, cy], width, height} = currentView();
+    const left = cx - width / 2;
+    const right = cx + width / 2;
+    const top = cy - height / 2;
+    const bottom = cy + height / 2;
+    const hits = [];
+    for (const prov of districtProvinceSet) {
+      const box = map.bounds[prov];
+      if (!box) continue;
+      if (box[2] >= left && box[0] <= right && box[3] >= top && box[1] <= bottom) hits.push(prov);
+    }
+    return hits;
+  }
+
   const cityRegionPath = code => {
     const city = code && lookup.get(code);
     if (!city) return '';
@@ -499,15 +588,39 @@
 
   function updateDistrictLines() {
     const {inset, province} = state;
-    const nextScope = inset ? '' : province ? province : camera.zoom >= zoomSteps[MAP_CONFIG.districtZoomIndex] ? 'national' : '';
-    if (nextScope === districtScope) return;
-    districtScope = nextScope;
-    if (!nextScope) ui['district-lines'].setAttribute('d', '');
-    else if (nextScope === 'national') {
-      allDistricts ||= Object.keys(map.districts).map(provinceDistrictPath).join('');
-      ui['district-lines'].setAttribute('d', allDistricts);
-    } else {
-      ui['district-lines'].setAttribute('d', provinceDistrictPath(nextScope));
+    if (inset) {
+      if (districtScope !== '') {
+        districtScope = '';
+        ui['district-lines'].setAttribute('d', '');
+      }
+      return;
+    }
+    if (province) {
+      const ready = districtCombinedCache.has(province);
+      const nextSig = province + ':' + (ready ? '1' : '0');
+      if (!ready && !drag?.moved) ensureDistrict(province);
+      if (nextSig === districtScope) return;
+      districtScope = nextSig;
+      ui['district-lines'].setAttribute('d', districtCombinedCache.get(province) || '');
+      return;
+    }
+    if (camera.zoom >= zoomSteps[MAP_CONFIG.districtZoomIndex]) {
+      const targets = visibleDistrictProvinces();
+      if (!drag?.moved) {
+        for (const prov of targets) {
+          if (!districtCombinedCache.has(prov)) ensureDistrict(prov);
+        }
+      }
+      const loaded = targets.filter(prov => districtCombinedCache.has(prov));
+      const nextSig = 'nat:' + loaded.join(',');
+      if (nextSig === districtScope) return;
+      districtScope = nextSig;
+      ui['district-lines'].setAttribute('d', loaded.map(prov => districtCombinedCache.get(prov)).join(''));
+      return;
+    }
+    if (districtScope !== '') {
+      districtScope = '';
+      ui['district-lines'].setAttribute('d', '');
     }
   }
 
@@ -761,6 +874,7 @@
       return;
     }
     highlightProvince(provincePaths.get(province));
+    if (city) ensureDistrict(city[FIELD.province]);
     highlightCity(city?.[FIELD.code] || '');
     ui.tooltip.textContent = city ? cityDescription(city) : provinces[province] + ' · 点击放大';
     ui.tooltip.hidden = false;
@@ -963,4 +1077,9 @@
     resizeFrame = requestAnimationFrame(render);
   });
   render();
+  if (ui['map-loading']) ui['map-loading'].hidden = true;
+  const scheduleIdle = window.requestIdleCallback || (fn => setTimeout(fn, 80));
+  scheduleIdle(() => {
+    ensureProfiles();
+  });
 })();

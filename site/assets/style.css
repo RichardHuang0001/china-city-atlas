@@ -247,6 +247,25 @@ button:disabled { cursor: default; }
 #atlas:focus-visible { outline: 2px solid var(--wine); outline-offset: -3px; }
 #atlas[data-zoomed] { cursor: grab; touch-action: none; }
 #atlas.dragging, #atlas.dragging * { cursor: grabbing !important; }
+.map-loading {
+  position: absolute;
+  inset: 50% auto auto 50%;
+  transform: translate(-50%, -50%);
+  z-index: 4;
+  padding: 7px 14px;
+  border: 1px solid var(--line);
+  border-radius: 999px;
+  background: color-mix(in srgb, var(--surface) 92%, transparent);
+  color: var(--muted);
+  font-size: 13px;
+  pointer-events: none;
+  box-shadow: 0 3px 12px #75405110;
+}
+.city-detail-loading {
+  margin: 0;
+  color: var(--muted);
+  font-size: 13px;
+}
 #provinces path, .sea-land {
   fill: #f8edd8;
   stroke: #946f67;

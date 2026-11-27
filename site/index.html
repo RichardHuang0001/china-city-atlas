@@ -5,11 +5,14 @@
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <meta name="description" content="按地图、省份和知城 2026 版线级查阅中国 337 座地级及以上城市分布。">
   <title>中国城市分级地图 · 2026</title>
+  <link rel="preload" as="script" href="assets/data.js">
+  <link rel="preload" as="script" href="assets/map-base.js">
+  <link rel="preload" as="script" href="assets/map-labels.js">
+  <link rel="preload" as="script" href="assets/app.js">
   <link rel="stylesheet" href="assets/style.css">
   <script defer src="assets/data.js"></script>
-  <script defer src="assets/map-data.js"></script>
+  <script defer src="assets/map-base.js"></script>
   <script defer src="assets/map-labels.js"></script>
-  <script defer src="assets/city-profiles.js"></script>
   <script defer src="assets/app.js"></script>
 </head>
 <body>
@@ -74,6 +77,7 @@
           <g id="points"></g>
           <g id="city-labels" aria-hidden="true"></g>
         </svg>
+        <div id="map-loading" class="map-loading" role="status" aria-live="polite">正在绘制全国底图…</div>
         <div class="zoom-dock">
           <p class="zoom-tip">放大可以显示更多城市信息哟～</p>
           <div class="zoom-column">
