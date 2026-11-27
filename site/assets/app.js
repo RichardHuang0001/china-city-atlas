@@ -7,7 +7,6 @@
   window.atlasDecadeRanks = window.atlasDecadeRanks || {};
   window.atlasDistricts = window.atlasDistricts || {};
   window.atlasSubdistricts = window.atlasSubdistricts || {};
-  if (map.districts) Object.assign(window.atlasDistricts, map.districts);
   const FIELD = {
     name: 0, code: 1, province: 2, tier: 3, rank: 4,
     reference: 5, coord: 6, point: 7, urbanRef: 8,
@@ -32,23 +31,18 @@
       ['65', '新疆'], ['54', '西藏'], ['63', '青海'], ['15', '内蒙古'],
       ['23', '黑龙江'], ['51', '四川'], ['53', '云南'], ['45', '广西'], ['71', '台湾'], ['46', '海南'],
     ],
-    // Municipalities + Shenzhen carry lazy county/district boundaries and names.
-    subdistrictBounds: {
-      '110000': [218.3, -157.0, 259.5, -111.1],
-      '120000': [248.2, -136.2, 276.1, -88.3],
-      '310000': [371.4, 85.5, 399.5, 118.1],
-      '500000': [6.9, 105.4, 122.0, 218.5],
-      '440300': [226.2, 357.3, 249.1, 370.0],
-    },
-    subdistrictProvinceMap: {
-      '11': ['110000'],
-      '12': ['120000'],
-      '31': ['310000'],
-      '50': ['500000'],
-      '44': ['440300'],
-    },
+    // Derived from map-base.js (generated from site/assets/subdistricts/*.js).
+    subdistrictBounds: map.subdistrictBounds || {},
     subdistrictLabelMaxUnits: 0.23,
   };
+  const subdistrictProvinceMap = {};
+  for (const cityCode of Object.keys(MAP_CONFIG.subdistrictBounds)) {
+    const prov = cityCode.slice(0, 2);
+    (subdistrictProvinceMap[prov] = subdistrictProvinceMap[prov] || []).push(cityCode);
+  }
+  const referenceProvinces = new Set(
+    cities.filter(city => city[FIELD.reference]).map(city => city[FIELD.province]),
+  );
   const tierConfig = Array.isArray(meta.tiers) && meta.tiers.length ? meta.tiers : DEFAULT_TIERS;
   const tiers = tierConfig.map(item => item.name);
   const colors = tierConfig.map(item => item.color);
@@ -87,7 +81,7 @@
   const state = {
     province: '', tiers: defaultTiers(), customTiers: false, query: '', selected: '', inset: false,
   };
-  const lookup = new Map(cities.map(city => [city[1], city]));
+  const lookup = new Map(cities.map(city => [city[FIELD.code], city]));
   const collator = new Intl.Collator('zh-CN');
   const ns = 'http://www.w3.org/2000/svg';
   const zoomSteps = MAP_CONFIG.zoomSteps;
@@ -313,7 +307,7 @@
   }
 
   const provinceRows = Object.keys(provinces).map(code => {
-    const list = cities.filter(city => city[2] === code && !city[5]);
+    const list = cities.filter(city => city[FIELD.province] === code && !city[FIELD.reference]);
     return '<tr><th scope="row"><button class="city-link" data-province="' + code + '">' +
       provinces[code] + '</button></th><td>' + list.length + '</td>' +
       stats(list).map(n => '<td>' + n + '</td>').join('') + '</tr>';
@@ -404,7 +398,7 @@
     const subdistricts = activeSubdistrictItems(units);
     const placed = labelLayout.place({
       markers: mainMarkers, subdistricts, width: rect.width, height: rect.height, left, top, units,
-      level, local, focus, obstacles, colors, maxTier,
+      level, local, focus, obstacles, colors, maxTier, field: FIELD,
     });
     ui['city-leaders'].replaceChildren(placed.leaders);
     ui['subdistrict-labels'].replaceChildren(placed.subdistrictLabels);
@@ -420,11 +414,7 @@
         '点击名称查看详情。';
   }
 
-  const districtProvinceSet = new Set(
-    Array.isArray(map.districtProvinces)
-      ? map.districtProvinces
-      : Object.keys(window.atlasDistricts),
-  );
+  const districtProvinceSet = new Set(map.districtProvinces || []);
   const cityRegionPaths = new Map();
   const districtCombinedCache = new Map();
   function registerDistrictChunk(prov) {
@@ -498,13 +488,13 @@
   function activeSubdistrictCities() {
     const {inset, province} = state;
     if (inset) return [];
-    if (province) return MAP_CONFIG.subdistrictProvinceMap[province] || [];
+    if (province) return subdistrictProvinceMap[province] || [];
     return camera.zoom >= zoomSteps[MAP_CONFIG.districtZoomIndex] ? visibleSubdistrictCities() : [];
   }
 
   function activeSubdistrictItems(units) {
     if (state.inset) return [];
-    const isMunicipality = !!state.province && ['11', '12', '31', '50'].includes(state.province);
+    const isMunicipality = !!state.province && referenceProvinces.has(state.province);
     if (!isMunicipality && units > MAP_CONFIG.subdistrictLabelMaxUnits) return [];
     const items = [];
     for (const cityCode of activeSubdistrictCities()) {

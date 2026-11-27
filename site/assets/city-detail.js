@@ -376,7 +376,7 @@ window.atlasDetail = (() => {
     } = ctx;
     const code = selected[FIELD.code];
     const tier = selected[FIELD.tier];
-    const decadeCities = decadeData.cities || decadeData;
+    const decadeCities = decadeData.cities || {};
     const prof = profiles[code];
     const decadeEntry = decadeCities[code];
     const nextKey = code + '|' + (markerHidden ? '0' : '1') + '|' + (prof ? '1' : '0') + '|' + (decadeEntry ? '1' : '0');

@@ -12,6 +12,8 @@ from pyproj import Transformer
 from shapely.geometry import shape
 from shapely import transform
 
+from geo_proj import INSET_PROJ, MAIN_PROJ
+
 ROOT = Path(__file__).resolve().parents[1]
 ASSETS = ROOT / "site" / "assets"
 SOURCE = Path(sys.argv[1])
@@ -23,20 +25,21 @@ CITY_PREFIX = "window.atlasData = "
 city_path = ASSETS / "data.js"
 city_data = json.loads(city_path.read_text().strip().removeprefix(CITY_PREFIX).removesuffix(";"))
 
-def project_at(meridian, latitude, parallels):
+def project_at(params):
     projection = Transformer.from_crs(
         4490,
-        f"+proj=aea +lon_0={meridian} +lat_0={latitude} "
-        f"+lat_1={parallels[0]} +lat_2={parallels[1]} +ellps=GRS80 +units=m",
+        f"+proj=aea +lon_0={params['lon_0']} +lat_0={params['lat_0']} "
+        f"+lat_1={params['lat_1']} +lat_2={params['lat_2']} +ellps=GRS80 +units=m",
         always_xy=True,
     )
+    scale = params["scale"]
     def project(x, y):
         east, north = projection.transform(x, y)
-        return east / 4000, -north / 4000
+        return east / scale, -north / scale
     return project
 
-main = project_at(105, 36, (25, 47))
-inset = project_at(114, 14, (5, 24))
+main = project_at(MAIN_PROJ)
+inset = project_at(INSET_PROJ)
 
 def path_line(coordinates, close=False):
     points = [(round(x, 2), round(y, 2)) for x, y in coordinates]

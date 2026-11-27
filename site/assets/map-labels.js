@@ -340,7 +340,8 @@ window.atlasLabels = (() => {
     return fragment;
   }
 
-  function place({markers, subdistricts = [], width, height, left, top, units, level, local, focus, obstacles, colors, maxTier = 5}) {
+  function place({markers, subdistricts = [], width, height, left, top, units, level, local, focus, obstacles, colors, maxTier = 5, field}) {
+    const F = field || FIELD;
     const labels = document.createDocumentFragment();
     const leaders = document.createDocumentFragment();
     const subdistrictLabels = document.createDocumentFragment();
@@ -358,9 +359,9 @@ window.atlasLabels = (() => {
       const y = (point[1] - top) / units;
       if (x < 0 || y < 0 || x > width || y > height) continue;
       const radius = size + 1.35;
-      const isFocus = city[FIELD.code] === focus;
-      const tier = isFocus ? -1 : city[FIELD.tier];
-      if (city[FIELD.tier] < minTier) minTier = city[FIELD.tier];
+      const isFocus = city[F.code] === focus;
+      const tier = isFocus ? -1 : city[F.tier];
+      if (city[F.tier] < minTier) minTier = city[F.tier];
       pointsIndex.add({
         left: x - radius, right: x + radius, top: y - radius, bottom: y + radius,
         tier, isFocus,
@@ -375,23 +376,23 @@ window.atlasLabels = (() => {
       // Place highest-priority cities first so lower tiers never displace higher tiers.
       candidates.sort((a, b) =>
         Number(b.isFocus) - Number(a.isFocus) ||
-        a.city[FIELD.tier] - b.city[FIELD.tier] || a.city[FIELD.rank] - b.city[FIELD.rank]);
+        a.city[F.tier] - b.city[F.tier] || a.city[F.rank] - b.city[F.rank]);
 
       const placedLabels = [];
       for (const candidate of candidates) {
         const {city, isFocus} = candidate;
-        if (!isFocus && city[FIELD.tier] > fillMax) continue;
-        const preferred = city[FIELD.tier] <= reveal;
-        const required = isFocus || city[FIELD.tier] === 0 || (!mobile && preferred);
-        const fontSize = isFocus ? font + 1.5 : city[FIELD.tier] < 2 ? font + .5 : font;
+        if (!isFocus && city[F.tier] > fillMax) continue;
+        const preferred = city[F.tier] <= reveal;
+        const required = isFocus || city[F.tier] === 0 || (!mobile && preferred);
+        const fontSize = isFocus ? font + 1.5 : city[F.tier] < 2 ? font + .5 : font;
         const best = choosePlacement({
-          ...candidate, width, height, fontSize, name: city[FIELD.name],
+          ...candidate, width, height, fontSize, name: city[F.name],
           required, preferred, spacingPad: preferred || isFocus ? 0 : spacingPad,
           mobile, textIndex, pointsIndex,
         });
         if (!best) continue;
         const {option, box, line} = best;
-        if (line) leaders.append(drawLeader(city, line, left, top, units, colors[city[FIELD.tier]]));
+        if (line) leaders.append(drawLeader(city, line, left, top, units, colors[city[F.tier]]));
         placedLabels.push(makeLabel(city, [left + option.x * units, top + option.y * units],
           fontSize * units, option.anchor, isFocus, required));
         textIndex.add(box);

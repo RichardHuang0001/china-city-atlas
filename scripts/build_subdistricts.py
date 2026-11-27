@@ -6,10 +6,10 @@ Uses only the Python standard library; shares path rounding with split_map_asset
 from hashlib import sha256
 from pathlib import Path
 import json
-import math
 import re
 import sys
 
+from geo_proj import project_main
 from split_map_assets import round_svg_path
 
 ROOT = Path(__file__).resolve().parents[1]
@@ -25,29 +25,6 @@ SUBDISTRICT_TARGETS = {
     "50": "500000",
     "4403": "440300",
 }
-
-# Exact GRS80 Albers Equal-Area Conic matching scripts/build_map.py (lon_0=105, lat_0=36, lat_1=25, lat_2=47)
-_A = 6378137.0
-_F = 1 / 298.257222101
-_E2 = 2 * _F - _F * _F
-_E = math.sqrt(_E2)
-_Q = lambda phi: (1 - _E2) * (
-    math.sin(phi) / (1 - _E2 * math.sin(phi) ** 2)
-    - math.log((1 - _E * math.sin(phi)) / (1 + _E * math.sin(phi))) / (2 * _E)
-)
-_M = lambda phi: math.cos(phi) / math.sqrt(1 - _E2 * math.sin(phi) ** 2)
-_PHI0, _PHI1, _PHI2, _LAM0 = map(math.radians, (36, 25, 47, 105))
-_Q0, _Q1, _Q2 = _Q(_PHI0), _Q(_PHI1), _Q(_PHI2)
-_M1, _M2 = _M(_PHI1), _M(_PHI2)
-_N = (_M1 * _M1 - _M2 * _M2) / (_Q2 - _Q1)
-_C = _M1 * _M1 + _N * _Q1
-_RHO0 = _A * math.sqrt(_C - _N * _Q0) / _N
-
-
-def project_main(lon: float, lat: float) -> tuple[float, float]:
-    rho = _A * math.sqrt(_C - _N * _Q(math.radians(lat))) / _N
-    theta = _N * (math.radians(lon) - _LAM0)
-    return rho * math.sin(theta) / 4000, -(_RHO0 - rho * math.cos(theta)) / 4000
 
 
 def ring_area_centroid(pts: list[tuple[float, float]]) -> tuple[float, float, float]:

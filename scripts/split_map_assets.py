@@ -50,6 +50,25 @@ def round_svg_path(path_str: str, decimals: int = 1) -> str:
     return "".join(parts)
 
 
+def collect_subdistrict_bounds(assets_dir: Path) -> dict[str, list[float]]:
+    """Read bounding boxes from generated site/assets/subdistricts/*.js shards."""
+    sub_dir = assets_dir / "subdistricts"
+    if not sub_dir.is_dir():
+        return {}
+    bounds = {}
+    for shard_path in sorted(sub_dir.glob("*.js")):
+        code = shard_path.stem
+        prefix = f'window.atlasSubdistricts["{code}"] = '
+        for line in shard_path.read_text(encoding="utf-8").splitlines():
+            line = line.strip()
+            if line.startswith(prefix) and line.endswith(";"):
+                payload = json.loads(line[len(prefix):-1])
+                if isinstance(payload.get("bounds"), list) and len(payload["bounds"]) == 4:
+                    bounds[code] = payload["bounds"]
+                break
+    return bounds
+
+
 def write_progressive_map_assets(map_data: dict, assets_dir: Path = ASSETS) -> tuple[Path, list[Path]]:
     """Write critical core map-base.js and lazy per-province districts/*.js."""
     compact = lambda obj: json.dumps(obj, ensure_ascii=False, separators=(",", ":"))
@@ -71,6 +90,7 @@ def write_progressive_map_assets(map_data: dict, assets_dir: Path = ASSETS) -> t
         "seaLand": round_svg_path(map_data["seaLand"], 1),
         "seaCities": map_data["seaCities"],
         "districtProvinces": district_provinces,
+        "subdistrictBounds": collect_subdistrict_bounds(assets_dir),
     }
     base_path = assets_dir / "map-base.js"
     base_path.write_text(

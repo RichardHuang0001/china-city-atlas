@@ -3,6 +3,8 @@ from collections import Counter
 from pathlib import Path
 import json
 
+from geo_proj import project_main
+
 assets = Path(__file__).resolve().parents[1] / "site" / "assets"
 source = (assets / "data.js").read_text(encoding="utf-8").strip()
 prefix = "window.atlasData = "
@@ -62,6 +64,8 @@ for city in main:
 
 subdistricts_dir = assets / "subdistricts"
 expected_subdistricts = {"110000": 16, "120000": 16, "310000": 16, "500000": 38, "440300": 9}
+subdistrict_bounds_meta = atlas_base.get("subdistrictBounds", {})
+assert set(subdistrict_bounds_meta) == set(expected_subdistricts), "map-base.js subdistrictBounds mismatch (re-run split_map_assets.py)"
 for city_code, expected_cnt in expected_subdistricts.items():
     sub_path = subdistricts_dir / f"{city_code}.js"
     assert sub_path.is_file(), f"Missing subdistrict chunk: {sub_path}"
@@ -71,6 +75,7 @@ for city_code, expected_cnt in expected_subdistricts.items():
     assert raw_lines[1].startswith(assign_prefix) and raw_lines[1].endswith(";")
     sub_data = json.loads(raw_lines[1][len(assign_prefix):-1])
     assert len(sub_data["bounds"]) == 4 and sub_data["path"].startswith("M")
+    assert subdistrict_bounds_meta[city_code] == sub_data["bounds"], city_code
     assert len(sub_data["items"]) == expected_cnt
     for item_name, pt, size in sub_data["items"]:
         assert item_name and len(pt) == 2 and size[0] > 0 and size[1] > 0
@@ -98,6 +103,9 @@ for name, code, province, tier, position, _, coordinates, point, _ in cities:
     assert 73 <= coordinates[0] <= 135 and 16 <= coordinates[1] <= 54, name
     frame = atlas_base["seaFrame"] if code == "460300" else atlas_base["frame"]
     assert frame[0] <= point[0] <= frame[2] and frame[1] <= point[1] <= frame[3], name
+    if code != "460300":
+        px, py = project_main(*coordinates)
+        assert abs(px - point[0]) < 0.02 and abs(py - point[1]) < 0.02, (name, px, py, point)
 
 prof_path = assets / "city-profiles.js"
 if prof_path.is_file():
