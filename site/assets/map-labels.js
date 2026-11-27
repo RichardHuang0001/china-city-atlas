@@ -296,10 +296,55 @@ window.atlasLabels = (() => {
     return leader;
   }
 
-  function place({markers, width, height, left, top, units, level, local, focus, obstacles, colors, maxTier = 5}) {
+  function makeSubdistrictLabel(name, [x, y], fontSize) {
+    const text = document.createElementNS(svgNamespace, 'text');
+    text.setAttribute('class', 'subdistrict-label');
+    text.setAttribute('x', x);
+    text.setAttribute('y', y);
+    text.setAttribute('text-anchor', 'middle');
+    text.setAttribute('font-size', fontSize);
+    text.setAttribute('stroke-width', fontSize * .22);
+    text.textContent = name;
+    return text;
+  }
+
+  function placeSubdistrictLabels({subdistricts, width, height, left, top, units, mobile, textIndex, pointsIndex}) {
+    const fragment = document.createDocumentFragment();
+    if (!subdistricts?.length) return fragment;
+    const fontSize = mobile ? 9.5 : 10.5;
+    const sorted = [...subdistricts].sort((a, b) => (b[2][0] * b[2][1]) - (a[2][0] * a[2][1]));
+    const nudges = [[0, 0], [0, -7], [0, 7], [9, 0], [-9, 0]];
+    for (const [name, [ax, ay], [polyW, polyH]] of sorted) {
+      const sx = (ax - left) / units;
+      const sy = (ay - top) / units;
+      if (sx < 4 || sy < 4 || sx > width - 4 || sy > height - 4) continue;
+      const wPx = polyW / units;
+      const hPx = polyH / units;
+      const labelW = Array.from(name).length * fontSize + 2;
+      const labelH = fontSize + 2;
+      if (Math.max(wPx, hPx) < labelW * .66 || Math.min(wPx, hPx) < labelH * .72) continue;
+
+      const maxDx = Math.max(4, wPx * .22);
+      const maxDy = Math.max(4, hPx * .22);
+      for (const [dx, dy] of nudges) {
+        if (Math.abs(dx) > maxDx || Math.abs(dy) > maxDy) continue;
+        const point = {x: sx + dx, y: sy + dy, anchor: 'middle'};
+        const box = labelBox(point, labelW, labelH);
+        if (box.left < 3 || box.top < 3 || box.right > width - 3 || box.bottom > height - 3) continue;
+        if (textIndex.query(box).size > 0 || pointsIndex.query(box).size > 0) continue;
+        fragment.append(makeSubdistrictLabel(name, [left + point.x * units, top + point.y * units], fontSize * units));
+        textIndex.add(box);
+        break;
+      }
+    }
+    return fragment;
+  }
+
+  function place({markers, subdistricts = [], width, height, left, top, units, level, local, focus, obstacles, colors, maxTier = 5}) {
     const labels = document.createDocumentFragment();
     const leaders = document.createDocumentFragment();
-    if (!markers.length) return {labels, leaders};
+    const subdistrictLabels = document.createDocumentFragment();
+    if (!markers.length && !subdistricts.length) return {labels, leaders, subdistrictLabels};
     const mobile = width < narrowMap;
     const font = mobile ? 11 : 12.5;
     const textIndex = createSpatialIndex();
@@ -322,41 +367,46 @@ window.atlasLabels = (() => {
       });
       candidates.push({city, x, y, radius, tier, isFocus});
     }
-    if (!candidates.length) return {labels, leaders};
 
-    const {reveal, fillMax} = disclosureRange(width, level, local, minTier, maxTier);
-    const spacingPad = local ? 0 : Math.max(4, (mobile ? 18 : 14) - level * 3);
+    if (candidates.length) {
+      const {reveal, fillMax} = disclosureRange(width, level, local, minTier, maxTier);
+      const spacingPad = local ? 0 : Math.max(4, (mobile ? 18 : 14) - level * 3);
 
-    // Place highest-priority cities first so lower tiers never displace higher tiers.
-    candidates.sort((a, b) =>
-      Number(b.isFocus) - Number(a.isFocus) ||
-      a.city[FIELD.tier] - b.city[FIELD.tier] || a.city[FIELD.rank] - b.city[FIELD.rank]);
+      // Place highest-priority cities first so lower tiers never displace higher tiers.
+      candidates.sort((a, b) =>
+        Number(b.isFocus) - Number(a.isFocus) ||
+        a.city[FIELD.tier] - b.city[FIELD.tier] || a.city[FIELD.rank] - b.city[FIELD.rank]);
 
-    const placedLabels = [];
-    for (const candidate of candidates) {
-      const {city, isFocus} = candidate;
-      if (!isFocus && city[FIELD.tier] > fillMax) continue;
-      const preferred = city[FIELD.tier] <= reveal;
-      const required = isFocus || city[FIELD.tier] === 0 || (!mobile && preferred);
-      const fontSize = isFocus ? font + 1.5 : city[FIELD.tier] < 2 ? font + .5 : font;
-      const best = choosePlacement({
-        ...candidate, width, height, fontSize, name: city[FIELD.name],
-        required, preferred, spacingPad: preferred || isFocus ? 0 : spacingPad,
-        mobile, textIndex, pointsIndex,
-      });
-      if (!best) continue;
-      const {option, box, line} = best;
-      if (line) leaders.append(drawLeader(city, line, left, top, units, colors[city[FIELD.tier]]));
-      placedLabels.push(makeLabel(city, [left + option.x * units, top + option.y * units],
-        fontSize * units, option.anchor, isFocus, required));
-      textIndex.add(box);
+      const placedLabels = [];
+      for (const candidate of candidates) {
+        const {city, isFocus} = candidate;
+        if (!isFocus && city[FIELD.tier] > fillMax) continue;
+        const preferred = city[FIELD.tier] <= reveal;
+        const required = isFocus || city[FIELD.tier] === 0 || (!mobile && preferred);
+        const fontSize = isFocus ? font + 1.5 : city[FIELD.tier] < 2 ? font + .5 : font;
+        const best = choosePlacement({
+          ...candidate, width, height, fontSize, name: city[FIELD.name],
+          required, preferred, spacingPad: preferred || isFocus ? 0 : spacingPad,
+          mobile, textIndex, pointsIndex,
+        });
+        if (!best) continue;
+        const {option, box, line} = best;
+        if (line) leaders.append(drawLeader(city, line, left, top, units, colors[city[FIELD.tier]]));
+        placedLabels.push(makeLabel(city, [left + option.x * units, top + option.y * units],
+          fontSize * units, option.anchor, isFocus, required));
+        textIndex.add(box);
+      }
+
+      // Append in reverse priority order so higher-tier labels paint on top if slightly overlapping.
+      for (let i = placedLabels.length - 1; i >= 0; i--) {
+        labels.append(placedLabels[i]);
+      }
     }
 
-    // Append in reverse priority order so higher-tier labels paint on top if slightly overlapping.
-    for (let i = placedLabels.length - 1; i >= 0; i--) {
-      labels.append(placedLabels[i]);
-    }
-    return {labels, leaders};
+    subdistrictLabels.append(placeSubdistrictLabels({
+      subdistricts, width, height, left, top, units, mobile, textIndex, pointsIndex,
+    }));
+    return {labels, leaders, subdistrictLabels};
   }
 
   return {makeLabel, place, priorityTier, narrowMap};

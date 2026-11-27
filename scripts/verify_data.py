@@ -60,6 +60,21 @@ for city in main:
         continue
     assert loaded_districts[province][code].startswith("M"), code
 
+subdistricts_dir = assets / "subdistricts"
+expected_subdistricts = {"110000": 16, "120000": 16, "310000": 16, "500000": 38, "440300": 9}
+for city_code, expected_cnt in expected_subdistricts.items():
+    sub_path = subdistricts_dir / f"{city_code}.js"
+    assert sub_path.is_file(), f"Missing subdistrict chunk: {sub_path}"
+    raw_lines = [line.strip() for line in sub_path.read_text(encoding="utf-8").splitlines() if line.strip()]
+    assert raw_lines[0] == "window.atlasSubdistricts = window.atlasSubdistricts || {};"
+    assign_prefix = f'window.atlasSubdistricts["{city_code}"] = '
+    assert raw_lines[1].startswith(assign_prefix) and raw_lines[1].endswith(";")
+    sub_data = json.loads(raw_lines[1][len(assign_prefix):-1])
+    assert len(sub_data["bounds"]) == 4 and sub_data["path"].startswith("M")
+    assert len(sub_data["items"]) == expected_cnt
+    for item_name, pt, size in sub_data["items"]:
+        assert item_name and len(pt) == 2 and size[0] > 0 and size[1] > 0
+
 # 2. Verify canonical full map-data.js if present locally
 full_map_path = assets / "map-data.js"
 if full_map_path.is_file():

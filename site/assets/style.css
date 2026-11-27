@@ -294,6 +294,15 @@ button:disabled { cursor: default; }
   pointer-events: none;
   vector-effect: non-scaling-stroke;
 }
+#subdistrict-lines {
+  fill: none;
+  stroke: #caa99e;
+  stroke-width: .45px;
+  stroke-dasharray: 1.6 2.2;
+  opacity: .6;
+  pointer-events: none;
+  vector-effect: non-scaling-stroke;
+}
 #district-lines {
   stroke: #b59287;
   stroke-width: .65px;
@@ -806,6 +815,16 @@ footer { margin-top: 13px; color: var(--muted); font-size: 12px; }
   dominant-baseline: central;
   font-weight: 650;
   cursor: pointer;
+}
+.subdistrict-label {
+  fill: #7d6159;
+  stroke: #fbf2e2;
+  stroke-linejoin: round;
+  paint-order: stroke;
+  dominant-baseline: central;
+  font-weight: 560;
+  letter-spacing: .04em;
+  pointer-events: none;
 }
 .city-label.major, .city-label.selected { fill: #762d46; font-weight: 760; }
 #province-labels { dominant-baseline: central; }

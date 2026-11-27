@@ -5,6 +5,7 @@
   const labelLayout = window.atlasLabels;
   window.atlasProfiles = window.atlasProfiles || {};
   window.atlasDistricts = window.atlasDistricts || {};
+  window.atlasSubdistricts = window.atlasSubdistricts || {};
   if (map.districts) Object.assign(window.atlasDistricts, map.districts);
   const FIELD = {
     name: 0, code: 1, province: 2, tier: 3, rank: 4,
@@ -30,6 +31,22 @@
       ['65', '新疆'], ['54', '西藏'], ['63', '青海'], ['15', '内蒙古'],
       ['23', '黑龙江'], ['51', '四川'], ['53', '云南'], ['45', '广西'], ['71', '台湾'], ['46', '海南'],
     ],
+    // Municipalities + Shenzhen carry lazy county/district boundaries and names.
+    subdistrictBounds: {
+      '110000': [218.3, -157.0, 259.5, -111.1],
+      '120000': [248.2, -136.2, 276.1, -88.3],
+      '310000': [371.4, 85.5, 399.5, 118.1],
+      '500000': [6.9, 105.4, 122.0, 218.5],
+      '440300': [226.2, 357.3, 249.1, 370.0],
+    },
+    subdistrictProvinceMap: {
+      '11': ['110000'],
+      '12': ['120000'],
+      '31': ['310000'],
+      '50': ['500000'],
+      '44': ['440300'],
+    },
+    subdistrictLabelMaxUnits: 0.23,
   };
   const tierConfig = Array.isArray(meta.tiers) && meta.tiers.length ? meta.tiers : DEFAULT_TIERS;
   const tiers = tierConfig.map(item => item.name);
@@ -56,9 +73,9 @@
   const byId = id => document.getElementById(id);
   const ui = Object.fromEntries([
     'query', 'province', 'legend', 'reset', 'atlas', 'points', 'map-stage', 'map-loading',
-    'provinces', 'city-highlight', 'province-labels', 'district-lines', 'boundaries', 'sea-card',
+    'provinces', 'city-highlight', 'province-labels', 'subdistrict-lines', 'district-lines', 'boundaries', 'sea-card',
     'sea-detail', 'sea-points', 'sea-mini', 'sea-open', 'marker-count', 'table-tier',
-    'zoom-in', 'zoom-out', 'zoom-fit', 'city-leaders', 'city-labels', 'sea-labels',
+    'zoom-in', 'zoom-out', 'zoom-fit', 'city-leaders', 'subdistrict-labels', 'city-labels', 'sea-labels',
     'tooltip', 'inset', 'national', 'map-title', 'map-hint', 'city-detail',
     'total', 'counts', 'sort', 'city-rows', 'empty', 'reference-count', 'reference-rows',
     'province-summary',
@@ -79,6 +96,7 @@
   let cameraFrame;
   let mapScope;
   let districtScope = '';
+  let subdistrictScope = '';
   let mainMarkers = [];
   let markerScale;
   let renderedDetailKey = '';
@@ -508,11 +526,13 @@
     const focus = state.selected || (mainMarkers.length === 1 ? mainMarkers[0].city[FIELD.code] : '');
     const level = zoomLevel(camera.zoom);
     const local = !!state.province;
+    const subdistricts = activeSubdistrictItems(units);
     const placed = labelLayout.place({
-      markers: mainMarkers, width: rect.width, height: rect.height, left, top, units,
+      markers: mainMarkers, subdistricts, width: rect.width, height: rect.height, left, top, units,
       level, local, focus, obstacles, colors, maxTier,
     });
     ui['city-leaders'].replaceChildren(placed.leaders);
+    ui['subdistrict-labels'].replaceChildren(placed.subdistrictLabels);
     ui['city-labels'].replaceChildren(placed.labels);
     const wide = rect.width >= labelLayout.narrowMap;
     const tier = labelLayout.priorityTier(rect.width, level, local, maxTier);
@@ -562,7 +582,7 @@
       .catch(() => '');
   }
 
-  function visibleDistrictProvinces() {
+  function visibleBoundsKeys(keys, getBox) {
     if (!fittedView) return [];
     const {center: [cx, cy], width, height} = currentView();
     const left = cx - width / 2;
@@ -570,12 +590,72 @@
     const top = cy - height / 2;
     const bottom = cy + height / 2;
     const hits = [];
-    for (const prov of districtProvinceSet) {
-      const box = map.bounds[prov];
-      if (!box) continue;
-      if (box[2] >= left && box[0] <= right && box[3] >= top && box[1] <= bottom) hits.push(prov);
+    for (const key of keys) {
+      const box = getBox(key);
+      if (box && box[2] >= left && box[0] <= right && box[3] >= top && box[1] <= bottom) hits.push(key);
     }
     return hits;
+  }
+
+  const visibleDistrictProvinces = () => visibleBoundsKeys(districtProvinceSet, prov => map.bounds[prov]);
+  const visibleSubdistrictCities = () => visibleBoundsKeys(
+    Object.keys(MAP_CONFIG.subdistrictBounds),
+    code => MAP_CONFIG.subdistrictBounds[code],
+  );
+
+  function ensureSubdistrict(cityCode) {
+    if (!cityCode || !MAP_CONFIG.subdistrictBounds[cityCode]) return Promise.resolve(null);
+    if (window.atlasSubdistricts[cityCode]) return Promise.resolve(window.atlasSubdistricts[cityCode]);
+    return loadScriptOnce('subdistrict:' + cityCode, 'assets/subdistricts/' + cityCode + '.js')
+      .then(() => {
+        if (!drag?.moved && fittedView) {
+          updateSubdistrictLines();
+          const {center: [x, y], width} = currentView();
+          paintLabels(x - width / 2, y - currentView().height / 2, width);
+        }
+        return window.atlasSubdistricts[cityCode] || null;
+      })
+      .catch(() => null);
+  }
+
+  function activeSubdistrictCities() {
+    const {inset, province} = state;
+    if (inset) return [];
+    if (province) return MAP_CONFIG.subdistrictProvinceMap[province] || [];
+    return camera.zoom >= zoomSteps[MAP_CONFIG.districtZoomIndex] ? visibleSubdistrictCities() : [];
+  }
+
+  function activeSubdistrictItems(units) {
+    if (state.inset) return [];
+    const isMunicipality = !!state.province && ['11', '12', '31', '50'].includes(state.province);
+    if (!isMunicipality && units > MAP_CONFIG.subdistrictLabelMaxUnits) return [];
+    const items = [];
+    for (const cityCode of activeSubdistrictCities()) {
+      const shard = window.atlasSubdistricts[cityCode];
+      if (shard?.items) items.push(...shard.items);
+    }
+    return items;
+  }
+
+  function updateSubdistrictLines() {
+    const targets = activeSubdistrictCities();
+    if (!targets.length) {
+      if (subdistrictScope !== '') {
+        subdistrictScope = '';
+        ui['subdistrict-lines'].setAttribute('d', '');
+      }
+      return;
+    }
+    if (!drag?.moved) {
+      for (const code of targets) {
+        if (!window.atlasSubdistricts[code]) ensureSubdistrict(code);
+      }
+    }
+    const loaded = targets.filter(code => window.atlasSubdistricts[code]);
+    const nextSig = (state.province || 'nat') + ':' + loaded.join(',');
+    if (nextSig === subdistrictScope) return;
+    subdistrictScope = nextSig;
+    ui['subdistrict-lines'].setAttribute('d', loaded.map(code => window.atlasSubdistricts[code].path).join(''));
   }
 
   const cityRegionPath = code => {
@@ -634,6 +714,7 @@
 
   function paintCamera() {
     updateDistrictLines();
+    updateSubdistrictLines();
     const {center: [x, y], width, height} = currentView();
     const left = x - width / 2;
     const top = y - height / 2;
@@ -670,6 +751,10 @@
       }
     }
     if (next === undefined) return;
+    if (camera.zoom <= 1 && !camera.center && state.selected && !state.inset) {
+      const selected = lookup.get(state.selected);
+      if (selected?.[FIELD.point]) camera.center = [...selected[FIELD.point]];
+    }
     camera.zoom = next;
     clampCenter();
     hideTooltip();
@@ -689,6 +774,7 @@
     ui.provinces.toggleAttribute('hidden', inset);
     ui.boundaries.toggleAttribute('hidden', inset);
     updateDistrictLines();
+    updateSubdistrictLines();
     for (const [code, shape] of provincePaths) {
       shape.classList.toggle('selected', code === province);
       shape.classList.toggle('context', !!province && code !== province);
@@ -874,7 +960,10 @@
       return;
     }
     highlightProvince(provincePaths.get(province));
-    if (city) ensureDistrict(city[FIELD.province]);
+    if (city) {
+      ensureDistrict(city[FIELD.province]);
+      ensureSubdistrict(city[FIELD.code]);
+    }
     highlightCity(city?.[FIELD.code] || '');
     ui.tooltip.textContent = city ? cityDescription(city) : provinces[province] + ' · 点击放大';
     ui.tooltip.hidden = false;

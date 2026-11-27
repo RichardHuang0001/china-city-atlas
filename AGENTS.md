@@ -4,7 +4,7 @@
 
 这是 **中国城市分级地图 · 2026**。源码在本目录，公开仓库为 `RichardHuang0001/china-city-atlas`，线上站点为 `https://citiescn.hiww.top/`。开发入口是 `site/index.html`。浏览器直接加载同目录资源，使用原生 HTML、CSS、JavaScript 和 SVG。不要引入框架、后端、CDN、在线瓦片、字体下载或 API Key 来实现常规功能。
 
-- `site/index.html` 定义地图、筛选、城市名录和来源说明。`<head>` 仅通过 `<link rel="preload">` + `defer` 加载首屏关键脚本：`data.js → map-base.js → map-labels.js → app.js`；其余体量较大的详情数据（`city-profiles.js`）和按省分片的地市边界（`districts/<prov>.js`）由 `app.js` 在首帧绘制后通过动态 `<script>` 按需/空闲懒加载（不用 `fetch()`，保持本地 `file://` 与静态托管子路径均可用）。
+- `site/index.html` 定义地图、筛选、城市名录和来源说明。`<head>` 仅通过 `<link rel="preload">` + `defer` 加载首屏关键脚本：`data.js → map-base.js → map-labels.js → app.js`；其余体量较大的详情数据（`city-profiles.js`）、按省分片的地市边界（`districts/<prov>.js`）以及 4 座直辖市与深圳的区级边界/区名分片（`subdistricts/<city>.js`）由 `app.js` 在首帧绘制后通过动态 `<script>` 按需/空闲懒加载（不用 `fetch()`，保持本地 `file://` 与静态托管子路径均可用）。
 - `site/assets/app.js` 是交互入口。筛选状态和相机状态分开维护。完整 `render()` 同步地图和表格，`paintCamera()` 更新 SVG 的 `viewBox` 并按当前可视区域与缩放状态按需加载并更新地市界线。拖动期间沿用现有标签且不发起分片请求，松手后重新避让与补全边界。
 - **性能与渐进加载规范（长期准则）**：详见 [docs/performance-architecture.md](docs/performance-architecture.md)。后续扩展功能时，首屏关键 JS/CSS 总传输预算控制在 **≤ 350 KB gzip**；新增大型数据或专题图层须拆为懒加载脚本，由 `loadScriptOnce` 挂载全局变量并在 UI 层支持骨架占位与就绪后原地刷新。
 - `site/assets/map-labels.js` 根据当前画布像素、视野、缩放步进和城市线级决定名称与微调避让。标签和标记用同一个六位行政区划代码关联，通过 `data-city` 与 `data-leader-for` 联动悬停高亮。
@@ -28,6 +28,7 @@
 - 地图用「＋／−」按固定级别缩放，放大后桌面与手机单指均可拖动，「全览」复位当前范围。不拦截滚轮或触控手势来缩放地图；滚轮要能正常滚动页面。拖动不能误触城市或省份点击。
 - 宽画布（至少 650 px）的全国视图默认优先放置全部一线与新一线名称；第一次按「＋」用 1.23 倍取景，优先放置视野内所有二线及以上名称；第 3 次按「＋」（`zoomSteps[3]` = `2.35×`）起渲染全国地市界线。
 - 省级视图显示省内地级界线并在缩放工具旁展示「返回全国」；在省级视图中直接拖动地图时，无缝退回全国视图并保留当前视觉缩放比例，方便拖看并点选邻近省份。海南视图可切换南海诸岛附图，选择三沙时自动切换。
+- 4 座直辖市（`110000`、`120000`、`310000`、`500000`）及深圳（`440300`）支持区级边界（`#subdistrict-lines`）与区名（`#subdistrict-labels`）：区界线采用比地市界更浅更细的虚线以清晰区分层级；放大至局部视图（或选中/点击直辖市与深圳并放大）时懒加载对应 `subdistricts/<city>.js` 并展示区名，且在标签避让时优先让位给城市名和点位徽标。
 
 ## 数据与底图构建
 
@@ -40,7 +41,7 @@
   .venv/bin/python scripts/build_map.py /path/to/chn/global
   python3 scripts/verify_data.py
   ```
-- `site/assets/map-data.js`、`site/assets/map-base.js` 和 `site/assets/districts/` 是本地生成文件，保持 Git 忽略；公开仓库不分发，运行和部署均需要。改动 `map-data.js` 后可用 `python3 scripts/split_map_assets.py` 重新生成核心底图与分片。数据出处和限制见 `docs/sources.md`。
+- `site/assets/map-data.js`、`site/assets/map-base.js`、`site/assets/districts/` 和 `site/assets/subdistricts/` 是本地生成文件，保持 Git 忽略；公开仓库不分发，运行和部署均需要。改动 `map-data.js` 后可用 `python3 scripts/split_map_assets.py` 重新生成核心底图与分片；直辖市与深圳的区级分片由 `scripts/build_subdistricts.py /path/to/chn/global` 从同一上游版本的 `chn-level-3.json` 生成。数据出处和限制见 `docs/sources.md`。
 
 ## 检查与部署
 

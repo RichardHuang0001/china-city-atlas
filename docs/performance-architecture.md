@@ -57,4 +57,4 @@
 4. **同步维护构建与校验链路**：
    - 更新地理数据后运行 `python3 scripts/build_map.py ...` 或 `python3 scripts/split_map_assets.py`；
    - 新增分片或资产文件时同步更新 [scripts/verify_data.py](../scripts/verify_data.py) 与 [hiww-web/apps/citiescn/build.mjs](../../hiww-web/apps/citiescn/build.mjs)；
-   - 衍生地理边界文件（`map-data.js`、`map-base.js`、`districts/`）继续保持 `.gitignore` 忽略，不提交大体积几何产物至公开源码仓库。
+   - 衍生地理边界文件（`map-data.js`、`map-base.js`、`districts/`、`subdistricts/`）继续保持 `.gitignore` 忽略，不提交大体积几何产物至公开源码仓库；直辖市与深圳的区级分片由 `scripts/build_subdistricts.py` 按需生成，并经 `app.js` 懒加载。
