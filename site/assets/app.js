@@ -1086,15 +1086,58 @@
       (code === state.selected ? ' aria-current="true"' : '') + '>' + label + '</button>';
   }
 
-  function render() {
+  // Cache the 337 SVG marker nodes once so filtering/searching/resizing never recreates DOM nodes.
+  const markerCache = new Map();
+  function getMarkerNode(city) {
+    const code = city[FIELD.code];
+    let node = markerCache.get(code);
+    if (!node) {
+      const tier = city[FIELD.tier];
+      node = document.createElementNS(ns, 'g');
+      node.dataset.city = code;
+      node.dataset.tier = tier;
+      node.setAttribute('role', 'img');
+      node.setAttribute('aria-label', cityDescription(city));
+      const badge = document.createElementNS(ns, 'path');
+      badge.setAttribute('class', 'marker-badge');
+      badge.setAttribute('d', badges[tier]);
+      badge.setAttribute('fill', colors[tier]);
+      const digit = document.createElementNS(ns, 'path');
+      digit.setAttribute('class', 'marker-digit');
+      digit.setAttribute('d', digits[tier]);
+      node.append(badge, digit);
+      markerCache.set(code, node);
+    }
+    node.setAttribute('class', 'marker' + (code === state.selected ? ' active' : ''));
+    return node;
+  }
+
+  function renderTable() {
     const list = visibleCities().sort(orders[ui.sort.value]);
     const ordinary = list.filter(city => !city[FIELD.reference]);
     const references = list.filter(city => city[FIELD.reference]);
+    const scope = provinces[state.province] || '全国';
+    const selection = !!(ui['table-tier'].value || state.query.trim());
+
+    ui.total.textContent = ordinary.length;
+    const countLabel = selection ? '筛选后线级分布' : scope + '线级分布';
+    ui.counts.setAttribute('aria-label', countLabel);
+    ui.counts.innerHTML = stats(ordinary).map((n, i) => '<span>' + swatch(i) + tiers[i] + ' ' + n + '</span>').join('');
+    ui['city-rows'].innerHTML = ordinary.map(city => '<tr data-row="' + city[FIELD.code] + '"' +
+      (city[FIELD.code] === state.selected ? ' class="active"' : '') + '><td>' + city[FIELD.rank] + '</td><td>' +
+      cityButton(city) + '</td><td>' + provinces[city[FIELD.province]] + '</td><td>' + swatch(city[FIELD.tier]) + tiers[city[FIELD.tier]] + '</td></tr>').join('');
+    ui.empty.hidden = !!ordinary.length;
+    ui['reference-count'].textContent = references.length + ' 座';
+    byId('reference').hidden = !references.length;
+    ui['reference-rows'].innerHTML = references.map(city =>
+      cityButton(city, swatch(city[FIELD.tier]) + city[FIELD.name] + ' · ' + tiers[city[FIELD.tier]] + ' ' + city[FIELD.rank])).join('');
+  }
+
+  function renderMap({skipPaint = false} = {}) {
     const scoped = matchesScope();
     const markers = scoped.filter(city => state.tiers.has(city[FIELD.tier]));
     const selected = scoped.find(city => city[FIELD.code] === state.selected);
     const scope = provinces[state.province] || '全国';
-    const selection = !!(ui['table-tier'].value || state.query.trim());
     setView();
     const miniScale = state.province ? 1 : fitInset();
 
@@ -1128,20 +1171,7 @@
       const baseSize = code === state.selected ? Math.max(8.8, ordinarySize * 1.25) :
         miniature ? 5.2 : reference ? ordinarySize + .9 : ordinarySize;
       const size = baseSize * tierScales[tier];
-      const marker = document.createElementNS(ns, 'g');
-      marker.dataset.city = code;
-      marker.dataset.tier = tier;
-      marker.setAttribute('class', 'marker' + (code === state.selected ? ' active' : ''));
-      marker.setAttribute('role', 'img');
-      marker.setAttribute('aria-label', cityDescription(city));
-      const badge = document.createElementNS(ns, 'path');
-      badge.setAttribute('class', 'marker-badge');
-      badge.setAttribute('d', badges[tier]);
-      badge.setAttribute('fill', colors[tier]);
-      const digit = document.createElementNS(ns, 'path');
-      digit.setAttribute('class', 'marker-digit');
-      digit.setAttribute('d', digits[tier]);
-      marker.append(badge, digit);
+      const marker = getMarkerNode(city);
       if (miniature) {
         positionMarker(marker, point, size * miniScale);
         mini.append(marker);
@@ -1157,22 +1187,15 @@
     if (active) ui.points.append(active);
     ui['sea-points'].replaceChildren(mini);
     ui['sea-labels'].replaceChildren(miniLabels);
-    paintCamera();
+    if (!skipPaint) paintCamera();
     ui['marker-count'].textContent = '图中 ' + shown + ' 座';
-    ui.total.textContent = ordinary.length;
-    const countLabel = selection ? '筛选后线级分布' : scope + '线级分布';
-    ui.counts.setAttribute('aria-label', countLabel);
-    ui.counts.innerHTML = stats(ordinary).map((n, i) => '<span>' + swatch(i) + tiers[i] + ' ' + n + '</span>').join('');
-    ui['city-rows'].innerHTML = ordinary.map(city => '<tr data-row="' + city[FIELD.code] + '"' +
-      (city[FIELD.code] === state.selected ? ' class="active"' : '') + '><td>' + city[FIELD.rank] + '</td><td>' +
-      cityButton(city) + '</td><td>' + provinces[city[FIELD.province]] + '</td><td>' + swatch(city[FIELD.tier]) + tiers[city[FIELD.tier]] + '</td></tr>').join('');
-    ui.empty.hidden = !!ordinary.length;
-    ui['reference-count'].textContent = references.length + ' 座';
-    byId('reference').hidden = !references.length;
-    ui['reference-rows'].innerHTML = references.map(city =>
-      cityButton(city, swatch(city[FIELD.tier]) + city[FIELD.name] + ' · ' + tiers[city[FIELD.tier]] + ' ' + city[FIELD.rank])).join('');
     renderCityDetail(selected);
     hideTooltip();
+  }
+
+  function render(options) {
+    renderMap(options);
+    renderTable();
   }
 
   function selectProvince(code) {
@@ -1303,7 +1326,8 @@
     camera.center = [prevView.center[0], newTop + (newRect.height * newWorldPerPx) / 2];
     fittedView = nationalFitted;
     clampCenter();
-    render();
+    // Skip immediate paintCamera() here because the active pointermove schedules it on rAF.
+    render({skipPaint: true});
   }
 
   let drag;
@@ -1382,15 +1406,19 @@
     else state.tiers.delete(Number(tier));
     render();
   });
+  let queryTimer;
   ui.query.addEventListener('input', () => {
     state.query = ui.query.value;
     state.selected = '';
-    render();
+    clearTimeout(queryTimer);
+    queryTimer = setTimeout(() => render(), 80);
   });
   ui.query.addEventListener('keydown', event => {
     if (event.key !== 'Enter') return;
+    clearTimeout(queryTimer);
     const list = visibleCities();
     if (list.length === 1) selectCity(list[0][FIELD.code], 'search');
+    else render();
   });
   ui.province.addEventListener('change', () => selectProvince(ui.province.value));
   ui.national.addEventListener('click', () => {
@@ -1403,12 +1431,13 @@
     render();
   });
   const updateTable = () => {
-    render();
+    renderTable();
     ui['city-rows'].closest('.rows').scrollTop = 0;
   };
   ui.sort.addEventListener('change', updateTable);
   ui['table-tier'].addEventListener('change', updateTable);
   ui.reset.addEventListener('click', () => {
+    clearTimeout(queryTimer);
     state.tiers = defaultTiers();
     state.customTiers = false;
     ui['table-tier'].value = '';
@@ -1444,10 +1473,27 @@
       render();
     }
   });
+  let lastOrdinarySize = ui.atlas.clientWidth < 600 ? 4.8 : 7;
   let resizeFrame;
+  function handleResize() {
+    const nextOrdinarySize = ui.atlas.clientWidth < 600 ? 4.8 : 7;
+    if (!fittedView || nextOrdinarySize !== lastOrdinarySize) {
+      lastOrdinarySize = nextOrdinarySize;
+      render();
+      return;
+    }
+    const {inset, province} = state;
+    const frame = inset ? map.seaFrame : province ? map.bounds[province] : map.frame;
+    const padding = inset ? 1.18 : province ? 1.20 : 1.065;
+    fittedView = fittedBox(ui.atlas, frame, padding);
+    clampCenter();
+    if (!province) fitInset();
+    markerScale = undefined;
+    paintCamera();
+  }
   window.addEventListener('resize', () => {
     cancelAnimationFrame(resizeFrame);
-    resizeFrame = requestAnimationFrame(render);
+    resizeFrame = requestAnimationFrame(handleResize);
   });
   render();
   if (ui['map-loading']) ui['map-loading'].hidden = true;
