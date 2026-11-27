@@ -19,9 +19,9 @@
   - [split_map_assets.py](../scripts/split_map_assets.py) 从 `map-data.js` 生成 `site/assets/map-base.js` 与 `site/assets/districts/<prov>.js`：
     - `map-base.js` 仅保留首屏必须的省级多边形、包络框、国界/南海附图及 `districtProvinces` 索引列表，并对全国视图边界坐标实施确定性 `0.1` SVG 单位舍入与连续重复点去重（相邻省界共享顶点完全同值、零接缝缺口，全国画布下误差 < 0.1 px），`map-base.js` 体积由 1,193 KB gzip 降至 **~272 KB gzip**。
     - 全量 27 个省份的地市界线保留原始高精度，拆分为 `site/assets/districts/<prov>.js`（单省均值 **~30 KB gzip**）。
-- **城市语料与详情数据（`assets/city-profiles.js`）**：
+- **城市详情组件与语料数据（`assets/city-detail.js`、`assets/city-profiles.js`、`assets/city-decade-ranks.js`）**：
   - 不在 `<head>` 中阻塞声明。首屏地图完成第一帧 `render()` 后，通过浏览器空闲回调（`requestIdleCallback` / `setTimeout`）静默预加载。
-  - 若用户在预加载完成前提前点击某城市，面板先渲染名称、线级与坐标骨架，并显示轻量加载提示；脚本就绪后自动原地刷新补全简介、经济与交通信息。
+  - `city-detail.js` 独立承载详情卡与 2016–2026 排名/经济指数双轴图渲染（`window.atlasDetail`）；若用户在预加载完成前提前点击某城市，`app.js` 先渲染名称、线级与收起按钮骨架并显示轻量加载提示，模块与数据脚本就绪后自动原地刷新补全简介、经济、交通与十年趋势图。
 
 ### (2) `file://` 与静态托管双兼容的动态 `<script>` 加载器
 
