@@ -116,14 +116,18 @@ if decade_path.is_file():
     decade_prefix = "window.atlasDecadeRanks = "
     decade_src = decade_path.read_text(encoding="utf-8").strip()
     assert decade_src.startswith(decade_prefix) and decade_src.endswith(";")
-    decade_ranks = json.loads(decade_src[len(decade_prefix):-1])
-    assert set(decade_ranks.keys()) == {city[1] for city in cities}
+    decade_payload = json.loads(decade_src[len(decade_prefix):-1])
+    assert isinstance(decade_payload.get("meta"), dict) and len(decade_payload["meta"].get("natGr", [])) == 10
+    decade_cities = decade_payload["cities"]
+    assert set(decade_cities.keys()) == {city[1] for city in cities}
     tier_set = {item["name"] for item in tiers_meta}
-    for code, item in decade_ranks.items():
-        assert isinstance(item, list) and len(item) == 3, code
-        ranks_11, tiers_11, _mult = item
+    for code, item in decade_cities.items():
+        assert isinstance(item, list) and len(item) == 5, code
+        ranks_11, tiers_11, edis_10, grs_10, flags_10 = item
         assert len(ranks_11) == 11 and all(1 <= r <= 337 for r in ranks_11), (code, ranks_11)
         assert len(tiers_11) == 11 and all(t in tier_set for t in tiers_11), (code, tiers_11)
+        assert len(edis_10) == 10 and all(v is None or (0 <= v <= 100) for v in edis_10), code
+        assert len(grs_10) == 10 and len(flags_10) == 10, code
 
 print(
     f"{meta['year']} 年版：333 个地级行政区、4 座直辖市、34 个省级图层、"

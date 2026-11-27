@@ -123,7 +123,7 @@
   }
 
   let profilesReady = Object.keys(window.atlasProfiles).length > 0;
-  let decadeRanksReady = Object.keys(window.atlasDecadeRanks).length > 0;
+  let decadeRanksReady = !!(window.atlasDecadeRanks?.cities && Object.keys(window.atlasDecadeRanks.cities).length);
   function refreshSelectedDetail() {
     if (!state.selected) return;
     const selected = lookup.get(state.selected);
@@ -146,7 +146,7 @@
       .catch(() => window.atlasProfiles);
   }
   function ensureDecadeRanks() {
-    if (decadeRanksReady || Object.keys(window.atlasDecadeRanks).length > 0) {
+    if (decadeRanksReady || (window.atlasDecadeRanks?.cities && Object.keys(window.atlasDecadeRanks.cities).length > 0)) {
       decadeRanksReady = true;
       return Promise.resolve(window.atlasDecadeRanks);
     }
@@ -293,19 +293,19 @@
 
   const rankHeightPct = (r, yTop, yBottom) => 14 + 78 * ((yBottom - r) / (yBottom - yTop));
 
-  function buildDecadeRankCard(selected, entry) {
+  function buildDecadeRankCard(selected, entry, decadeMeta) {
     const card = el('section', 'detail-card detail-card--decade');
-    card.setAttribute('aria-label', selected[FIELD.name] + ' 2016-2026 全国排名变化');
+    card.setAttribute('aria-label', selected[FIELD.name] + ' 2016-2026 全国排名与经济发展趋势');
     const head = el('div', 'detail-card-head');
     head.append(el('h4', '', '2016-2026'));
 
     if (!entry) {
-      head.append(el('span', 'detail-card-sub', '历年全国排名变迁'));
-      card.append(head, el('p', 'city-detail-loading', '正在按需加载 2016–2026 排名数据…'));
+      head.append(el('span', 'detail-card-sub', '排名与经济发展指数'));
+      card.append(head, el('p', 'city-detail-loading', '正在按需加载 2016–2026 排名与经济指数…'));
       return card;
     }
 
-    const [ranks, tiersHistory, realMult] = entry;
+    const [ranks, tiersHistory, edis = [], rawGrs = [], flags = []] = entry;
     const {best, worst, yTop, yBottom} = rankEnvelope(ranks);
     const rStart = ranks[0];
     const rEnd = ranks[10];
@@ -317,10 +317,17 @@
     const deltaText = delta > 0 ? '↑' + delta + '位' : delta < 0 ? '↓' + Math.abs(delta) + '位' : '持平';
     const deltaTone = delta > 0 ? 'is-up' : delta === 0 ? 'is-flat' : endSev >= 0.45 ? 'is-down' : 'is-mild-down';
     kpis.append(el('span', 'decade-delta ' + deltaTone, deltaText));
+    const ediStart = edis[0];
+    const ediEnd = edis[9];
+    if (ediEnd !== null && ediEnd !== undefined) {
+      kpis.append(el('span', 'decade-edi-pill', '经济 ' + ediEnd.toFixed(1)));
+    }
     head.append(kpis);
 
-    const multNote = realMult ? ' · 16–25实增 ' + realMult.toFixed(2) + '×' : '';
-    const defaultReadout = '2016 #' + rStart + ' → 2026 #' + rEnd + ' · 区间 #' + best + '–#' + worst + multNote;
+    const ediSummary = (ediStart !== null && ediStart !== undefined && ediEnd !== null && ediEnd !== undefined)
+      ? ' · 经济 ' + ediStart.toFixed(1) + '→' + ediEnd.toFixed(1) + '（' + (ediEnd - ediStart >= 0 ? '+' : '') + (ediEnd - ediStart).toFixed(1) + '）'
+      : '';
+    const defaultReadout = '排名 #' + rStart + '→#' + rEnd + ediSummary;
     const readout = el('div', 'decade-readout', defaultReadout);
 
     const plot = el('div', 'decade-plot');
@@ -342,13 +349,66 @@
     baseLine.style.bottom = baseHeight.toFixed(2) + '%';
     guides.append(baseLine);
 
+    for (const tickVal of [85, 50, 15]) {
+      const rg = el('span', 'decade-guide-right', String(tickVal));
+      rg.style.bottom = tickVal + '%';
+      guides.append(rg);
+    }
+
     const barsWrap = el('div', 'decade-bars');
+    const lineLayer = el('div', 'decade-line-layer');
+    lineLayer.setAttribute('aria-hidden', 'true');
+    const lineSvg = document.createElementNS(ns, 'svg');
+    lineSvg.setAttribute('class', 'decade-line-svg');
+    lineSvg.setAttribute('viewBox', '0 0 110 100');
+    lineSvg.setAttribute('preserveAspectRatio', 'none');
+    lineLayer.append(lineSvg);
+
+    const pts = [];
+    for (let i = 0; i < 10; i++) {
+      if (edis[i] === null || edis[i] === undefined) continue;
+      pts.push(((i + 0.5) * 10).toFixed(2) + ',' + (100 - edis[i]).toFixed(2));
+    }
+    if (pts.length >= 2) {
+      const halo = document.createElementNS(ns, 'polyline');
+      halo.setAttribute('points', pts.join(' '));
+      halo.setAttribute('fill', 'none');
+      halo.setAttribute('stroke', 'rgba(255,252,247,0.88)');
+      halo.setAttribute('stroke-width', '4.4');
+      halo.setAttribute('vector-effect', 'non-scaling-stroke');
+      halo.setAttribute('stroke-linecap', 'round');
+      halo.setAttribute('stroke-linejoin', 'round');
+
+      const line = document.createElementNS(ns, 'polyline');
+      line.setAttribute('points', pts.join(' '));
+      line.setAttribute('fill', 'none');
+      line.setAttribute('stroke', '#c46d1e');
+      line.setAttribute('stroke-width', '2.25');
+      line.setAttribute('vector-effect', 'non-scaling-stroke');
+      line.setAttribute('stroke-linecap', 'round');
+      line.setAttribute('stroke-linejoin', 'round');
+      lineSvg.append(halo, line);
+    }
+
+    const dots = [];
+    for (let i = 0; i < 10; i++) {
+      if (edis[i] === null || edis[i] === undefined) {
+        dots.push(null);
+        continue;
+      }
+      const fl = flags[i] || 0;
+      const dot = el('span', 'decade-dot' + (fl === 2 ? ' is-neg' : fl === 1 ? ' is-slow' : ''));
+      dot.style.left = (((i + 0.5) / 11) * 100).toFixed(3) + '%';
+      dot.style.bottom = edis[i].toFixed(1) + '%';
+      lineLayer.append(dot);
+      dots.push(dot);
+    }
+
+    const natGrList = decadeMeta?.natGr || [];
     ranks.forEach((rk, idx) => {
       const h = rankHeightPct(rk, yTop, yBottom);
       const y = DECADE_YEARS[idx];
       const tr = tiersHistory[idx];
-      const diff = rStart - rk;
-      const diffStr = diff > 0 ? '（较16年 ↑' + diff + '）' : diff < 0 ? '（较16年 ↓' + Math.abs(diff) + '）' : '（与16年持平）';
 
       const col = document.createElement('button');
       col.type = 'button';
@@ -393,13 +453,38 @@
       col.append(track);
       const showTip = () => {
         for (const child of barsWrap.children) child.classList.remove('is-active');
+        for (const d of dots) if (d) d.classList.remove('is-active');
         col.classList.add('is-active');
-        readout.replaceChildren(
-          el('strong', '', y + '年'),
-          document.createTextNode(' · 全国 '),
-          el('strong', '', '第 ' + rk + ' 名'),
-          document.createTextNode('（' + tr + '）' + (idx > 0 ? diffStr : ' · 起始基准')),
-        );
+        if (dots[idx]) dots[idx].classList.add('is-active');
+
+        if (idx === 10) {
+          readout.replaceChildren(
+            el('strong', '', String(y)),
+            document.createTextNode(' · #' + rk + '（' + tr + '） · 宏观年报待出'),
+          );
+          return;
+        }
+        const nodesOut = [
+          el('strong', '', String(y)),
+          document.createTextNode(' · #' + rk),
+        ];
+        const ediVal = edis[idx];
+        if (ediVal !== null && ediVal !== undefined) {
+          nodesOut.push(document.createTextNode(' · '), el('strong', '', '经济 ' + ediVal.toFixed(1)));
+        }
+        const gr = rawGrs[idx];
+        if (gr !== null && gr !== undefined) {
+          const nat = natGrList[idx];
+          const natStr = nat !== undefined ? ' / 全国+' + nat.toFixed(1) + '%' : '';
+          const grTxt = (gr >= 0 ? '+' : '') + gr.toFixed(1) + '%';
+          const fl = flags[idx] || 0;
+          nodesOut.push(document.createTextNode('（'));
+          if (fl === 2) nodesOut.push(el('span', 'tone-warn', grTxt));
+          else if (fl === 1) nodesOut.push(el('span', 'tone-slow', grTxt));
+          else nodesOut.push(document.createTextNode(grTxt));
+          nodesOut.push(document.createTextNode(natStr + '）'));
+        }
+        readout.replaceChildren(...nodesOut);
       };
       col.addEventListener('pointerenter', showTip);
       col.addEventListener('focus', showTip);
@@ -409,20 +494,23 @@
 
     plot.addEventListener('pointerleave', () => {
       for (const child of barsWrap.children) child.classList.remove('is-active');
+      for (const d of dots) if (d) d.classList.remove('is-active');
       readout.textContent = defaultReadout;
     });
-    plot.append(guides, barsWrap);
+    plot.append(guides, barsWrap, lineLayer);
 
     const xAxis = el('div', 'decade-x-axis');
     xAxis.setAttribute('aria-hidden', 'true');
     DECADE_YEARS.forEach((y, idx) => {
-      xAxis.append(el('span', idx === 10 ? 'is-latest' : '', '\'' + String(y).slice(2)));
+      const fl = idx < 10 ? (flags[idx] || 0) : 0;
+      const cls = idx === 10 ? 'is-latest' : fl === 2 ? 'is-neg' : fl === 1 ? 'is-slow' : '';
+      xAxis.append(el('span', cls, '\'' + String(y).slice(2)));
     });
 
     const foot = el('div', 'decade-foot');
     foot.append(
-      el('span', '', '纵轴：全国排名（越高越靠前）'),
-      el('span', '', '峰值 #' + best + ' · 谷值 #' + worst),
+      el('span', '', '左轴柱：排名 #' + best + '–#' + worst),
+      el('span', '', '右轴线：16–25 经济指数（\'26待出）'),
     );
 
     card.append(head, readout, plot, xAxis, foot);
@@ -439,9 +527,10 @@
     const tier = selected[FIELD.tier];
     const markerHidden = !state.tiers.has(tier);
     const profiles = window.atlasProfiles || {};
-    const decadeRanks = window.atlasDecadeRanks || {};
+    const decadeData = window.atlasDecadeRanks || {};
+    const decadeCities = decadeData.cities || decadeData;
     const prof = profiles[code];
-    const decadeEntry = decadeRanks[code];
+    const decadeEntry = decadeCities[code];
     const nextKey = code + '|' + (markerHidden ? '0' : '1') + '|' + (prof ? '1' : '0') + '|' + (decadeEntry ? '1' : '0');
     ui['city-detail'].hidden = false;
     if (nextKey === renderedDetailKey) return;
@@ -538,7 +627,7 @@
       }
       trCard.append(trHead, trList);
 
-      grid.append(econCard, trCard, buildDecadeRankCard(selected, decadeEntry));
+      grid.append(econCard, trCard, buildDecadeRankCard(selected, decadeEntry, decadeData.meta));
       if (!decadeEntry && !decadeRanksReady) ensureDecadeRanks();
       nodes.push(grid);
     } else if (!profilesReady) {

@@ -381,7 +381,7 @@
 <script>
 (() => {
   const {cities, provinces} = window.atlasData;
-  const decade = window.atlasDecadeRanks;
+  const decade = window.atlasDecadeRanks.cities || window.atlasDecadeRanks;
   const YEARS = [2016, 2017, 2018, 2019, 2020, 2021, 2022, 2023, 2024, 2025, 2026];
   const TIER_NAMES = ['一线', '新一线', '二线', '三线', '四线', '五线'];
   const cityByCode = new Map(cities.map(c => [c[1], c]));
