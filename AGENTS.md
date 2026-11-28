@@ -57,5 +57,5 @@
    pnpm --filter @hiww/citiescn deploy:dry
    pnpm --filter @hiww/citiescn exec wrangler deploy
    ```
-   发布后验证 `https://citiescn.hiww.top/` 返回 200、桌面与手机布局正常、`/tools/mobile-preview.html` 返回 404。
+   发布后验证 `https://citiescn.hiww.top/` 返回 200、页脚显示最新版本号、桌面与手机布局正常、`/tools/mobile-preview.html` 返回 404。
 4. 不要把 Cloudflare 凭据或私人站点配置复制到本仓库。不改动 `hiww.top`、`home.hiww.top` 的路由或邮件 DNS。不要使用腾讯云代替既有部署。若需在远程服务器运行耗时任务，尽量使用 tmux。
