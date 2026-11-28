@@ -61,9 +61,9 @@ window.atlasLabels = (() => {
     if (width >= narrowMap) {
       return local ? Math.min(maxTier, 3 + level) : Math.min(maxTier, 1 + level);
     }
-    // A narrow map leaves room for the symbols and coastlines at every step.
+    // On narrow screens, start sparse at 1x (Tier 0) and unlock one tier per zoom step.
     if (local) return Math.min(maxTier, 2 + level);
-    return level < 2 ? 0 : Math.min(maxTier, level - 1);
+    return Math.min(maxTier, level);
   }
 
   function disclosureRange(width, level, local, minTier, maxTier = 5) {
@@ -347,7 +347,7 @@ window.atlasLabels = (() => {
     const subdistrictLabels = document.createDocumentFragment();
     if (!markers.length && !subdistricts.length) return {labels, leaders, subdistrictLabels};
     const mobile = width < narrowMap;
-    const font = mobile ? 11 : 12.5;
+    const font = mobile ? (local || level >= 2 ? 10.5 : 10) : 12.5;
     const textIndex = createSpatialIndex();
     const pointsIndex = createSpatialIndex();
     for (const box of obstacles) textIndex.add({...box});
@@ -371,7 +371,7 @@ window.atlasLabels = (() => {
 
     if (candidates.length) {
       const {reveal, fillMax} = disclosureRange(width, level, local, minTier, maxTier);
-      const spacingPad = local ? 0 : Math.max(4, (mobile ? 18 : 14) - level * 3);
+      const spacingPad = (local || level >= 3) ? 0 : Math.max(0, (mobile ? 12 : 14) - level * 4);
 
       // Place highest-priority cities first so lower tiers never displace higher tiers.
       candidates.sort((a, b) =>
@@ -383,7 +383,7 @@ window.atlasLabels = (() => {
         const {city, isFocus} = candidate;
         if (!isFocus && city[F.tier] > fillMax) continue;
         const preferred = city[F.tier] <= reveal;
-        const required = isFocus || city[F.tier] === 0 || (!mobile && preferred);
+        const required = isFocus || city[F.tier] === 0 || ((local || level >= 1) && preferred);
         const fontSize = isFocus ? font + 1.5 : city[F.tier] < 2 ? font + .5 : font;
         const best = choosePlacement({
           ...candidate, width, height, fontSize, name: city[F.name],

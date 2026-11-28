@@ -926,7 +926,7 @@
     if ((event.pointerType === 'mouse' && event.button !== 0) || !pannable) return;
     drag = {
       id: event.pointerId, x: event.clientX, y: event.clientY,
-      moved: false, threshold: event.pointerType === 'touch' ? 7 : 5,
+      moved: false, threshold: 4, gain: event.pointerType === 'touch' ? 1.35 : 1,
     };
   });
   ui.atlas.addEventListener('pointermove', event => {
@@ -943,7 +943,10 @@
       ui.atlas.classList.add('dragging');
     }
     const {center: [x, y], width, height} = currentView();
-    camera.center = [x - dx * width / ui.atlas.clientWidth, y - dy * height / ui.atlas.clientHeight];
+    camera.center = [
+      x - dx * drag.gain * width / ui.atlas.clientWidth,
+      y - dy * drag.gain * height / ui.atlas.clientHeight,
+    ];
     clampCenter();
     drag.x = event.clientX;
     drag.y = event.clientY;
