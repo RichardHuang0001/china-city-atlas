@@ -648,6 +648,14 @@ button:disabled { cursor: default; }
   font-variant-numeric: tabular-nums;
 }
 .detail-tr-row dd.is-empty { color: var(--muted); }
+.detail-tr-names {
+  display: block;
+  margin-top: 2px;
+  color: var(--muted);
+  font-size: 11.5px;
+  line-height: 1.5;
+  overflow-wrap: anywhere;
+}
 
 /* 2016-2026 decade rank chart placed in left column under Economy & Commerce */
 .detail-card--decade {

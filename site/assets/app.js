@@ -117,6 +117,7 @@
 
   let detailReady = !!window.atlasDetail;
   let profilesReady = Object.keys(window.atlasProfiles).length > 0;
+  let transportNamesState = window.atlasTransportNames ? 'ready' : 'pending';
   let decadeRanksReady = !!(window.atlasDecadeRanks?.cities && Object.keys(window.atlasDecadeRanks.cities).length);
   function refreshSelectedDetail() {
     if (!state.selected) return;
@@ -166,6 +167,14 @@
       .catch(() => window.atlasDecadeRanks);
   }
 
+  function ensureTransportNames() {
+    if (transportNamesState !== 'pending') return;
+    transportNamesState = 'loading';
+    loadScriptOnce('transportNames', 'assets/city-transport-names.js')
+      .then(() => { transportNamesState = 'ready'; refreshSelectedDetail(); })
+      .catch(() => { transportNamesState = 'error'; refreshSelectedDetail(); });
+  }
+
   function renderCityDetail(selected) {
     if (!selected) {
       ui['city-detail'].hidden = true;
@@ -182,6 +191,9 @@
         markerHidden: !state.tiers.has(selected[FIELD.tier]),
         profiles: window.atlasProfiles || {},
         profilesReady,
+        transportNames: window.atlasTransportNames || {},
+        transportNamesState,
+        ensureTransportNames,
         decadeData: window.atlasDecadeRanks || {},
         decadeRanksReady,
         ensureProfiles,

@@ -30,10 +30,12 @@ window.atlasDetail = (() => {
     return wrap;
   }
 
-  function buildTransportRow(label, text, isEmpty = false) {
+  function buildTransportRow(label, text, isEmpty = false, namesText = '') {
     const row = el('div', 'detail-tr-row');
     row.append(el('dt', '', label));
-    row.append(el('dd', isEmpty ? 'is-empty' : '', text));
+    const description = el('dd', isEmpty ? 'is-empty' : '', text);
+    if (namesText) description.append(el('span', 'detail-tr-names', namesText));
+    row.append(description);
     return row;
   }
 
@@ -372,6 +374,7 @@ window.atlasDetail = (() => {
     const {
       FIELD, provinces, tiers, rankUnit, swatch, markerHidden,
       profiles, profilesReady, decadeData, decadeRanksReady,
+      transportNames, transportNamesState, ensureTransportNames,
       ensureProfiles, ensureDecadeRanks,
     } = ctx;
     const code = selected[FIELD.code];
@@ -379,7 +382,7 @@ window.atlasDetail = (() => {
     const decadeCities = decadeData.cities || {};
     const prof = profiles[code];
     const decadeEntry = decadeCities[code];
-    const nextKey = code + '|' + (markerHidden ? '0' : '1') + '|' + (prof ? '1' : '0') + '|' + (decadeEntry ? '1' : '0');
+    const nextKey = code + '|' + (markerHidden ? '0' : '1') + '|' + (prof ? '1' : '0') + '|' + (decadeEntry ? '1' : '0') + '|' + transportNamesState;
     container.hidden = false;
     if (nextKey === renderedDetailKey) return;
     renderedDetailKey = nextKey;
@@ -468,9 +471,22 @@ window.atlasDetail = (() => {
         el('span', 'detail-card-sub', isTop3 ? '含数量与承载规模' : '有无与数量概览'),
       );
       const trList = el('dl', 'detail-transport-list');
+      const names = transportNames[code];
       for (const [label, text, isEmpty] of formatTransportItems(prof.tr || [], isTop3)) {
-        trList.append(buildTransportRow(label, text, isEmpty));
+        let namesText = '';
+        if (!isEmpty && (label === '机场' || label === '高铁')) {
+          const list = names?.[label === '机场' ? 'airports' : 'stations'];
+          const count = prof.tr[label === '机场' ? 0 : 3];
+          if (Array.isArray(list) && list.length) {
+            namesText = (list.length < count ? '已收录：' : '') + list.join('、');
+          } else {
+            namesText = transportNamesState === 'error' || transportNamesState === 'ready'
+              ? '名称暂无数据' : '名称加载中…';
+          }
+        }
+        trList.append(buildTransportRow(label, text, isEmpty, namesText));
       }
+      if (transportNamesState === 'pending') ensureTransportNames();
       trCard.append(trHead, trList);
 
       grid.append(econCard, trCard, buildDecadeRankCard(selected[FIELD.name], decadeEntry, decadeData.meta));
