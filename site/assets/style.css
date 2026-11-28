@@ -232,6 +232,7 @@ button:disabled { cursor: default; }
   overflow: hidden;
   border-block: 1px solid var(--line);
   background: var(--map-water);
+  touch-action: manipulation;
 }
 #atlas {
   display: block;
@@ -246,6 +247,7 @@ button:disabled { cursor: default; }
 #atlas:focus { outline: none; }
 #atlas:focus-visible { outline: 2px solid var(--wine); outline-offset: -3px; }
 #atlas[data-zoomed] { cursor: grab; touch-action: none; }
+#atlas.dragging { will-change: transform; }
 #atlas.dragging, #atlas.dragging * { cursor: grabbing !important; }
 .map-loading {
   position: absolute;
@@ -336,6 +338,7 @@ button:disabled { cursor: default; }
   align-items: flex-start;
   gap: 9px;
   pointer-events: none;
+  touch-action: manipulation;
 }
 .zoom-column {
   display: flex;
@@ -364,6 +367,7 @@ button:disabled { cursor: default; }
   background: var(--white);
   box-shadow: 0 3px 10px #71425217;
   pointer-events: auto;
+  touch-action: manipulation;
 }
 .zoom-national {
   display: inline-flex;
@@ -389,6 +393,9 @@ button:disabled { cursor: default; }
   border-radius: 0;
   background: transparent;
   color: var(--wine);
+  touch-action: manipulation;
+  user-select: none;
+  -webkit-tap-highlight-color: transparent;
 }
 .zoom-tools button:first-child { border-radius: 9px 9px 0 0; }
 .zoom-tools button:last-child { border-radius: 0 0 9px 9px; font-size: 12px; }
@@ -1025,7 +1032,8 @@ footer { margin-top: 13px; color: var(--muted); font-size: 12px; }
     padding: 4px 9px;
     box-shadow: none;
   }
-  .zoom-tools button { min-width: 39px; min-height: 36px; }
+  .zoom-tools button { min-width: 48px; min-height: 42px; }
+  #zoom-fit { font-size: 13px; padding: 0 10px; }
   .zoom-tools button:first-child { border-radius: 9px 0 0 9px; }
   .zoom-tools button:last-child { border-radius: 0 9px 9px 0; }
   .zoom-tools button + button { border-top: 0; border-inline-start: 1px solid var(--line); }

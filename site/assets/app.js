@@ -438,8 +438,9 @@
     return loadScriptOnce('district:' + prov, 'assets/districts/' + prov + '.js')
       .then(() => {
         registerDistrictChunk(prov);
-        if (!state.inset && highlightedCity && lookup.get(highlightedCity)?.[FIELD.province] === prov) {
-          ui['city-highlight'].setAttribute('d', cityRegionPath(highlightedCity));
+        const activeCode = highlightedCity || state.selected;
+        if (!state.inset && activeCode && lookup.get(activeCode)?.[FIELD.province] === prov) {
+          ui['city-highlight'].setAttribute('d', cityRegionPath(activeCode));
         }
         const needNational = !state.province && camera.zoom >= zoomSteps[MAP_CONFIG.districtZoomIndex];
         if (!state.inset && (state.province === prov || needNational)) {
@@ -813,6 +814,12 @@
   let highlightedCity = '';
   let highlightedNodes = [];
 
+  function syncRegionHighlight(code = highlightedCity || state.selected) {
+    ui['city-highlight'].setAttribute('d', state.inset ? '' : cityRegionPath(code));
+    const seaPath = (code && map.seaCities?.[code]) || '';
+    for (const node of seaHighlightNodes) node.setAttribute('d', seaPath);
+  }
+
   function highlightCity(code) {
     if (highlightedCity === code) return;
     for (const node of highlightedNodes) node.classList.remove('is-highlighted');
@@ -821,9 +828,7 @@
       '[data-city="' + code + '"], [data-leader-for="' + code + '"]'
     )] : [];
     for (const node of highlightedNodes) node.classList.add('is-highlighted');
-    ui['city-highlight'].setAttribute('d', state.inset ? '' : cityRegionPath(code));
-    const seaPath = (code && map.seaCities?.[code]) || '';
-    for (const node of seaHighlightNodes) node.setAttribute('d', seaPath);
+    syncRegionHighlight(code || state.selected);
   }
 
   function highlightProvince(node) {
@@ -836,6 +841,7 @@
   function hideTooltip() {
     highlightProvince(undefined);
     highlightCity('');
+    syncRegionHighlight(state.selected);
     ui.tooltip.hidden = true;
   }
 
@@ -914,11 +920,19 @@
   }
 
   let drag;
+  let dragFrame;
   let suppressClick = false;
+  function paintDragTransform() {
+    if (!drag?.moved) return;
+    const tx = (drag.startCenter[0] - camera.center[0]) * drag.pxPerWorld;
+    const ty = (drag.startCenter[1] - camera.center[1]) * drag.pxPerWorld;
+    ui.atlas.style.transform = 'translate3d(' + tx.toFixed(1) + 'px,' + ty.toFixed(1) + 'px,0)';
+  }
   ui.atlas.addEventListener('pointerdown', event => {
     suppressClick = false;
     if (!event.isPrimary) {
       ui.atlas.classList.remove('dragging');
+      ui.atlas.style.transform = '';
       drag = undefined;
       return;
     }
@@ -926,7 +940,7 @@
     if ((event.pointerType === 'mouse' && event.button !== 0) || !pannable) return;
     drag = {
       id: event.pointerId, x: event.clientX, y: event.clientY,
-      moved: false, threshold: 4, gain: event.pointerType === 'touch' ? 1.35 : 1,
+      moved: false, threshold: 4, gain: event.pointerType === 'touch' ? 1.75 : 1,
     };
   });
   ui.atlas.addEventListener('pointermove', event => {
@@ -935,27 +949,41 @@
     const dy = event.clientY - drag.y;
     if (!drag.moved) {
       if (Math.hypot(dx, dy) < drag.threshold) return;
-      if (state.province && !state.inset) exitProvinceToPan(event.clientY);
       drag.moved = true;
+      if (state.province && !state.inset) {
+        exitProvinceToPan(event.clientY);
+        paintCamera();
+      }
+      const view = currentView();
+      const [baseX, baseY] = fittedView.center;
+      const marginX = Math.max(0, (fittedView.width - view.width) / 2);
+      const marginY = Math.max(0, (fittedView.height - view.height) / 2);
+      drag.startX = drag.x;
+      drag.startY = drag.y;
+      drag.startCenter = [...view.center];
+      drag.pxPerWorld = (ui.atlas.clientWidth || 1) / view.width;
+      drag.minCenter = [baseX - marginX, baseY - marginY];
+      drag.maxCenter = [baseX + marginX, baseY + marginY];
       suppressClick = true;
       hideTooltip();
       ui.atlas.setPointerCapture(event.pointerId);
       ui.atlas.classList.add('dragging');
     }
-    const {center: [x, y], width, height} = currentView();
+    const totalDx = (event.clientX - drag.startX) * drag.gain;
+    const totalDy = (event.clientY - drag.startY) * drag.gain;
     camera.center = [
-      x - dx * drag.gain * width / ui.atlas.clientWidth,
-      y - dy * drag.gain * height / ui.atlas.clientHeight,
+      Math.max(drag.minCenter[0], Math.min(drag.maxCenter[0], drag.startCenter[0] - totalDx / drag.pxPerWorld)),
+      Math.max(drag.minCenter[1], Math.min(drag.maxCenter[1], drag.startCenter[1] - totalDy / drag.pxPerWorld)),
     ];
-    clampCenter();
-    drag.x = event.clientX;
-    drag.y = event.clientY;
-    scheduleCameraPaint();
+    cancelAnimationFrame(dragFrame);
+    dragFrame = requestAnimationFrame(paintDragTransform);
   });
   function endDrag(event) {
     if (drag?.id !== event.pointerId) return;
     const moved = drag.moved;
+    cancelAnimationFrame(dragFrame);
     ui.atlas.classList.remove('dragging');
+    ui.atlas.style.transform = '';
     drag = undefined;
     if (moved) scheduleCameraPaint();
   }
