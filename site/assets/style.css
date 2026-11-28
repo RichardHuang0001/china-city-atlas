@@ -246,8 +246,7 @@ button:disabled { cursor: default; }
 #map-stage[data-local] #atlas { aspect-ratio: auto; height: clamp(465px, 70svh, 790px); }
 #atlas:focus { outline: none; }
 #atlas:focus-visible { outline: 2px solid var(--wine); outline-offset: -3px; }
-#atlas[data-zoomed] { cursor: grab; touch-action: none; }
-#atlas.dragging { will-change: transform; }
+#atlas[data-zoomed] { cursor: grab; touch-action: none; will-change: transform; transform: translateZ(0); }
 #atlas.dragging, #atlas.dragging * { cursor: grabbing !important; }
 .map-loading {
   position: absolute;
@@ -272,12 +271,13 @@ button:disabled { cursor: default; }
   fill: #f8edd8;
   stroke: #946f67;
   stroke-width: 1px;
-  vector-effect: non-scaling-stroke;
 }
+.sea-land { vector-effect: non-scaling-stroke; }
+#provinces path { stroke-width: calc(1px * var(--map-scale, 1)); }
 #provinces path:nth-child(3n) { fill: #f4e8ce; }
 #provinces path:nth-child(4n) { fill: #fbefdf; }
-#provinces path.selected { fill: #f8ecd1; stroke: #8c5c57; stroke-width: 1.55px; }
-#provinces path.context { fill: #f6ece6; stroke: #cdb3b0; stroke-width: .85px; }
+#provinces path.selected { fill: #f8ecd1; stroke: #8c5c57; stroke-width: calc(1.55px * var(--map-scale, 1)); }
+#provinces path.context { fill: #f6ece6; stroke: #cdb3b0; stroke-width: calc(.85px * var(--map-scale, 1)); }
 #provinces path.hovered { fill: #efd1cf; cursor: pointer; }
 #city-highlight, .sea-city-highlight {
   fill: #e8bab8;
@@ -286,29 +286,29 @@ button:disabled { cursor: default; }
   stroke-width: 1.45px;
   stroke-linejoin: round;
   pointer-events: none;
-  vector-effect: non-scaling-stroke;
 }
-.sea-city-highlight { stroke-width: 1px; }
+#city-highlight { stroke-width: calc(1.45px * var(--map-scale, 1)); }
+.sea-city-highlight { stroke-width: 1px; vector-effect: non-scaling-stroke; }
 #district-lines, #boundaries, .sea-boundary {
   fill: none;
   stroke: #8f6a62;
   stroke-width: .95px;
   pointer-events: none;
-  vector-effect: non-scaling-stroke;
 }
+.sea-boundary { vector-effect: non-scaling-stroke; }
+#boundaries { stroke-width: calc(.95px * var(--map-scale, 1)); }
 #subdistrict-lines {
   fill: none;
   stroke: #caa99e;
-  stroke-width: .45px;
-  stroke-dasharray: 1.6 2.2;
+  stroke-width: calc(.45px * var(--map-scale, 1));
+  stroke-dasharray: calc(1.6 * var(--map-scale, 1)) calc(2.2 * var(--map-scale, 1));
   opacity: .6;
   pointer-events: none;
-  vector-effect: non-scaling-stroke;
 }
 #district-lines {
   stroke: #b59287;
-  stroke-width: .65px;
-  stroke-dasharray: 3.2 2.4;
+  stroke-width: calc(.65px * var(--map-scale, 1));
+  stroke-dasharray: calc(3.2 * var(--map-scale, 1)) calc(2.4 * var(--map-scale, 1));
   opacity: .76;
 }
 #province-labels {

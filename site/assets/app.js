@@ -463,13 +463,13 @@
       .catch(() => '');
   }
 
-  function visibleBoundsKeys(keys, getBox) {
+  function visibleBoundsKeys(keys, getBox, pad = 0) {
     if (!fittedView) return [];
     const {center: [cx, cy], width, height} = currentView();
-    const left = cx - width / 2;
-    const right = cx + width / 2;
-    const top = cy - height / 2;
-    const bottom = cy + height / 2;
+    const left = cx - width / 2 - pad;
+    const right = cx + width / 2 + pad;
+    const top = cy - height / 2 - pad;
+    const bottom = cy + height / 2 + pad;
     const hits = [];
     for (const key of keys) {
       const box = getBox(key);
@@ -592,7 +592,20 @@
     return best;
   }
 
+  let panBaseCenter = null;
+  let panPxPerWorld = 1;
+  let inertiaFrame;
+  let settleTimer;
+  function stopPanAnimations() {
+    cancelAnimationFrame(inertiaFrame);
+    inertiaFrame = 0;
+    clearTimeout(settleTimer);
+    settleTimer = 0;
+  }
+
   function paintCamera() {
+    stopPanAnimations();
+    ui.atlas.style.transform = '';
     updateDistrictLines();
     updateSubdistrictLines();
     const {center: [x, y], width, height} = currentView();
@@ -600,6 +613,18 @@
     const top = y - height / 2;
     ui.atlas.setAttribute('viewBox', [left, top, width, height].join(' '));
     const scale = width / (ui.atlas.clientWidth || 1);
+    panBaseCenter = [x, y];
+    panPxPerWorld = 1 / scale;
+    ui.atlas.style.setProperty('--map-scale', String(scale));
+    if (!state.inset) {
+      const cullPad = Math.max(width, height) * 0.65;
+      const visibleProvs = camera.zoom > 1.05
+        ? new Set(visibleBoundsKeys(provincePaths.keys(), code => map.bounds[code], cullPad))
+        : null;
+      for (const [code, shape] of provincePaths) {
+        shape.style.display = (!visibleProvs || visibleProvs.has(code)) ? '' : 'none';
+      }
+    }
     // During a drag labels move with the map. Reflow after release so names
     // do not blink in and out while the reader is moving the view.
     if (scale !== markerScale) {
@@ -934,31 +959,65 @@
   let drag;
   let dragFrame;
   let suppressClick = false;
-  function paintDragTransform() {
-    if (!drag?.moved) return;
-    const tx = (drag.startCenter[0] - camera.center[0]) * drag.pxPerWorld;
-    const ty = (drag.startCenter[1] - camera.center[1]) * drag.pxPerWorld;
+  function paintPanTransform() {
+    if (!panBaseCenter) return;
+    const tx = (panBaseCenter[0] - camera.center[0]) * panPxPerWorld;
+    const ty = (panBaseCenter[1] - camera.center[1]) * panPxPerWorld;
     ui.atlas.style.transform = 'translate3d(' + tx.toFixed(1) + 'px,' + ty.toFixed(1) + 'px,0)';
+  }
+  function scheduleSettlePaint(delay = 90) {
+    clearTimeout(settleTimer);
+    settleTimer = setTimeout(() => {
+      settleTimer = 0;
+      scheduleCameraPaint();
+    }, delay);
+  }
+  function startInertia(vx, vy, bounds) {
+    let lastTime = performance.now();
+    function step(now) {
+      const dt = Math.min(32, now - lastTime);
+      lastTime = now;
+      const decay = Math.pow(0.92, dt / 16);
+      vx *= decay;
+      vy *= decay;
+      const nextX = Math.max(bounds.minX, Math.min(bounds.maxX, camera.center[0] - (vx * dt) / panPxPerWorld));
+      const nextY = Math.max(bounds.minY, Math.min(bounds.maxY, camera.center[1] - (vy * dt) / panPxPerWorld));
+      const hitEdge = nextX === camera.center[0] && nextY === camera.center[1];
+      camera.center = [nextX, nextY];
+      paintPanTransform();
+      if (hitEdge || Math.hypot(vx, vy) < 0.03) {
+        inertiaFrame = 0;
+        scheduleSettlePaint(40);
+        return;
+      }
+      inertiaFrame = requestAnimationFrame(step);
+    }
+    inertiaFrame = requestAnimationFrame(step);
   }
   ui.atlas.addEventListener('pointerdown', event => {
     suppressClick = false;
     if (!event.isPrimary) {
       ui.atlas.classList.remove('dragging');
-      ui.atlas.style.transform = '';
       drag = undefined;
+      if (panBaseCenter && (panBaseCenter[0] !== camera.center[0] || panBaseCenter[1] !== camera.center[1])) {
+        scheduleCameraPaint();
+      }
       return;
     }
     const pannable = camera.zoom > 1 || (!!state.province && !state.inset);
     if ((event.pointerType === 'mouse' && event.button !== 0) || !pannable) return;
+    stopPanAnimations();
     drag = {
       id: event.pointerId, x: event.clientX, y: event.clientY,
-      moved: false, threshold: 4, gain: event.pointerType === 'touch' ? 1.75 : 1,
+      moved: false, threshold: 4, gain: event.pointerType === 'touch' ? 1.35 : 1,
+      samples: [{t: performance.now(), x: event.clientX, y: event.clientY}],
     };
   });
   ui.atlas.addEventListener('pointermove', event => {
     if (!drag || drag.id !== event.pointerId) return;
     const dx = event.clientX - drag.x;
     const dy = event.clientY - drag.y;
+    const now = performance.now();
     if (!drag.moved) {
       if (Math.hypot(dx, dy) < drag.threshold) return;
       drag.moved = true;
@@ -973,31 +1032,45 @@
       drag.startX = drag.x;
       drag.startY = drag.y;
       drag.startCenter = [...view.center];
-      drag.pxPerWorld = (ui.atlas.clientWidth || 1) / view.width;
-      drag.minCenter = [baseX - marginX, baseY - marginY];
-      drag.maxCenter = [baseX + marginX, baseY + marginY];
+      drag.bounds = {
+        minX: baseX - marginX, maxX: baseX + marginX,
+        minY: baseY - marginY, maxY: baseY + marginY,
+      };
       suppressClick = true;
       hideTooltip();
       ui.atlas.setPointerCapture(event.pointerId);
       ui.atlas.classList.add('dragging');
     }
+    drag.samples.push({t: now, x: event.clientX, y: event.clientY});
+    while (drag.samples.length > 2 && now - drag.samples[0].t > 100) drag.samples.shift();
     const totalDx = (event.clientX - drag.startX) * drag.gain;
     const totalDy = (event.clientY - drag.startY) * drag.gain;
     camera.center = [
-      Math.max(drag.minCenter[0], Math.min(drag.maxCenter[0], drag.startCenter[0] - totalDx / drag.pxPerWorld)),
-      Math.max(drag.minCenter[1], Math.min(drag.maxCenter[1], drag.startCenter[1] - totalDy / drag.pxPerWorld)),
+      Math.max(drag.bounds.minX, Math.min(drag.bounds.maxX, drag.startCenter[0] - totalDx / panPxPerWorld)),
+      Math.max(drag.bounds.minY, Math.min(drag.bounds.maxY, drag.startCenter[1] - totalDy / panPxPerWorld)),
     ];
     cancelAnimationFrame(dragFrame);
-    dragFrame = requestAnimationFrame(paintDragTransform);
+    dragFrame = requestAnimationFrame(paintPanTransform);
   });
   function endDrag(event) {
     if (drag?.id !== event.pointerId) return;
-    const moved = drag.moved;
+    const {moved, samples, gain, bounds} = drag;
     cancelAnimationFrame(dragFrame);
     ui.atlas.classList.remove('dragging');
-    ui.atlas.style.transform = '';
     drag = undefined;
-    if (moved) scheduleCameraPaint();
+    if (!moved) return;
+    const last = samples[samples.length - 1];
+    const first = samples[0];
+    const dt = last.t - first.t;
+    if (dt >= 12 && dt <= 160) {
+      const vx = Math.max(-2.5, Math.min(2.5, ((last.x - first.x) * gain) / dt));
+      const vy = Math.max(-2.5, Math.min(2.5, ((last.y - first.y) * gain) / dt));
+      if (Math.hypot(vx, vy) > 0.14) {
+        startInertia(vx, vy, bounds);
+        return;
+      }
+    }
+    scheduleSettlePaint(90);
   }
   for (const event of ['pointerup', 'pointercancel', 'lostpointercapture']) {
     window.addEventListener(event, endDrag);
