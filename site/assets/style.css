@@ -246,7 +246,7 @@ button:disabled { cursor: default; }
 #map-stage[data-local] #atlas { aspect-ratio: auto; height: clamp(465px, 70svh, 790px); }
 #atlas:focus { outline: none; }
 #atlas:focus-visible { outline: 2px solid var(--wine); outline-offset: -3px; }
-#atlas[data-zoomed] { cursor: grab; touch-action: none; will-change: transform; transform: translateZ(0); }
+#atlas[data-zoomed] { cursor: grab; touch-action: none; }
 #atlas.dragging, #atlas.dragging * { cursor: grabbing !important; }
 .map-loading {
   position: absolute;

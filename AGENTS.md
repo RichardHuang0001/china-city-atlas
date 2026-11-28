@@ -50,7 +50,11 @@
 2. 在桌面宽度（如 1440 px）和手机宽度（如 360 / 390 px）打开正式页面实测：
    - 桌面应有 337 个标记，手机默认 49 个，两端名录仍有 333 条；
    - 核验四川 21 个地级行政区（18 市 + 3 州）、第 3 次「＋」放大后全国虚线地市界线渲染、省级视图缩放区旁「返回全国」、放大后桌面/单指拖动、名录独立框滚动及五线切换单调性。
-3. 部署维护在同级 `hiww-web/apps/citiescn/`，Worker 名为 `hiww-citiescn`。新增运行时文件时同步更新 `build.mjs` 的复制清单；**每次发布新版本前须递增 `hiww-web/apps/citiescn/package.json` 中的语义化版本号**（构建时会自动与 8 位资源哈希拼接并注入页面底部）。在 `hiww-web` 根目录执行：
+3. 部署维护在同级 `hiww-web/apps/citiescn/`，Worker 名为 `hiww-citiescn`。新增运行时文件时同步更新 `build.mjs` 的复制清单；**每次发布新版本前须按语义化规则递增 `hiww-web/apps/citiescn/package.json` 的 `version`**（构建时会自动与 8 位资源哈希拼接并注入页面底部）：
+   - `PATCH`（如 `1.3.0 → 1.3.1`）：Bug 修复、样式/灵敏度微调、文案或数据修正、纯性能优化（不新增功能维度）；
+   - `MINOR`（如 `1.3.1 → 1.4.0`）：新增可见功能、新数据维度、新交互能力或较大幅度的体验/架构重构；
+   - `MAJOR`（如 `1.x.x → 2.0.0`）：年度大版更新（如切换至下一年度榜单）或破坏性底层重构。
+   在 `hiww-web` 根目录执行：
    ```sh
    pnpm --filter @hiww/citiescn typecheck
    pnpm --filter @hiww/citiescn build
